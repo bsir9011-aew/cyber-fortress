@@ -1,0 +1,47 @@
+import type { SimulationState } from '../domain/simulation';
+import type { NetworkRule } from '../domain/access';
+import type { InfrastructureConnection } from '../domain/infrastructure';
+import { isAssetOnline, selectNetworkRule } from '../simulation/access';
+import {
+  businessAvailability,
+  isBusinessGoalMet,
+} from '../simulation/business';
+import { currentMinute, isFinished } from '../simulation/clock';
+
+/** Jawna projekcja: nigdy spread SimulationState/access/hidden do komponentów. */
+export function selectPlayerView(state: SimulationState) {
+  return {
+    world: state.world,
+    clock: state.clock,
+    minute: currentMinute(state.clock),
+    finished: isFinished(state.clock),
+    business: state.business,
+    processName: state.process.name,
+    maxFinalBacklog: state.process.maxFinalBacklog,
+    goalMet: isBusinessGoalMet(state),
+    availability: businessAvailability(state),
+    vpnAssetId: state.access.vpnAssetId,
+    vpnOnline: isAssetOnline(state.world, state.access.vpnAssetId),
+    erpOnline: isAssetOnline(state.world, state.process.erpAssetId),
+    // Reguły są jawną dokumentacją konfiguracyjną w wariancie referencyjnym.
+    rules: state.access.rules,
+    tasks: state.tasks,
+    history: state.history,
+    sessionObservation: state.knowledge.sessionObservation,
+  };
+}
+
+export type PlayerView = ReturnType<typeof selectPlayerView>;
+
+export function selectConnectionRule(
+  rules: readonly NetworkRule[],
+  connection: InfrastructureConnection | undefined,
+): NetworkRule | undefined {
+  return connection?.kind === 'network' && connection.protocol
+    ? selectNetworkRule(rules, {
+        sourceAssetId: connection.sourceAssetId,
+        targetAssetId: connection.targetAssetId,
+        protocol: connection.protocol,
+      })
+    : undefined;
+}

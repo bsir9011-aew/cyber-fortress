@@ -3,6 +3,8 @@ import {
   selectRelatedAssets,
 } from '../application/infrastructureSelectors';
 import type { WorldState } from '../domain/world';
+import type { NetworkRule } from '../domain/access';
+import { selectConnectionRule } from '../application/selectPlayerView';
 import { AssetIcon } from './AssetIcon';
 import {
   assetLabels,
@@ -15,9 +17,15 @@ interface Props {
   world: WorldState;
   selection: MapSelection;
   onSelect: (selection: MapSelection) => void;
+  networkRules?: readonly NetworkRule[];
 }
 
-export function InfrastructureInspector({ world, selection, onSelect }: Props) {
+export function InfrastructureInspector({
+  world,
+  selection,
+  onSelect,
+  networkRules = [],
+}: Props) {
   const asset =
     selection?.kind === 'asset'
       ? world.assets.find((item) => item.id === selection.id)
@@ -26,6 +34,7 @@ export function InfrastructureInspector({ world, selection, onSelect }: Props) {
     selection?.kind === 'connection'
       ? world.connections.find((item) => item.id === selection.id)
       : undefined;
+  const rule = selectConnectionRule(networkRules, connection);
 
   return (
     <aside className="inspector" aria-label="Inspektor infrastruktury">
@@ -191,8 +200,10 @@ export function InfrastructureInspector({ world, selection, onSelect }: Props) {
           </section>
           {connection.kind === 'network' && (
             <div className="context-note">
-              Ścieżka komunikacji nie oznacza przyznanych uprawnień. Reguły
-              dostępu nie są tutaj określone.
+              {rule
+                ? `Polityka ${rule.id}: ${rule.action === 'allow' ? 'dopuszczaj' : 'blokuj'}. Brama ponownie ocenia również istniejący ruch po zmianie reguły.`
+                : 'Ten przepływ nie ma zdefiniowanej reguły w bieżącej symulacji.'}{' '}
+              Dostęp do usługi wymaga osobno ważnej sesji i uprawnienia.
             </div>
           )}
         </>
