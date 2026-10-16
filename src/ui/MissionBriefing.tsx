@@ -1,10 +1,19 @@
-import { nexusBriefing } from '../content/nexusIncident';
+import type { PlayerView } from '../application/selectPlayerView';
 
-export function MissionBriefing({ onStart }: { onStart: () => void }) {
+export function MissionBriefing({
+  onStart,
+  view,
+}: {
+  onStart: () => void;
+  view: PlayerView;
+}) {
   return (
     <main id="main" className="briefing-screen">
       <div className="briefing-copy">
-        <span className="eyebrow">NEXUS Logistics / Misja 01</span>
+        <span className="eyebrow">
+          NEXUS Logistics /{' '}
+          {view.run.mode === 'training' ? 'Trening' : 'Nieznany incydent'}
+        </span>
         <span className="mission-tag">14:00 — 15:30 · 18 tur</span>
         <h1>
           Ostatnie okno
@@ -16,23 +25,23 @@ export function MissionBriefing({ onStart }: { onStart: () => void }) {
         </p>
         <blockquote>
           <span className="speaker-tag">Ewa · kierowniczka operacji</span>
-          {nexusBriefing.message}
+          {view.briefing.message}
         </blockquote>
         <div className="briefing-objectives">
           <article>
             <span className="eyebrow">Cel 01 / Poufność</span>
             <h2>Chroń dane operacyjne</h2>
             <p>
-              Cel: 0 ujawnionych rekordów z 2000. Podczas gry znasz tylko to, co
-              uda się zaobserwować.
+              Cel: 0 ujawnionych rekordów z {view.recordPool}. Podczas gry znasz
+              tylko to, co uda się zaobserwować.
             </p>
           </article>
           <article>
             <span className="eyebrow">Cel 02 / Ciągłość</span>
             <h2>Dowieź wysyłki</h2>
             <p>
-              Do 15:30 pozostaw najwyżej 40 zaległych zamówień. Zdalny zespół
-              potrzebuje ERP przez VPN.
+              Do 15:30 pozostaw najwyżej {view.maxFinalBacklog} zaległych
+              zamówień. Zdalny zespół potrzebuje ERP przez VPN.
             </p>
           </article>
         </div>
@@ -58,7 +67,7 @@ export function MissionBriefing({ onStart }: { onStart: () => void }) {
           <span className="resource-monogram">A</span>
           <div>
             <h3>Analityk</h3>
-            <p>{nexusBriefing.analystHint}</p>
+            <p>{view.briefing.analystHint}</p>
           </div>
         </article>
         <article>

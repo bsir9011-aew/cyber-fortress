@@ -1,12 +1,24 @@
-import type { SimulationCommand, SimulationState } from '../domain/simulation';
+import type {
+  ReferenceSimulationState,
+  SimulationCommand,
+  SimulationState,
+} from '../domain/simulation';
 import { applySimulationCommand } from '../simulation/engine';
-import { createInitialSimulation } from './createInitialSimulation';
+import { createScenario } from './createScenario';
 
+export function simulationReducer(
+  state: ReferenceSimulationState,
+  command: SimulationCommand,
+): ReferenceSimulationState;
+export function simulationReducer(
+  state: SimulationState,
+  command: SimulationCommand,
+): SimulationState;
 export function simulationReducer(
   state: SimulationState,
   command: SimulationCommand,
 ): SimulationState {
   return command?.type === 'reset'
-    ? createInitialSimulation()
+    ? createScenario(state.hidden.scenario, state.run)
     : applySimulationCommand(state, command);
 }

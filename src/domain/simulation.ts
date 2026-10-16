@@ -3,6 +3,11 @@ import type { WorldState } from './world';
 import type { AttackerState } from './attack';
 import type { AuthenticationObservation, TelemetryState } from './telemetry';
 import type {
+  LegitimateActorState,
+  RunIdentity,
+  ScenarioDefinition,
+} from './scenario';
+import type {
   DecisionRecord,
   IncidentHypothesis,
   IncidentState,
@@ -27,6 +32,17 @@ export interface BusinessProcess {
   readonly workstationAssetId: string;
   readonly remoteAccountId: string;
   readonly protocol: string;
+  /** Dodatkowe części procesu wymagają własnej legalnej sesji i wszystkich usług. */
+  readonly additionalWork?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly capacity: number;
+    readonly accountId: string;
+    readonly services: readonly {
+      readonly targetAssetId: string;
+      readonly protocol: string;
+    }[];
+  }[];
 }
 
 export interface ProcessAvailability {
@@ -34,6 +50,12 @@ export interface ProcessAvailability {
   readonly localAvailable: boolean;
   readonly remoteAvailable: boolean;
   readonly status: 'available' | 'degraded' | 'unavailable';
+  readonly contributions?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly available: boolean;
+    readonly capacity: number;
+  }[];
 }
 
 export interface BusinessReport extends ProcessAvailability {
@@ -141,6 +163,7 @@ export type SimulationEventData =
 export type SimulationEvent = EventBase & SimulationEventData;
 
 export interface SimulationState {
+  readonly run: RunIdentity;
   readonly world: WorldState;
   readonly clock: SimulationClock;
   readonly process: BusinessProcess;
@@ -153,10 +176,19 @@ export interface SimulationState {
   /** Dziennik potwierdzeń działań i raportów biznesowych, nie log uwierzytelnień. */
   readonly history: readonly SimulationEvent[];
   readonly hidden: {
-    readonly attacker: AttackerState;
+    readonly attacker: AttackerState | null;
+    readonly scenario: ScenarioDefinition;
+    readonly legitimateActors: readonly LegitimateActorState[];
     readonly decisionHistory: readonly DecisionRecord[];
     readonly sessionOrigins: Readonly<
       Record<string, 'unauthorized' | 'legitimate'>
     >;
+  };
+}
+
+/** Kontrakt kompatybilności dla istniejących testów i API wariantu referencyjnego. */
+export interface ReferenceSimulationState extends SimulationState {
+  readonly hidden: SimulationState['hidden'] & {
+    readonly attacker: AttackerState;
   };
 }

@@ -1,0 +1,323 @@
+.scenario-selection {
+  max-width: 1170px;
+  margin: 0 auto;
+  padding: 65px 28px 50px;
+  min-height: calc(100vh - 140px);
+}
+.selection-heading {
+  max-width: 770px;
+}
+.selection-heading h1 {
+  font-size: clamp(34px, 4.2vw, 59px);
+  line-height: 1.13;
+  letter-spacing: -0.045em;
+  font-weight: 550;
+  margin: 18px 0 22px;
+}
+.selection-heading > p {
+  max-width: 650px;
+  color: #bed0df;
+  font-size: 15px;
+}
+.mode-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 37px;
+}
+.mode-cards article {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  border: 1px solid #46657b;
+  border-radius: 10px;
+  background: linear-gradient(130deg, #183448, #10212e);
+}
+.mode-cards article.unknown-mode {
+  border-color: #548e94;
+  background: linear-gradient(130deg, #17434b, #112633);
+}
+.mode-number {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #a4dce4;
+}
+.mode-cards h2 {
+  margin: 19px 0 14px;
+  font-size: 28px;
+  font-weight: 550;
+  letter-spacing: -0.03em;
+}
+.mode-cards p {
+  font-size: 14px;
+  color: #c6d6e2;
+  margin-bottom: 12px;
+}
+.mode-cards ul {
+  margin: 8px 0 30px;
+  padding-left: 20px;
+  color: #acc5d6;
+  font-size: 13px;
+  line-height: 2.1;
+}
+.mode-cards .primary-button {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 13px;
+  gap: 12px;
+}
+.selection-note {
+  max-width: 730px;
+  margin: 25px 0 0;
+  color: #b3cbdc;
+  font-size: 12px;
+}
+.run-mode-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 12px 28px;
+  border-bottom: 1px solid #3c586c;
+  background: #142d3c;
+  font-size: 12px;
+  color: #c6e7eb;
+}
+.run-mode-bar span:nth-child(2) {
+  color: #acc5d6;
+  font-size: 11px;
+}
+.run-mode-bar button {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #598395;
+  border-radius: 5px;
+  padding: 6px 10px;
+  color: #c2e8eb;
+  font-size: 11px;
+}
+.variant-reveal,
+.legitimate-impact {
+  border: 1px solid #45697c;
+  border-radius: 8px;
+  background: #153040;
+  padding: 22px;
+  margin-bottom: 24px;
+}
+.variant-reveal h2,
+.legitimate-impact h2 {
+  font-size: 23px;
+  font-weight: 550;
+  margin-bottom: 12px;
+}
+.variant-reveal p,
+.legitimate-impact p,
+.legitimate-report p {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #c7dbe5;
+  margin-bottom: 12px;
+}
+.variant-reveal small {
+  color: #a8c7da;
+  font-size: 12px;
+}
+.legitimate-impact {
+  margin-top: 24px;
+  background: #112634;
+}
+.replay-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.secondary-button {
+  padding: 14px 20px;
+  color: #c4edf0;
+  border: 1px solid #6aadb3;
+  border-radius: 6px;
+  background: #22404f;
+  font-size: 13px;
+}
+.secondary-button:hover {
+  background: #2e5b6b;
+}
+.business-dependencies {
+  margin: 8px 20px 16px;
+  padding: 14px 0;
+  color: #bad1e1;
+  border-bottom: 1px solid #3b586c;
+  font-size: 12px;
+  line-height: 1.85;
+}
+.business-dependencies ul {
+  padding-left: 18px;
+}
+.business-dependencies p {
+  margin-bottom: 0;
+  color: #a8c5d7;
+}
+.business-dependencies summary {
+  color: #c7e5ec;
+  cursor: pointer;
+}
+
+/* Czytelność istniejących małych opisów bez zmiany układu i kolorów marki. */
+.mission-shell {
+  --muted: #b3c6d8;
+}
+.mission-shell .eyebrow,
+.mission-shell .section-heading .eyebrow,
+.mission-shell .operations-panel > .eyebrow,
+.mission-shell .business-heading .eyebrow {
+  font-size: 10px;
+}
+.mission-shell .source-note,
+.mission-shell .evidence-caveat,
+.mission-shell .evidence-meta,
+.mission-shell .evidence-empty small,
+.mission-shell .alert-card .alert-caveat {
+  font-size: 12px;
+  color: #b7cddd;
+}
+.mission-shell .status-pill {
+  font-size: 10px;
+}
+.mission-shell .operations-panel button,
+.mission-shell .operations-panel select,
+.mission-shell .operations-panel summary {
+  font-size: 12px;
+}
+.mission-shell .operations-panel label,
+.mission-shell .worker-status p {
+  font-size: 11px;
+}
+.mission-shell .worker-ready,
+.mission-shell .worker-busy {
+  font-size: 10px;
+}
+.mission-shell .auth-table,
+.mission-shell .auth-table th,
+.mission-shell .auth-table caption {
+  font-size: 11px;
+}
+.mission-shell .evidence-card-heading h3 {
+  font-size: 13px;
+}
+.mission-shell .observed-sessions li {
+  font-size: 12px;
+}
+.mission-shell .observed-sessions li small {
+  font-size: 11px;
+  color: #afc6d9;
+}
+.mission-shell .alert-card p,
+.mission-shell .evidence-empty,
+.mission-shell .mission-feedback p,
+.mission-shell .decision-warning {
+  font-size: 13px;
+}
+.mission-shell .message-byline time,
+.mission-shell .message-byline small,
+.mission-shell .section-heading > span,
+.mission-shell .comparison-label {
+  font-size: 11px;
+}
+.mission-shell .message-byline,
+.mission-shell .hypothesis-panel label,
+.mission-shell .hypothesis-panel p,
+.mission-shell .business-last-report {
+  font-size: 12px;
+}
+.mission-shell .business-metrics dt,
+.mission-shell .business-target,
+.mission-shell .business-access {
+  font-size: 11px;
+}
+.mission-shell .turn-progress {
+  font-size: 12px;
+}
+.mission-shell .turn-progress small,
+.mission-shell .mission-objective-bar small {
+  font-size: 11px;
+}
+.mission-shell .report-scorecard p,
+.mission-shell .containment-facts p,
+.mission-shell .moment-comparison p,
+.mission-shell .report-disclosure {
+  font-size: 13px;
+}
+.mission-shell .containment-facts strong,
+.mission-shell .moment-comparison small {
+  font-size: 11px;
+}
+.mission-shell .action-group-title {
+  font-size: 12px;
+}
+.mission-shell .action-group-title span {
+  font-size: 11px;
+}
+@media (max-width: 760px) {
+  .mission-shell .alert-card {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .mission-shell .alert-card > .status-pill {
+    grid-column: 2;
+    margin-left: 0;
+    justify-self: start;
+  }
+  .scenario-selection {
+    padding: 35px 18px;
+  }
+  .selection-heading h1 {
+    font-size: 37px;
+  }
+  .selection-heading > p {
+    font-size: 14px;
+  }
+  .mode-cards {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 27px;
+  }
+  .mode-cards article {
+    padding: 24px;
+    min-width: 0;
+  }
+  .mode-cards .primary-button {
+    align-self: stretch;
+    padding: 14px 10px;
+    font-size: 12px;
+  }
+  .run-mode-bar {
+    padding: 12px 16px;
+  }
+  .run-mode-bar span:nth-child(2) {
+    display: none;
+  }
+  .replay-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .replay-actions button {
+    width: 100%;
+    padding: 14px 12px;
+    font-size: 12px;
+  }
+  .variant-reveal,
+  .legitimate-impact {
+    padding: 18px;
+  }
+  .mission-shell .simulation-timebar {
+    gap: 10px;
+  }
+  .mission-shell .reset-button,
+  .mission-shell .advance-button {
+    white-space: normal;
+    min-height: 44px;
+    line-height: 1.6;
+  }
+}

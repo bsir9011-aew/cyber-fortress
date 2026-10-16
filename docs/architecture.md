@@ -1,4 +1,4 @@
-# Architektura FORTRESS LAB — Sprint 4B
+# Architektura FORTRESS LAB — Sprint 5
 
 Jedna aplikacja React + TypeScript + Vite z natywną mapą SVG. Silnik to czyste
 funkcje TypeScript: bez Reacta, DOM, zegara systemowego, I/O i losowości.
@@ -10,7 +10,7 @@ Nie ma dodatkowych zależności projektu ani backendu.
 | Katalog              | Odpowiedzialność                                                     |
 | -------------------- | -------------------------------------------------------------------- |
 | `src/domain`         | Kontrakty infrastruktury, tożsamości, dostępu i symulacji.           |
-| `src/content`        | Infrastruktura i referencyjny wariant symulacji NEXUS.               |
+| `src/content`        | Infrastruktura i trzy definicje wariantów NEXUS.               |
 | `src/simulation`     | Zegar, biznes, dostęp, walidacja zadań i przejścia stanu.            |
 | `src/application`    | Inicjalizacja, reset/reducer, projekcja dla gracza i selektory mapy. |
 | `src/ui`             | Mapa, inspektor, panele, formularze komend i polskie opisy zdarzeń.  |
@@ -19,18 +19,42 @@ Nie ma dodatkowych zależności projektu ani backendu.
 
 `SimulationState` zawiera jeden `world: WorldState` oraz zegar, proces i bilans
 biznesowy, fakty dostępu, zadania, telemetrię, sprawę, wiedzę gracza, historię
-i ukryte pochodzenie sesji oraz ślad decyzji. W Sprincie 4A `hidden.attacker` przechowuje plan, własną wiedzę, licznik
-ujawnionych rekordów i prywatną historię przeciwnika. Dostępność zasobu istnieje
+i ukryte pochodzenie sesji oraz ślad decyzji. `run` zachowuje tryb i seed,
+a `hidden.scenario` początkową konfigurację do powtórki. `hidden.attacker`
+przechowuje plan, wiedzę, licznik i prywatną historię albo rzeczywiste `null`
+w legalnym wariancie. `hidden.legitimateActors` zawiera harmonogram legalnych klientów. Dostępność zasobu istnieje
 tylko w `world.assets[].status`: nie ma drugiej
 flagi VPN w React ani w stanie dostępu. `WorldState` nadal zawiera 9 zasobów,
 5 stref i 11 relacji topologii. Konta i uprawnienia są odrębnymi faktami silnika.
 
-`createInitialSimulation` głęboko kopiuje dane scenariusza i inicjalizuje pustą
-wiedzę oraz historię. Dane źródłowe telemetrii są kopiowane z treści scenariusza;
-rejestracja i detekcja tworzą początkowy alert. `simulationReducer` obsługuje reset przez nową inicjalizację;
-pozostałe komendy przekazuje do `applySimulationCommand`. React korzysta z tego
-reducera i przechowuje osobno tylko wybór mapy, warstwę i wartości formularzy.
-Nie ma timerów, osobnych liczników biznesowych ani reguł gry w komponentach.
+`createScenario` waliduje i głęboko kopiuje konfigurację, rozstrzyga ewentualne
+próby wstępne i inicjalizuje jeden stan. `createInitialSimulation()` nadal tworzy
+wariant referencyjny. `simulationReducer` resetuje bieżącą definicję i seed;
+`scenarioReducer` dodaje wyłącznie komendę rozpoczęcia nowej próby. Pozostałe
+komendy trafiają do dotychczasowego `applySimulationCommand`. React zachowuje
+osobno tylko wybór kontekstu, mapy, briefingu i formularzy, bez reguł symulacji.
+
+## Konfiguracje i nieznany incydent — Sprint 5
+
+`domain/scenario.ts` definiuje infrastrukturę, dostęp, legalne zachowania, źródła,
+świadków, opcjonalny plan przeciwnika i cele. Trzy konfiguracje w `content/scenarios`
+korzystają ze wszystkich wspólnych mechanizmów. Walidator odrzuca brakujące
+referencje i sprzeczne cele; nie dodaje zastępczych kont lub zasobów.
+
+Trening wybiera dotychczasowe A. W nieznanym incydencie `seed % 3` wybiera A/B/C
+przed pierwszą decyzją, bez losowania podczas renderowania. Nazwa, ID i typ są
+prywatne do raportu. Powtórka zachowuje definicję i seed, a nowy incydent
+przechodzi do kolejnej konfiguracji i odtwarza wszystkie dane.
+
+W B `attacker` jest `null`: legalny klient Marty wytwarza 52 odmowy i sukces
+z 13:58 przez istniejące `issueVpnSession`, a kolektor i detektor otrzymują zwykłe
+zdarzenia. W C nie ma S-19 ani sukcesu z 13:58; plan zaczyna od uwierzytelnienia
+w turze 3. Alerty wszystkich trzech wariantów są identyczne. Logi A/B także są
+identyczne na starcie; różnice są dostępne w relacji i legalnych zależnościach.
+
+[Kontrakt konfiguracji](scenario-configuration.md) opisuje pełne API, referencje,
+polityki legalnych klientów i diagram. [Raport porównawczy](scenario-variants-validation.md)
+podaje wyniki, zachowane regresje i ograniczenia grywalności.
 
 ## Czas, zadania i kolejność granicy tury
 
@@ -40,7 +64,7 @@ komend nie przesuwa zegara. Na granicy tury:
 
 1. Rozliczamy napływ i obsługę zamówień za zakończony przedział według starej konfiguracji.
 2. Kończymy należne zadania, sortując po terminie, priorytecie i stabilnym ID. Zmiany administratora poprzedzają odczyt analityka.
-3. Wygaszamy sesje, rozstrzygamy ponowne logowanie legalnego zespołu i najwyżej jedną akcję przeciwnika przy aktualnej konfiguracji.
+3. Wygaszamy sesje, rozstrzygamy zaplanowane logowania legalnych klientów i najwyżej jedną akcję przeciwnika, jeśli występuje, przy aktualnej konfiguracji.
 4. Rejestrujemy w sensorach wytworzone zdarzenia uwierzytelnienia i wykonujemy detekcję.
 5. Ukończone badania pozyskują dozwolone obserwacje logów i sesji; rozmowa tworzy relację człowieka.
 6. Oceniamy koniec misji i wyprowadzamy wiadomości z jawnych faktów. Po turze 18 blokujemy dalsze komendy; osobny selektor udostępnia raport. Reset pozostaje dostępny.
@@ -62,7 +86,7 @@ a identyczne sekwencje komend dają identyczny wynik i historię.
 
 ## Proces obsługi zamówień
 
-Niezależny portal dostarcza 20 zamówień na turę. Lokalne stanowiska mają wydajność
+W wariancie referencyjnym portal dostarcza 20 zamówień na turę. Lokalne stanowiska mają wydajność
 8, a zagregowany legalny zespół zdalny dodaje 14, łącznie 22. Lokalny kanał wymaga
 sprawnych stanowisk i ERP oraz dopuszczonej ścieżki HTTPS. Zdalny wymaga ERP,
 sprawnego VPN, aktywnego legalnego tunelu, polityki HTTPS i uprawnienia do ERP.
@@ -79,12 +103,25 @@ obsłużonych zamówień 312. To wyjaśnienie rachunkowe wymagania Sprintu 3, be
 zmiany GDD i parametrów. Test ustawia początkową niedostępność jako fixture;
 zlecenie wyłączenia przy starcie działa dopiero o 14:05. Cel to ≤ 40 o 15:30.
 
-24 zdalnych dyspozytorów reprezentuje na razie jeden legalny aktor biznesowy,
+W B/C proces ma 8 zamówień lokalnie, 8 przez zdalny ERP i dodatkowe 6 przez
+`process.additionalWork`. Ta część wymaga własnego legalnego konta, aktywnej
+sesji oraz wszystkich usług ERP/HTTPS i FS-01/SMB. W B używa konta Marty, w C
+odrębnego `file-team` i F-01. `canUseService` sprawdza każdą zależność. Odmowa SMB
+zostawia HTTPS i zmienia wydajność 22 → 16; brak uprawnienia, sesji lub usługi
+odbiera tę samą część. Nie ma kary za wybór przycisku. Raporty biznesowe zawierają
+obserwowalną dostępność części procesu; narracja może opisać jej rzeczywisty koszt.
+
+W wariancie referencyjnym 24 zdalnych dyspozytorów reprezentuje jeden aktor biznesowy,
 testowe konto `dispatch-team` i tunel `B-01`. To agregacja wydajności, nie zalecenie
 współdzielenia rzeczywistych kont. Legalny zespół po przywróceniu bramy próbuje
 zalogować się z własnym aktualnym poświadczeniem, podlega blokadzie konta i
 wymaganiom uwierzytelnienia. Nie omija reguł ani uprawnień. Nie odtwarza S-19.
-Pełne modelowanie kont 24 osób oraz dystrybucji nowych haseł jest poza zakresem.
+`simulation/legitimateActors.ts` stosuje te same funkcje wydawania i rejestracji
+sesji dla wszystkich legalnych klientów. Referencyjny zespół i file-team używają
+jawnej polityki `managed-current`. Klient Marty w B ma politykę `fixed` i opóźnienie
+jednej tury po utracie tunelu; nie poznaje automatycznie nowego poświadczenia po
+resecie. Blokada i reset mają zwykłe skutki przy jego ponownym logowaniu.
+Pełne modelowanie 24 osób i dystrybucji haseł pozostaje poza zakresem.
 
 ## Topologia, polityka, sesja i uprawnienie
 
@@ -228,7 +265,7 @@ definiuje dane i parametry źródeł. Zdarzenie zawiera wyłącznie czas, źród
 konto, wynik i ewentualne ID wydanej sesji. Nie ma adresów IP, powodu zdobycia
 hasła, wersji poświadczenia, etykiety sprawcy ani informacji o kopiowaniu.
 
-Historia scenariusza obejmuje 52 odmowy w 13:40–13:57, sukces S-19 o 13:58
+Historia wariantu referencyjnego obejmuje 52 odmowy w 13:40–13:57, sukces S-19 o 13:58
 oraz legalne uwierzytelnienie B-01 o 14:00. To 53 zdarzenia sprzed startu i jedno
 na początku misji. `recordAuthentication` zapisuje kolejne wyniki rzeczywistych
 wywołań `issueVpnSession` obu aktorów. Niedziałająca brama nie wytwarza własnego
@@ -305,6 +342,15 @@ i `stoppedOnlyByRetryBudget` są osobne: przy przywróceniu SMB po wyczerpaniu p
 raport potrafi pokazać 0 ujawnionych rekordów i nadal możliwy dostęp.
 Ocena to stan o 15:30 w granicach modelu, nie gwarancja trwałego bezpieczeństwa.
 
+Po zakończeniu raport ujawnia typ wariantu i rozdziela cel ograniczenia FS-01
+od stanu konta. Dla legalnego B ocena zagrożenia ma `applicable: false`, a jej
+cel `null`. Nie powstaje historia nieistniejącego napastnika ani komunikat o jego
+pokonaniu. Raport wyjaśnia prawdziwy alert, relację i legalną rolę konta oraz
+liczbę przedziałów obniżonej wydajności i ograniczone legalne logowania.
+Nie dodajemy łącznej punktacji. Odnowione SMB po wyczerpaniu prób może pozostawić
+0 rekordów, lecz nie spełnia celu aktualnego ograniczenia dostępu — granica
+planera pozostaje jawna.
+
 React przełącza lekkie konteksty Sprawy/Operacje/Architektura bez routera.
 Briefing, wybór kontekstu i formularze są stanem interfejsu; reguły i narracja
 pozostają w silniku. Skróty, fokus klawiatury, etykiety i oznaczenia tekstowe
@@ -326,16 +372,16 @@ priorytety na granicy tury, brak wycieku wiedzy, deterministyczność i reset.
 `npm run typecheck` sprawdza również silnik bez typów DOM. `npm run build` najpierw
 wykonuje te kontrole. Testy silnika działają w Node, bez emulacji przeglądarki.
 
-123 testy obejmują dotychczasowe 87 i 36 nowych przypadków misji. Dwa historyczne
-oczekiwania zaktualizowano zgodnie z nowym źródłem: brak sensora jest teraz
-jawnym wariantem fixture, a konto wskazane przez alert jest wiedzą gracza.
-Żaden przypadek nie został usunięty lub pominięty. Wyniki przeciwnika i biznesu
-z 4A pozostają bez zmian. Pięć pełnych ścieżek drukuje rzeczywiste liczby.
-[Raport 4B](incident-gameplay-validation.md) opisuje walidację, regresje i przegląd
-pierwszych minut. [Raport 4A](threat-simulation-validation.md) zachowuje wyniki
-bazowego silnika.
+192 testy obejmują zachowane 123 i 69 nowych przypadków wariantów. W trzech
+starszych plikach doprecyzowano tylko typ referencyjnego fixture'a i jeden parametr
+typu redukcji; asercje i wyniki nie zmieniły się. Testy walidują referencje,
+brak przeciwnika, rzeczywiste legalne logowania, prywatność, reset i 12 pełnych
+przebiegów strategia × wariant. Osobny test ujawnia ograniczenie budżetu prób
+po ponownym otwarciu SMB. [Raport Sprintu 5](scenario-variants-validation.md)
+zawiera liczbowe porównanie i Chromium. Historyczne wyniki zachowują
+[raport 4B](incident-gameplay-validation.md) oraz [raport 4A](threat-simulation-validation.md).
 
-Modeluje się jednego przeciwnika, jeden trop, jeden protokół i trzy porcje danych.
+Trzy stałe definicje obejmują co najwyżej jednego przeciwnika, jeden trop, jeden protokół i trzy porcje danych.
 Nie ma adaptacyjnego szukania innych hostów, pełnego skanowania, zmieniania
 znanego hasła, pełnego SIEM/SOAR, sensorów ruchu, audytu plików, ekonomii, rozbudowanej kampanii,
 FastAPI ani trwałych zapisów. Zatrzymany planer nie zaczyna od nowa po wyczerpaniu

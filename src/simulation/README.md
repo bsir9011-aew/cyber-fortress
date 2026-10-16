@@ -8,6 +8,7 @@ Czyste funkcje TypeScript, niezależne od Reacta, DOM, Node I/O i czasu rzeczywi
 - `tasks.ts`: czas pracy, role i walidacja przydziału.
 - `engine.ts`: deterministyczne przejście stanu na komendę.
 - `attacker.ts`: planer z ograniczoną wiedzą i prywatne rozstrzyganie prób dostępu/transferu.
+- `legitimateActors.ts`: legalni klienci z jawną wiedzą o poświadczeniu i harmonogramem logowania.
 - `telemetry.ts`: źródłowe zdarzenia uwierzytelnienia, kolekcja, retencja, dostępność i detekcja.
 - `narrative.ts`: wiadomości wynikające z jawnych faktów, bez dostępu do prywatnej prawdy.
 - `threatAssessment.ts`: prywatny ślad decyzji i ocena rzeczywistych możliwości do raportu.
@@ -15,3 +16,4 @@ Czyste funkcje TypeScript, niezależne od Reacta, DOM, Node I/O i czasu rzeczywi
 Inicjalizacja, reset, publiczna projekcja i bramka raportu pozostają w `application`;
 scenariusz i wypowiedzi postaci w `content`, kontrakty w `domain`, prezentacja w `ui`.
 Kolejność tury i uproszczenia opisano w `docs/architecture.md`.
+Konfiguracje trzech wariantów i ich referencje opisuje `docs/scenario-configuration.md`.

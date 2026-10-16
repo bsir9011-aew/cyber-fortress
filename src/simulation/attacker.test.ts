@@ -5,7 +5,7 @@ import { simulationReducer } from '../application/simulationReducer';
 import { nexusAttack } from '../content/nexusAttack';
 import type {
   SimulationCommand,
-  SimulationState,
+  ReferenceSimulationState as SimulationState,
   TaskAction,
 } from '../domain/simulation';
 import { canUseService, issueVpnSession } from './access';
@@ -623,12 +623,18 @@ describe('niezmienność, granice i prywatność', () => {
         workerId: 'administrator',
         action: { type: 'terminate-session', sessionId: 'S-19' },
       },
-      ...Array.from({ length: 17 }, (): SimulationCommand => ({
-        type: 'advance-turn',
-      })),
+      ...Array.from(
+        { length: 17 },
+        (): SimulationCommand => ({
+          type: 'advance-turn',
+        }),
+      ),
     ];
     const play = () =>
-      commands.reduce(simulationReducer, createInitialSimulation());
+      commands.reduce<SimulationState>(
+        simulationReducer,
+        createInitialSimulation(),
+      );
     expect(play()).toEqual(play());
     expect(exposed(play())).toBe(2000);
   });

@@ -66,7 +66,9 @@ export function deriveNarrative(
           {
             id: `erp-${task.id}`,
             speaker: 'Ewa',
-            text: 'Po zmianie SMB zdalna obsługa ERP nadal działa. Wysyłki są realizowane.',
+            text: business.report.contributions?.some((item) => !item.available)
+              ? `Po zmianie SMB zdalna obsługa ERP nadal działa, ale część pracy zależna od FS-01 jest niedostępna. Wydajność wynosi ${business.report.capacity} zamówień na turę.`
+              : 'Po zmianie SMB zdalna obsługa ERP nadal działa. Wysyłki są realizowane.',
             source: 'business',
             referenceId: business.id,
           },
@@ -118,6 +120,17 @@ export function deriveNarrative(
         [...facts.history]
           .reverse()
           .find((event) => event.kind === 'business-report')?.id ?? 'business',
+    });
+  if (
+    facts.business.lastReport?.remoteAvailable &&
+    facts.business.lastReport.contributions?.some((item) => !item.available)
+  )
+    add({
+      id: 'ewa-files',
+      speaker: 'Ewa',
+      text: `ERP jest dostępny, ale nie możemy ukończyć części obsługi zależnej od dokumentów FS-01. Ostatni przedział miał wydajność ${facts.business.lastReport.capacity}. Sprawdź legalną sesję, usługę, regułę i uprawnienie.`,
+      source: 'business',
+      referenceId: 'business-file-dependency',
     });
   if (facts.business.backlog > 40)
     add({

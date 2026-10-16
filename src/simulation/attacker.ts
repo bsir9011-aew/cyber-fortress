@@ -5,7 +5,10 @@ import type {
   AttackerState,
   PlannedAttackAction,
 } from '../domain/attack';
-import type { SimulationState } from '../domain/simulation';
+import type {
+  ReferenceSimulationState,
+  SimulationState,
+} from '../domain/simulation';
 import {
   canUseService,
   isAssetOnline,
@@ -25,11 +28,16 @@ export function createInitialAttacker(
     definition.maxConsecutiveFailures,
     definition.stolenCredentialVersion,
     ...definition.chunkSizes,
+    ...(definition.firstAuthenticationTurn === undefined
+      ? []
+      : [definition.firstAuthenticationTurn]),
   ];
   if (
     positiveIntegers.some(
       (value) => !Number.isSafeInteger(value) || value < 1,
     ) ||
+    (definition.initialSessionId === null &&
+      definition.firstAuthenticationTurn === undefined) ||
     definition.chunkSizes.length === 0 ||
     definition.chunkSizes.reduce((sum, size) => sum + size, 0) <
       definition.recordLimit
@@ -51,8 +59,14 @@ export function createInitialAttacker(
     consecutiveFailures: 0,
     authenticationAttempts: 0,
     nextAction: {
-      kind: 'reconnaissance',
-      dueTurn: definition.firstReconnaissanceTurn,
+      kind:
+        definition.initialSessionId === null
+          ? 'authenticate'
+          : 'reconnaissance',
+      dueTurn:
+        definition.initialSessionId === null
+          ? definition.firstAuthenticationTurn!
+          : definition.firstReconnaissanceTurn,
     },
     privateHistory: [],
   };
@@ -96,7 +110,7 @@ function recordAttempt(
             outcome,
             sessionId:
               outcome === 'session-lost'
-                ? state.hidden.attacker.currentSessionId
+                ? (state.hidden.attacker?.currentSessionId ?? null)
                 : attacker.currentSessionId,
             copiedRecords,
             totalExposedRecords: attacker.transfer.exposedRecords,
@@ -138,6 +152,7 @@ function resolveAuthentication(
   action: PlannedAttackAction,
 ): SimulationState {
   const attacker = state.hidden.attacker;
+  if (!attacker) return state;
   const definition = attacker.definition;
   const attempted = {
     ...attacker,
@@ -202,8 +217,13 @@ function resolveAuthentication(
 }
 
 /** Jedna próba na granicy tury. Wyniki pozostają poza publicznym history. */
+export function stepAttacker(
+  state: ReferenceSimulationState,
+): ReferenceSimulationState;
+export function stepAttacker(state: SimulationState): SimulationState;
 export function stepAttacker(state: SimulationState): SimulationState {
   const attacker = state.hidden.attacker;
+  if (!attacker) return state;
   const action = selectAttackerAction(attacker, state.clock.turn);
   if (!action) return state;
   if (action.kind === 'authenticate')

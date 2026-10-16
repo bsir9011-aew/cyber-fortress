@@ -1,5 +1,8 @@
 # Sprint 4B — walidacja pierwszej grywalnej misji
 
+Raport zachowuje historyczne wyniki wariantu referencyjnego. Aktualne trzy
+warianty, tryby, testy i screenshoty opisuje [walidacja Sprintu 5](scenario-variants-validation.md).
+
 Misja „Ostatnie okno wysyłkowe” korzysta z tego samego stanu, zegara, biznesu,
 dostępu i przeciwnika co Sprint 4A. Nie zmieniono harmonogramu ani bazowych
 wyników transferu. Informacje w tym dokumencie ujawniają rozwiązania scenariusza.

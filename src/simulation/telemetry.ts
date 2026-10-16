@@ -1,4 +1,7 @@
-import type { SimulationState } from '../domain/simulation';
+import type {
+  ReferenceSimulationState,
+  SimulationState,
+} from '../domain/simulation';
 import type {
   AuthenticationObservation,
   AuthenticationRecord,
@@ -14,8 +17,15 @@ export function recordAuthentication(
   state: SimulationState,
   accountId: string,
   result: SessionIssueResult,
+  minute = currentMinute(state.clock),
 ): SimulationState {
   if (!isAssetOnline(state.world, state.access.vpnAssetId)) return state;
+  let sequence = state.telemetry.sourceEvents.length + 1;
+  const usedIds = new Set(
+    state.telemetry.sourceEvents.map((event) => event.id),
+  );
+  while (usedIds.has(`AUTH-${String(sequence).padStart(4, '0')}`))
+    sequence += 1;
   return {
     ...state,
     telemetry: {
@@ -23,8 +33,8 @@ export function recordAuthentication(
       sourceEvents: [
         ...state.telemetry.sourceEvents,
         {
-          id: `AUTH-${String(state.telemetry.sourceEvents.length + 1).padStart(4, '0')}`,
-          minute: currentMinute(state.clock),
+          id: `AUTH-${String(sequence).padStart(4, '0')}`,
+          minute,
           sourceAssetId: state.access.vpnAssetId,
           accountId,
           outcome: result.ok ? 'success' : 'failure',
@@ -134,6 +144,10 @@ export function detectVpnAlerts(
   return alerts;
 }
 
+export function updateTelemetry(
+  state: ReferenceSimulationState,
+): ReferenceSimulationState;
+export function updateTelemetry(state: SimulationState): SimulationState;
 export function updateTelemetry(state: SimulationState): SimulationState {
   const telemetry = collectAuthenticationTelemetry(state);
   const minute = currentMinute(state.clock);

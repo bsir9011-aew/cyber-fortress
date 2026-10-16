@@ -1,11 +1,15 @@
 export type AttackAction =
-  'reconnaissance' | 'start-transfer' | 'transfer' | 'authenticate';
+  | 'reconnaissance'
+  | 'start-transfer'
+  | 'transfer'
+  | 'authenticate';
 
 export interface AttackDefinition {
   readonly id: string;
   readonly accountId: string;
   readonly stolenCredentialVersion: number;
-  readonly initialSessionId: string;
+  readonly initialSessionId: string | null;
+  readonly firstAuthenticationTurn?: number;
   readonly knownGatewayAssetId: string;
   /** Jedyny trop scenariusza, nie wiedza o całym grafie infrastruktury. */
   readonly targetAssetId: string;
