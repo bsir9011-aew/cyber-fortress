@@ -1,5 +1,9 @@
 # Sprint 4A — raport walidacji
 
+Dokument zachowuje wyniki bazowego silnika Sprintu 4A. Sprint 4B dodaje sensory,
+dochodzenie i raport po zakończeniu, zachowując te wyniki. Aktualna walidacja i
+zmienione granice obserwacji: [raport Sprintu 4B](incident-gameplay-validation.md).
+
 Raport opisuje diagnostykę silnika. Ukryte wyniki nie są logami SOC i nie są
 udostępniane przez bieżący `selectPlayerView` ani ekran rozgrywki.
 

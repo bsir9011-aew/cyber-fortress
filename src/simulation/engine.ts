@@ -9,6 +9,14 @@ import { isBusinessGoalMet, settleBusiness } from './business';
 import { currentMinute, isFinished } from './clock';
 import { taskRejection, taskSpecs } from './tasks';
 import { stepAttacker } from './attacker';
+import {
+  recordAuthentication,
+  readAuthenticationLogs,
+  updateTelemetry,
+} from './telemetry';
+import { updateNarrative } from './narrative';
+import { completeDecision, rememberDecision } from './threatAssessment';
+import { nexusOwnerAccount } from '../content/nexusIncident';
 
 function record(
   state: SimulationState,
@@ -105,6 +113,7 @@ function applyTaskEffect(
       };
     case 'inspect-vpn-sessions':
     case 'inspect-auth-logs':
+    case 'contact-account-owner':
       return state;
   }
 }
@@ -142,9 +151,10 @@ function resumeLegitimateWork(state: SimulationState): SimulationState {
     },
     minute,
   );
-  if (!result.ok) return next;
+  const observed = recordAuthentication(next, account.id, result);
+  if (!result.ok) return observed;
   return {
-    ...next,
+    ...observed,
     access: result.access,
     hidden: {
       ...state.hidden,
@@ -157,7 +167,11 @@ function resumeLegitimateWork(state: SimulationState): SimulationState {
 }
 
 function observeVpnSessions(state: SimulationState): SimulationState {
-  if (!isAssetOnline(state.world, state.access.vpnAssetId))
+  if (
+    !state.telemetry.sessionSensor.enabled ||
+    state.telemetry.sessionSensor.sourceAssetId !== state.access.vpnAssetId ||
+    !isAssetOnline(state.world, state.telemetry.sessionSensor.sourceAssetId)
+  )
     return record(state, { kind: 'research-unavailable' });
   const minute = currentMinute(state.clock);
   const sessions = state.access.sessions
@@ -182,6 +196,47 @@ function observeVpnSessions(state: SimulationState): SimulationState {
     },
     { kind: 'sessions-observed', count: sessions.length },
   );
+}
+
+function observeCompletedResearch(
+  state: SimulationState,
+  task: EmployeeTask,
+): SimulationState {
+  if (task.action.type === 'inspect-vpn-sessions')
+    return observeVpnSessions(state);
+  if (task.action.type === 'inspect-auth-logs') {
+    const observation = readAuthenticationLogs(state, task.id);
+    if (!observation) return record(state, { kind: 'research-unavailable' });
+    return record(
+      {
+        ...state,
+        knowledge: {
+          ...state.knowledge,
+          authObservations: [...state.knowledge.authObservations, observation],
+        },
+      },
+      { kind: 'auth-logs-observed', count: observation.records.length },
+    );
+  }
+  if (task.action.type === 'contact-account-owner') {
+    const statement = {
+      id: task.id,
+      kind: 'human-statement' as const,
+      ...nexusOwnerAccount,
+      observedAtMinute: currentMinute(state.clock),
+    };
+    return record(
+      {
+        ...state,
+        knowledge: {
+          ...state.knowledge,
+          ownerStatements: [...state.knowledge.ownerStatements, statement],
+        },
+      },
+      { kind: 'owner-contacted', accountId: task.action.accountId },
+    );
+  }
+  return state;
 }
 
 function advanceTurn(state: SimulationState): SimulationState {
@@ -213,27 +268,29 @@ function advanceTurn(state: SimulationState): SimulationState {
       ...next,
       tasks: next.tasks.map((item) => (item.id === task.id ? completed : item)),
     };
-    next = record(applyTaskEffect(next, completed), {
-      kind: 'task-completed',
-      task: completed,
-    });
+    next = record(
+      completeDecision(next, applyTaskEffect(next, completed), completed),
+      {
+        kind: 'task-completed',
+        task: completed,
+      },
+    );
     if (task.workerId === 'administrator')
       next = record(next, { kind: 'configuration-changed', task: completed });
   }
   // 3. Wygaśnięcia oraz legalny zespół i przeciwnik po zmianach konfiguracji.
   next = resumeLegitimateWork(next);
   next = stepAttacker(next);
+  next = updateTelemetry(next);
   // 4. Tylko ukończone badanie ujawnia dozwoloną obserwację.
-  for (const task of due)
-    if (task.action.type === 'inspect-vpn-sessions')
-      next = observeVpnSessions(next);
+  for (const task of due) next = observeCompletedResearch(next, task);
   // 5. Ocena celu; brak nowych tur po terminie.
   if (isFinished(next.clock))
     next = record(next, {
       kind: 'simulation-finished',
       success: isBusinessGoalMet(next),
     });
-  return next;
+  return updateNarrative(next);
 }
 
 /** Czysta transformacja stanu. Reset konfiguruje warstwa application. */
@@ -252,6 +309,24 @@ export function applySimulationCommand(
       reason: 'invalid-command',
     });
   if (command.type === 'advance-turn') return advanceTurn(state);
+  if (command.type === 'set-hypothesis') {
+    if (
+      ![
+        'insufficient-evidence',
+        'compromised-credential',
+        'unusual-legitimate-session',
+        'existing-tunnel-access',
+      ].includes(command.hypothesis)
+    )
+      return record(state, {
+        kind: 'command-rejected',
+        reason: 'invalid-command',
+      });
+    return {
+      ...state,
+      incident: { ...state.incident, hypothesis: command.hypothesis },
+    };
+  }
   if (command.type !== 'schedule-task')
     return record(state, {
       kind: 'command-rejected',
@@ -269,7 +344,7 @@ export function applySimulationCommand(
     status: 'running',
   };
   return record(
-    { ...state, tasks: [...state.tasks, task] },
+    rememberDecision({ ...state, tasks: [...state.tasks, task] }, task),
     { kind: 'task-started', task },
   );
 }

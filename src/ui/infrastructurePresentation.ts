@@ -41,7 +41,7 @@ export const layers: readonly {
     shortName: 'Telemetria',
     description: 'Źródła obserwacji i ich pokrycie.',
     emptyMessage:
-      'Brak zdefiniowanych źródeł telemetrii. Nie przypisano jeszcze sensorów ani obserwowanych połączeń.',
+      'Brak osobnych relacji obserwacji na mapie. Lokalne sensory bramy VPN opisano powyżej; nie modelujemy sensora przepływów ani audytu plików.',
   },
 ];
 

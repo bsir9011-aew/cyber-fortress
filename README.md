@@ -2,78 +2,76 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — Threat Simulation Engine (Sprint 4A)
+## FORTRESS LAB — First Playable Incident (Sprint 4B)
 
-Strategiczno-techniczna gra o cyberbezpieczeństwie fikcyjnej firmy **NEXUS
-Logistics**. Uczymy poprzez decyzje i ich konsekwencje dla działalności firmy.
+Pierwsza grywalna misja **„Ostatnie okno wysyłkowe”** w NEXUS Logistics.
+Jako Security Engineer otrzymujesz sygnał nietypowych logowań VPN, pozyskujesz
+dowody i decydujesz, jak chronić dane, zachowując obsługę zamówień do 15:30.
+Bez backendu, kluczy API, timerów czasu rzeczywistego i nowych zależności.
 
-Interaktywna mapa dziewięciu zasobów jest połączona z deterministycznym silnikiem
-działalności firmy. Czas, zadania, stan VPN, sesje i reguły sieciowe wpływają na
-rzeczywistą kolejkę zamówień. Jeden stan symulacji zasila mapę i wszystkie panele.
-Bez backendu i wymaganych kluczy API.
+### Rozpoczęcie misji
 
-Silnik zawiera też pierwszego symulowanego przeciwnika. Rekonesans, logowanie i
-każda porcja kopiowanych rekordów podlegają rzeczywistym warunkom dostępu. Jego
-plan i wyniki są prywatne: bieżący interfejs zachowuje dotychczasową wiedzę gracza,
-a podsumowanie na ekranie nadal dotyczy wyłącznie działalności firmy. Brak sensorów
-oznacza brak alertów SOC i automatycznej informacji o wycieku.
+1. Przeczytaj briefing Ewy i wybierz **Rozpocznij dochodzenie**.
+2. W kontekście **Sprawy** obejrzyj alert. To sygnał do zbadania, nie potwierdzenie przejęcia konta.
+3. Zleć analitykowi badanie logów, odczyt sesji lub rozmowę z Martą. Możesz też od razu zlecić administratorowi zmianę dostępu. Każda osoba ma jeden kanał pracy.
+4. Wybierz **Następne 5 minut**, aby rozliczyć działalność, ukończyć zadania i rozstrzygnąć działania przeciwnika. Czytanie dowodów oraz oznaczanie hipotezy nie przesuwa zegara.
+5. Porównuj dowody z ich źródłem i czasem pozyskania. Odczyty nie odświeżają się automatycznie. Ponowne badanie może ujawnić nowe zdarzenia.
+6. W **Operacjach** obserwuj firmę i komunikaty zespołu; w **Architekturze** zbadaj mapę dziewięciu zasobów oraz jawne reguły.
+7. Po 18 turach raport osobno pokaże poufność, ciągłość oraz pozostałe możliwości dostępu. **Zagraj ponownie** odtwarza cały scenariusz.
 
-### Walidacja przeciwnika
+Cel danych: **0 ujawnionych rekordów z 2000**. Cel biznesowy: **najwyżej 40
+zaległych zamówień o 15:30**. Nie sumujemy ich do jednej punktacji.
+
+### Źródła i granice wiedzy
+
+- **VPN Authentication:** 52 nieudane próby konta `magazyn-07` przed 14:00, sukces 13:58 tworzący S-19 oraz legalne logowanie B-01 o 14:00. Retencja 120 minut, opóźnienie 0. Rejestrowane są także późniejsze rzeczywiste próby obu aktorów.
+- **VPN Active Sessions:** odczyt aktywnych tuneli podczas badania; retencja 0, opóźnienie 0. Lista zachowuje czas obserwacji.
+- **Marta:** osobny dowód typu relacja człowieka. Rozmowa zajmuje 5 minut i pozostaje możliwa bez VPN.
+- Reguła detekcji: co najmniej 20 nieudanych logowań konta w 20 minut z tego samego sensora. Alert nie odczytuje stanu przeciwnika.
+
+Badanie obu źródeł bramy zajmuje analitykowi 5 minut i wymaga dostępnego VPN.
+Nie modelujemy adresów źródłowych, przepływów ani audytu plików. Błędy i późniejszy
+sukces nie dowodzą, że hasło odgadnięto podczas tych prób. Brak danych nie dowodzi
+braku ataku. Prywatny plan i licznik transferu są ujawniane wyłącznie w raporcie
+po zakończeniu misji, nie w bieżącym widoku ani publicznym dzienniku.
+
+![Dochodzenie w NEXUS Logistics](docs/screenshots/incident-02-investigation.png)
+
+Zrzuty: [briefing](docs/screenshots/incident-01-briefing.png),
+[dochodzenie](docs/screenshots/incident-02-investigation.png),
+[decyzja](docs/screenshots/incident-03-decision.png),
+[raport końcowy](docs/screenshots/incident-04-report.png).
+
+### Walidacja pięciu strategii
 
 ```bash
 npm test
-# Szczegółowy raport ścieżek z rzeczywistymi liczbami:
-npm test -- src/simulation/attacker.test.ts --reporter=verbose --disableConsoleIntercept
+# Rzeczywiste liczby oraz nazwy nowych przypadków:
+npm test -- src/simulation/incident.test.ts --reporter=verbose --disableConsoleIntercept
 ```
 
-Wyniki referencyjnych przebiegów 18 tur przy tym samym stanie początkowym:
+Poniżej wyniki testów pełnych 18 tur; **to informacje dla programisty, ujawniające rozwiązania**.
 
-| Decyzja gracza                                    | Ujawnione rekordy | Obsłużone zamówienia | Zaległe |
-| ------------------------------------------------- | ----------------: | -------------------: | ------: |
-| A: brak reakcji                                   |              2000 |                  360 |       0 |
-| B: blokada SMB zlecona o 14:00, ukończona o 14:10 |                 0 |                  360 |       0 |
-| C: blokada SMB zlecona o 14:15, ukończona o 14:25 |               400 |                  360 |       0 |
+| Ścieżka | Decyzje | Ujawnione rekordy | Obsłużone zamówienia | Zaległe |
+| --- | --- | ---: | ---: | ---: |
+| A | Zignorowanie ostrzeżenia | 2000 | 360 | 0 |
+| B | Logi, sesje, Marta; SMB deny gotowe 14:20 | 0 | 360 | 0 |
+| C | Wyłączenie VPN 14:05 bez przywrócenia | 0 | 156 | 204 |
+| D | Zakończenie tylko S-19 o 14:10 | 2000 | 360 | 0 |
+| E | SMB deny gotowe 14:25 po pierwszej porcji | 400 | 360 | 0 |
 
-[Pełny raport i wykaz testów](docs/threat-simulation-validation.md) oraz
-[architektura i diagram przejść](docs/architecture.md#przeciwnik-sprint-4a)
-opisują backoff, ponowne logowanie i granice wiedzy. Liczby w tabeli są wynikami
-testów; nie są komunikatami dostępnymi graczowi podczas rozgrywki.
+W B i E udział jest odcięty, lecz konto i istniejący tunel nadal wymagają uwagi.
+Raport sprawdza aktualne możliwości niezależnie od wyczerpania limitu ponowień.
+[Raport Sprintu 4B](docs/incident-gameplay-validation.md) opisuje testy,
+Chromium, przegląd pierwszych minut i ograniczenia. Zachowano wyniki silnika
+ze [Sprintu 4A](docs/threat-simulation-validation.md).
 
-### Pierwsza próba symulacji
+### Mapa i dostępność
 
-1. Zleć administratorowi **Wyłącz VPN**. Zadanie trwa 5 minut; samo kliknięcie nie zmienia infrastruktury.
-2. Kliknij **Następne 5 minut**. Firma rozliczy poprzedni przedział przy sprawnym VPN, a następnie brama zostanie wyłączona.
-3. Przesuń kolejne tury: zamiast maksymalnie 22 firma obsługuje 8 zamówień na turę przy popycie 20. Kolejka rośnie o 12.
-4. Zleć **Włącz VPN** i zakończ jego zadanie. Wydajność wróci w następnym przedziale, o ile pozostałe zależności działają. Nadwyżka 2 zamówień pozwala stopniowo zmniejszać zaległości.
-5. O 15:30, po 18 turach, sprawdź podsumowanie. Cel: maksymalnie 40 zaległych zleceń. **Reset scenariusza** odtwarza stan początkowy.
-
-Czas nie płynie podczas oglądania mapy i planowania. Raport „Ostatnie 5 minut”
-dotyczy zakończonego przedziału; bieżąca wydajność uwzględnia już ukończone zmiany.
-Sześć początkowych tur bez VPN daje 72 zaległości. Po dalszych 12 sprawnych turach
-końcowa zaległość wynosi 48 — firma nie bankuje niewykorzystanej wydajności.
-
-Analityk może zbadać aktywne sesje VPN. Dopiero ukończone badanie udostępnia cele
-zakończenia sesji, blokady logowania lub resetu poświadczenia. To odrębne działania.
-Lista sesji zachowuje czas odczytu i wymaga ponownego badania, aby ją odświeżyć.
-Administrator może też zmieniać konkretne reguły, np. blokować SMB bez blokowania HTTPS.
-
-![Działająca symulacja NEXUS Logistics](docs/screenshots/nexus-simulation-engine.png)
-
-### Poznawanie infrastruktury
-
-- Kliknij zasób, aby poznać jego funkcję, właściciela, usługi i powiązania.
-- Kliknij strzałkę lub jej etykietę, aby zobaczyć źródło, cel, protokół i znaczenie.
-- Przełączaj warstwy: sieć, tożsamość i dostęp, procesy biznesowe oraz telemetria.
-- Wybór relacji z inspektora automatycznie otwiera jej warstwę.
-- `Tab` i `Enter`/`Spacja` obsługują węzły i relacje; „Wyczyść wybór” usuwa zaznaczenie.
-- Na małym ekranie mapę można przewijać poziomo wewnątrz jej panelu.
-
-Telemetria jest celowo pusta: scenariusz nie definiuje jeszcze źródeł obserwacji.
-Nie ma fikcyjnych audytów, napraw ani niepotwierdzonych ocen bezpieczeństwa.
-Relacja sieciowa nie oznacza uprawnienia do usługi, a zależność biznesowa wskazuje
-usługę potrzebną do pracy, nie trasę pakietów.
-
-Zachowano mapę, warstwy, inspektor i obsługę klawiatury ze Sprintu 2.
+- Kliknij zasób lub relację, aby otworzyć inspektor. Warstwy rozdzielają sieć, tożsamość, biznes i pokrycie sensorów.
+- `Tab`, `Enter` i `Spacja` obsługują decyzje oraz elementy mapy. Widoczny fokus nie zależy od koloru statusu.
+- Na telefonie skróty **Sprawa i dowody / Zleć zadanie** prowadzą do odpowiednich sekcji. Mapę i logi można przewijać w ich panelach.
+- Krótkie przejścia respektują `prefers-reduced-motion`.
 
 ### Wymagania i uruchomienie
 
@@ -121,8 +119,8 @@ npm run build
 ```text
 src/
   domain/       # typy i kontrakty świata
-  simulation/   # czas, dostęp, biznes, zadania, przeciwnik i przejścia stanu
-  application/  # inicjalizacja, reducer, publiczna projekcja i selektory mapy
+  simulation/   # czas, dostęp, biznes, zadania, przeciwnik, sensory, narracja i przejścia stanu
+  application/  # inicjalizacja, reducer, publiczna projekcja, raport końcowy i selektory mapy
   content/      # infrastruktura i referencyjny scenariusz symulacji NEXUS
   ui/           # React, style i SVG
   persistence/  # miejsce na przyszłe adaptery zapisu
@@ -138,8 +136,14 @@ Licencja: [MIT](LICENSE).
 
 ### Granice etapu
 
-Transfer oznacza wyłącznie zmianę liczby ujawnionych rekordów w stanie TypeScript;
-nie wykonuje operacji na prawdziwych plikach ani w sieci. Nie ma jeszcze wykrywania
-incydentów, SOC/SIEM, panelu dochodzenia, ekonomii ani zapisów gry. Nie ma źródła
-logów uwierzytelnienia: interfejs zgłasza ich brak. Uproszczenia przeciwnika, dostępu
-i zagregowanego legalnego zespołu opisano w [architekturze](docs/architecture.md).
+Jedna misja i jeden deterministyczny przeciwnik. Kopiowanie zmienia wyłącznie
+licznik abstrakcyjnych rekordów w TypeScript. Nie ma prawdziwych operacji
+sieciowych, plików, SOC/SIEM, sensorów ruchu, generatywnych dialogów, kampanii,
+ekonomii ani zapisu gry. Odświeżenie strony rozpoczyna nową próbę.
+
+Prosty planer kończy próby po 3 kolejnych porażkach; raport odróżnia ten limit
+od odcięcia technicznych możliwości. Wyłączenie VPN nie zmienia ważności
+przejętego poświadczenia. Pełne przywrócenie zablokowanego konta oraz usuwanie
+uprawnień pozostają poza dostępnymi komendami tego sprintu.
+
+Przegląd techniczny pierwszych minut nie zastępuje testów grywalności z ludźmi.

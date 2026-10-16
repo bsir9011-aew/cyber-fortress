@@ -7,6 +7,7 @@ import {
   isBusinessGoalMet,
 } from '../simulation/business';
 import { currentMinute, isFinished } from '../simulation/clock';
+import { knownAccountIds } from '../simulation/tasks';
 
 /** Jawna projekcja: nigdy spread SimulationState/access/hidden do komponentów. */
 export function selectPlayerView(state: SimulationState) {
@@ -28,6 +29,16 @@ export function selectPlayerView(state: SimulationState) {
     tasks: state.tasks,
     history: state.history,
     sessionObservation: state.knowledge.sessionObservation,
+    authObservations: state.knowledge.authObservations,
+    ownerStatements: state.knowledge.ownerStatements,
+    alerts: state.incident.alerts,
+    hypothesis: state.incident.hypothesis,
+    messages: state.incident.messages,
+    knownAccountIds: knownAccountIds(state),
+    sensors: {
+      authentication: state.telemetry.authenticationSensor,
+      sessions: state.telemetry.sessionSensor,
+    },
   };
 }
 

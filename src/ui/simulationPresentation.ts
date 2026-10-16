@@ -10,6 +10,8 @@ export function actionLabel(action: TaskAction): string {
       return 'Sprawdzenie aktywnych sesji VPN';
     case 'inspect-auth-logs':
       return 'Pobranie logów uwierzytelnienia';
+    case 'contact-account-owner':
+      return `Rozmowa z właścicielką konta ${action.accountId}`;
     case 'terminate-session':
       return `Zakończenie sesji ${action.sessionId}`;
     case 'block-account':
@@ -29,7 +31,8 @@ const rejectionLabels: Record<CommandRejection, string> = {
   'worker-busy': 'Wykonawca jest zajęty. Poczekaj na zakończenie zadania.',
   'wrong-worker': 'To zadanie wymaga innego wykonawcy.',
   'unknown-target': 'Nieprawidłowy cel działania.',
-  'target-not-observed': 'Najpierw zbadaj dostępne sesje, aby wskazać cel.',
+  'target-not-observed':
+    'Najpierw pozyskaj obserwację wskazującą konto lub sesję.',
   'invalid-state': 'Cel nie wymaga już tej zmiany.',
   'source-unavailable':
     'Źródło danych jest niedostępne lub nie zostało zdefiniowane.',
@@ -51,8 +54,12 @@ export function eventLabel(event: SimulationEvent): string {
       return `Zamówienia: +${event.report.received}, obsłużono ${event.report.processed}, zaległe ${event.report.backlog}. Wydajność w tym przedziale: ${event.report.capacity}.`;
     case 'sessions-observed':
       return `Analityk odczytał listę aktywnych sesji VPN: ${event.count}.`;
+    case 'auth-logs-observed':
+      return `Analityk pobrał logi uwierzytelnienia: ${event.count} zdarzeń.`;
+    case 'owner-contacted':
+      return `Zakończono rozmowę z właścicielką konta ${event.accountId}. Relacja jest dostępna w sprawie.`;
     case 'research-unavailable':
-      return 'Badanie zakończone bez nowej obserwacji: brak dostępu do bramy VPN.';
+      return 'Badanie zakończone bez nowej obserwacji: sensor lub brama VPN są niedostępne.';
     case 'simulation-finished':
       return event.success
         ? '15:30 — cel operacyjny osiągnięty.'

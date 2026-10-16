@@ -1,6 +1,13 @@
 import type { AccessState, NetworkRule } from './access';
 import type { WorldState } from './world';
 import type { AttackerState } from './attack';
+import type { AuthenticationObservation, TelemetryState } from './telemetry';
+import type {
+  DecisionRecord,
+  IncidentHypothesis,
+  IncidentState,
+  OwnerStatement,
+} from './incident';
 
 export interface SimulationClock {
   readonly startMinute: number;
@@ -47,6 +54,7 @@ export type WorkerId = 'analyst' | 'administrator';
 export type TaskAction =
   | { readonly type: 'inspect-vpn-sessions' }
   | { readonly type: 'inspect-auth-logs' }
+  | { readonly type: 'contact-account-owner'; readonly accountId: string }
   | { readonly type: 'terminate-session'; readonly sessionId: string }
   | { readonly type: 'block-account'; readonly accountId: string }
   | { readonly type: 'reset-credential'; readonly accountId: string }
@@ -72,6 +80,7 @@ export interface EmployeeTask {
 
 export type SimulationCommand =
   | { readonly type: 'advance-turn' }
+  | { readonly type: 'set-hypothesis'; readonly hypothesis: IncidentHypothesis }
   | {
       readonly type: 'schedule-task';
       readonly workerId: WorkerId;
@@ -94,6 +103,8 @@ export interface SessionObservation {
 
 export interface PlayerKnowledge {
   readonly sessionObservation: SessionObservation | null;
+  readonly authObservations: readonly AuthenticationObservation[];
+  readonly ownerStatements: readonly OwnerStatement[];
 }
 
 export type CommandRejection =
@@ -115,11 +126,15 @@ export type SimulationEventData =
   | { readonly kind: 'command-rejected'; readonly reason: CommandRejection }
   | {
       readonly kind:
-        'task-started' | 'task-completed' | 'configuration-changed';
+        | 'task-started'
+        | 'task-completed'
+        | 'configuration-changed';
       readonly task: EmployeeTask;
     }
   | { readonly kind: 'business-report'; readonly report: BusinessReport }
   | { readonly kind: 'sessions-observed'; readonly count: number }
+  | { readonly kind: 'auth-logs-observed'; readonly count: number }
+  | { readonly kind: 'owner-contacted'; readonly accountId: string }
   | { readonly kind: 'research-unavailable' }
   | { readonly kind: 'simulation-finished'; readonly success: boolean };
 
@@ -133,10 +148,13 @@ export interface SimulationState {
   readonly business: BusinessState;
   readonly tasks: readonly EmployeeTask[];
   readonly knowledge: PlayerKnowledge;
+  readonly telemetry: TelemetryState;
+  readonly incident: IncidentState;
   /** Dziennik potwierdzeń działań i raportów biznesowych, nie log uwierzytelnień. */
   readonly history: readonly SimulationEvent[];
   readonly hidden: {
     readonly attacker: AttackerState;
+    readonly decisionHistory: readonly DecisionRecord[];
     readonly sessionOrigins: Readonly<
       Record<string, 'unauthorized' | 'legitimate'>
     >;

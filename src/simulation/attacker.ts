@@ -13,6 +13,7 @@ import {
   issueVpnSession,
 } from './access';
 import { currentMinute } from './clock';
+import { recordAuthentication } from './telemetry';
 
 export function createInitialAttacker(
   definition: AttackDefinition,
@@ -156,6 +157,9 @@ function resolveAuthentication(
           currentMinute(state.clock),
         )
       : null;
+  const observed = result
+    ? recordAuthentication(state, definition.accountId, result)
+    : state;
   if (!result?.ok) {
     const failed = failAttempt(
       {
@@ -165,7 +169,7 @@ function resolveAuthentication(
       state.clock.turn,
       'authenticate',
     );
-    return recordAttempt(state, failed, action, 'authentication-rejected');
+    return recordAttempt(observed, failed, action, 'authentication-rejected');
   }
   const nextKind = !attacker.knowledge.reconnaissanceConfirmed
     ? 'reconnaissance'
@@ -173,7 +177,7 @@ function resolveAuthentication(
       ? 'transfer'
       : 'start-transfer';
   const next: SimulationState = {
-    ...state,
+    ...observed,
     access: result.access,
     hidden: {
       ...state.hidden,
