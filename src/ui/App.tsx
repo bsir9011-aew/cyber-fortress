@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { createInitialWorld } from '../application/createInitialWorld';
+import { useReducer, useState } from 'react';
+import { createInitialSimulation } from '../application/createInitialSimulation';
+import { selectPlayerView } from '../application/selectPlayerView';
+import { simulationReducer } from '../application/simulationReducer';
+import type { SimulationCommand } from '../domain/simulation';
 import {
   getConnectionLayer,
   selectLayerConnections,
@@ -10,9 +13,20 @@ import { InfrastructureInspector } from './InfrastructureInspector';
 import { InfrastructureMap } from './InfrastructureMap';
 import { connectionLabels, layers } from './infrastructurePresentation';
 import type { MapSelection } from './infrastructurePresentation';
+import { BusinessPanel } from './BusinessPanel';
+import { OperationsPanel } from './OperationsPanel';
+import { SimulationEventLog } from './SimulationEventLog';
+import { SimulationTimeBar } from './SimulationTimeBar';
+import './simulation.css';
 
 export function App() {
-  const [world] = useState(createInitialWorld);
+  const [simulation, dispatch] = useReducer(
+    simulationReducer,
+    undefined,
+    createInitialSimulation,
+  );
+  const view = selectPlayerView(simulation);
+  const { world } = view;
   const [layer, setLayer] = useState<MapLayer>('network');
   const [selection, setSelection] = useState<MapSelection>(null);
   const visibleConnections = selectLayerConnections(world, layer);
@@ -33,6 +47,14 @@ export function App() {
     setLayer(next);
     // Zasób zachowuje kontekst; ukryta relacja nie pozostaje zaznaczona.
     if (selection?.kind === 'connection') setSelection(null);
+  }
+
+  function onCommand(command: SimulationCommand) {
+    if (command.type === 'reset') {
+      setSelection(null);
+      setLayer('network');
+    }
+    dispatch(command);
   }
 
   return (
@@ -64,9 +86,11 @@ export function App() {
           </div>
         </div>
         <span className="version">
-          DEV 0.2 <span>· Living Infrastructure</span>
+          DEV 0.2 <span>· Simulation Engine</span>
         </span>
       </header>
+
+      <SimulationTimeBar view={view} onCommand={onCommand} />
 
       <div className="command-layout">
         <aside className="sidebar" aria-label="Warstwy i organizacja">
@@ -135,6 +159,7 @@ export function App() {
             </div>
             <span className="environment-badge">Środowisko symulowane</span>
           </div>
+          <BusinessPanel view={view} />
           <section className="map-panel" aria-labelledby="map-title">
             <div className="map-panel-heading">
               <div>
@@ -209,20 +234,25 @@ export function App() {
               </p>
             </div>
           </section>
+          <SimulationEventLog view={view} />
         </main>
 
-        <InfrastructureInspector
-          world={world}
-          selection={selection}
-          onSelect={select}
-        />
+        <div className="right-column">
+          <OperationsPanel view={view} onCommand={onCommand} />
+          <InfrastructureInspector
+            world={world}
+            selection={selection}
+            onSelect={select}
+            networkRules={view.rules}
+          />
+        </div>
       </div>
       <footer className="app-footer">
         <span>
           FORTRESS LAB <span className="muted">/</span> NEXUS Logistics
         </span>
         <span>
-          Rozpoznanie infrastruktury <span className="footer-dot" /> Sprint 2
+          Symulacja działalności <span className="footer-dot" /> Sprint 3
         </span>
       </footer>
     </div>

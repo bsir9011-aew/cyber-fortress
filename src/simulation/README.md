@@ -1,8 +1,13 @@
-# Symulacja
+# Silnik symulacji
 
-Miejsce na przyszłe czyste funkcje TypeScript: czas, dostęp, biznes i telemetrię.
-W bootstrapie 0.2 silnik nie jest jeszcze zaimplementowany.
+Czyste funkcje TypeScript, niezależne od Reacta, DOM, Node I/O i czasu rzeczywistego.
 
-Moduł może korzystać z `domain`, ale nie z Reacta, DOM, komponentów UI ani API
-przeglądarki. Czas i losowość będą przekazywane jawnie, aby zapewnić deterministyczne
-testy w środowisku Node. Nie twórz pętli symulacji w komponentach Reacta.
+- `clock.ts`: arytmetyka czasu i koniec okna operacyjnego.
+- `access.ts`: topologia, reguły, sesje, uprawnienia i wydanie nowego tunelu.
+- `business.ts`: zależności procesu i bilans zamówień.
+- `tasks.ts`: czas pracy, role i walidacja przydziału.
+- `engine.ts`: deterministyczne przejście stanu na komendę.
+
+Inicjalizacja, reset i publiczna projekcja pozostają w `application`; scenariusz
+w `content`, kontrakty w `domain`, a komunikaty interfejsu w `ui`.
+Kolejność tury i uproszczenia opisano w `docs/architecture.md`.

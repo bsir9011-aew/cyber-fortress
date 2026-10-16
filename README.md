@@ -2,15 +2,35 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — Living Infrastructure (Sprint 2)
+## FORTRESS LAB — Simulation Engine (Sprint 3)
 
 Strategiczno-techniczna gra o cyberbezpieczeństwie fikcyjnej firmy **NEXUS
 Logistics**. Uczymy poprzez decyzje i ich konsekwencje dla działalności firmy.
 
-Obecny etap to interaktywna mapa dziewięciu zasobów NEXUS Logistics, strefy,
-kierunkowe relacje i inspektor. Wszystkie systemy i powiązania pochodzą z jednego
-modelu świata. **Nie zawiera jeszcze silnika, incydentów, pierwszej misji ani
-zapisu gry.** Bez backendu i wymaganych kluczy API.
+Interaktywna mapa dziewięciu zasobów jest połączona z deterministycznym silnikiem
+działalności firmy. Czas, zadania, stan VPN, sesje i reguły sieciowe wpływają na
+rzeczywistą kolejkę zamówień. Jeden stan symulacji zasila mapę i wszystkie panele.
+Bez backendu i wymaganych kluczy API.
+
+### Pierwsza próba symulacji
+
+1. Zleć administratorowi **Wyłącz VPN**. Zadanie trwa 5 minut; samo kliknięcie nie zmienia infrastruktury.
+2. Kliknij **Następne 5 minut**. Firma rozliczy poprzedni przedział przy sprawnym VPN, a następnie brama zostanie wyłączona.
+3. Przesuń kolejne tury: zamiast maksymalnie 22 firma obsługuje 8 zamówień na turę przy popycie 20. Kolejka rośnie o 12.
+4. Zleć **Włącz VPN** i zakończ jego zadanie. Wydajność wróci w następnym przedziale, o ile pozostałe zależności działają. Nadwyżka 2 zamówień pozwala stopniowo zmniejszać zaległości.
+5. O 15:30, po 18 turach, sprawdź podsumowanie. Cel: maksymalnie 40 zaległych zleceń. **Reset scenariusza** odtwarza stan początkowy.
+
+Czas nie płynie podczas oglądania mapy i planowania. Raport „Ostatnie 5 minut”
+dotyczy zakończonego przedziału; bieżąca wydajność uwzględnia już ukończone zmiany.
+Sześć początkowych tur bez VPN daje 72 zaległości. Po dalszych 12 sprawnych turach
+końcowa zaległość wynosi 48 — firma nie bankuje niewykorzystanej wydajności.
+
+Analityk może zbadać aktywne sesje VPN. Dopiero ukończone badanie udostępnia cele
+zakończenia sesji, blokady logowania lub resetu poświadczenia. To odrębne działania.
+Lista sesji zachowuje czas odczytu i wymaga ponownego badania, aby ją odświeżyć.
+Administrator może też zmieniać konkretne reguły, np. blokować SMB bez blokowania HTTPS.
+
+![Działająca symulacja NEXUS Logistics](docs/screenshots/nexus-simulation-engine.png)
 
 ### Poznawanie infrastruktury
 
@@ -26,7 +46,7 @@ Nie ma fikcyjnych audytów, napraw ani niepotwierdzonych ocen bezpieczeństwa.
 Relacja sieciowa nie oznacza uprawnienia do usługi, a zależność biznesowa wskazuje
 usługę potrzebną do pracy, nie trasę pakietów.
 
-![Mapa NEXUS Logistics z wybraną bramą VPN](docs/screenshots/nexus-infrastructure-map.png)
+Zachowano mapę, warstwy, inspektor i obsługę klawiatury ze Sprintu 2.
 
 ### Wymagania i uruchomienie
 
@@ -52,14 +72,14 @@ działała również w środowiskach z niezapisywalnym katalogiem domowym.
 
 ### Polecenia
 
-| Polecenie            | Działanie                                                  |
-| -------------------- | ---------------------------------------------------------- |
-| `npm run dev`        | Serwer deweloperski Vite z odświeżaniem zmian.             |
-| `npm run typecheck`  | Ścisłe sprawdzanie typów aplikacji, testów i konfiguracji. |
-| `npm test`           | Jednorazowe uruchomienie testów Vitest w Node.             |
-| `npm run test:watch` | Testy w trybie obserwowania zmian.                         |
-| `npm run build`      | Sprawdzenie typów i produkcyjny build do `dist/`.          |
-| `npm run preview`    | Lokalny podgląd zbudowanego `dist/` (domyślny port: 4173). |
+| Polecenie            | Działanie                                                        |
+| -------------------- | ---------------------------------------------------------------- |
+| `npm run dev`        | Serwer deweloperski Vite z odświeżaniem zmian.                   |
+| `npm run typecheck`  | Typy aplikacji, testów i konfiguracji oraz silnik bez typów DOM. |
+| `npm test`           | Jednorazowe uruchomienie testów Vitest w Node.                   |
+| `npm run test:watch` | Testy w trybie obserwowania zmian.                               |
+| `npm run build`      | Sprawdzenie typów i produkcyjny build do `dist/`.                |
+| `npm run preview`    | Lokalny podgląd zbudowanego `dist/` (domyślny port: 4173).       |
 
 Walidacja przed commitem:
 
@@ -74,9 +94,9 @@ npm run build
 ```text
 src/
   domain/       # typy i kontrakty świata
-  simulation/   # miejsce na przyszły silnik niezależny od Reacta
-  application/  # inicjalizacja świata i selektory warstw/powiązań
-  content/      # dane organizacji oraz scenariusz NEXUS Logistics
+  simulation/   # czas, dostęp, biznes, zadania i czyste przejścia stanu
+  application/  # inicjalizacja, reducer, publiczna projekcja i selektory mapy
+  content/      # infrastruktura i referencyjny scenariusz symulacji NEXUS
   ui/           # React, style i SVG
   persistence/  # miejsce na przyszłe adaptery zapisu
 docs/           # architektura i GDD
@@ -88,3 +108,10 @@ prototype/      # archiwalny prototyp HTML 0.1
 - [Prototyp referencyjny](prototype/README.md)
 
 Licencja: [MIT](LICENSE).
+
+### Granice etapu
+
+Silnik nie symuluje jeszcze przeciwnika, kopiowania danych, wykrywania incydentów,
+ekonomii ani zapisów gry. Nie ma źródła logów uwierzytelnienia: interfejs zgłasza
+ich brak, zamiast tworzyć fikcyjne alerty. Uproszczenia dostępu i zagregowanego
+legalnego zespołu opisano w [architekturze](docs/architecture.md).
