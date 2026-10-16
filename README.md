@@ -2,7 +2,7 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — Simulation Engine (Sprint 3)
+## FORTRESS LAB — Threat Simulation Engine (Sprint 4A)
 
 Strategiczno-techniczna gra o cyberbezpieczeństwie fikcyjnej firmy **NEXUS
 Logistics**. Uczymy poprzez decyzje i ich konsekwencje dla działalności firmy.
@@ -11,6 +11,33 @@ Interaktywna mapa dziewięciu zasobów jest połączona z deterministycznym siln
 działalności firmy. Czas, zadania, stan VPN, sesje i reguły sieciowe wpływają na
 rzeczywistą kolejkę zamówień. Jeden stan symulacji zasila mapę i wszystkie panele.
 Bez backendu i wymaganych kluczy API.
+
+Silnik zawiera też pierwszego symulowanego przeciwnika. Rekonesans, logowanie i
+każda porcja kopiowanych rekordów podlegają rzeczywistym warunkom dostępu. Jego
+plan i wyniki są prywatne: bieżący interfejs zachowuje dotychczasową wiedzę gracza,
+a podsumowanie na ekranie nadal dotyczy wyłącznie działalności firmy. Brak sensorów
+oznacza brak alertów SOC i automatycznej informacji o wycieku.
+
+### Walidacja przeciwnika
+
+```bash
+npm test
+# Szczegółowy raport ścieżek z rzeczywistymi liczbami:
+npm test -- src/simulation/attacker.test.ts --reporter=verbose --disableConsoleIntercept
+```
+
+Wyniki referencyjnych przebiegów 18 tur przy tym samym stanie początkowym:
+
+| Decyzja gracza                                    | Ujawnione rekordy | Obsłużone zamówienia | Zaległe |
+| ------------------------------------------------- | ----------------: | -------------------: | ------: |
+| A: brak reakcji                                   |              2000 |                  360 |       0 |
+| B: blokada SMB zlecona o 14:00, ukończona o 14:10 |                 0 |                  360 |       0 |
+| C: blokada SMB zlecona o 14:15, ukończona o 14:25 |               400 |                  360 |       0 |
+
+[Pełny raport i wykaz testów](docs/threat-simulation-validation.md) oraz
+[architektura i diagram przejść](docs/architecture.md#przeciwnik-sprint-4a)
+opisują backoff, ponowne logowanie i granice wiedzy. Liczby w tabeli są wynikami
+testów; nie są komunikatami dostępnymi graczowi podczas rozgrywki.
 
 ### Pierwsza próba symulacji
 
@@ -94,7 +121,7 @@ npm run build
 ```text
 src/
   domain/       # typy i kontrakty świata
-  simulation/   # czas, dostęp, biznes, zadania i czyste przejścia stanu
+  simulation/   # czas, dostęp, biznes, zadania, przeciwnik i przejścia stanu
   application/  # inicjalizacja, reducer, publiczna projekcja i selektory mapy
   content/      # infrastruktura i referencyjny scenariusz symulacji NEXUS
   ui/           # React, style i SVG
@@ -111,7 +138,8 @@ Licencja: [MIT](LICENSE).
 
 ### Granice etapu
 
-Silnik nie symuluje jeszcze przeciwnika, kopiowania danych, wykrywania incydentów,
-ekonomii ani zapisów gry. Nie ma źródła logów uwierzytelnienia: interfejs zgłasza
-ich brak, zamiast tworzyć fikcyjne alerty. Uproszczenia dostępu i zagregowanego
-legalnego zespołu opisano w [architekturze](docs/architecture.md).
+Transfer oznacza wyłącznie zmianę liczby ujawnionych rekordów w stanie TypeScript;
+nie wykonuje operacji na prawdziwych plikach ani w sieci. Nie ma jeszcze wykrywania
+incydentów, SOC/SIEM, panelu dochodzenia, ekonomii ani zapisów gry. Nie ma źródła
+logów uwierzytelnienia: interfejs zgłasza ich brak. Uproszczenia przeciwnika, dostępu
+i zagregowanego legalnego zespołu opisano w [architekturze](docs/architecture.md).

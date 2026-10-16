@@ -7,6 +7,7 @@ Czyste funkcje TypeScript, niezależne od Reacta, DOM, Node I/O i czasu rzeczywi
 - `business.ts`: zależności procesu i bilans zamówień.
 - `tasks.ts`: czas pracy, role i walidacja przydziału.
 - `engine.ts`: deterministyczne przejście stanu na komendę.
+- `attacker.ts`: planer z ograniczoną wiedzą i prywatne rozstrzyganie prób dostępu/transferu.
 
 Inicjalizacja, reset i publiczna projekcja pozostają w `application`; scenariusz
 w `content`, kontrakty w `domain`, a komunikaty interfejsu w `ui`.

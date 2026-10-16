@@ -1,10 +1,10 @@
 import type { SimulationState } from '../domain/simulation';
 
-/** Referencyjny wariant GDD, bez planera i transferu danych napastnika. */
+/** Dane działalności i dostępu; plan przeciwnika definiuje nexusAttack. */
 export const nexusSimulation: Pick<
   SimulationState,
-  'clock' | 'process' | 'access' | 'hidden'
-> = {
+  'clock' | 'process' | 'access'
+> & { readonly hidden: Pick<SimulationState['hidden'], 'sessionOrigins'> } = {
   clock: { startMinute: 14 * 60, turnMinutes: 5, turnLimit: 18, turn: 0 },
   process: {
     id: 'dispatch',
