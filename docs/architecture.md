@@ -1,4 +1,4 @@
-# Architektura FORTRESS LAB — Sprint 5
+# Architektura FORTRESS LAB — Sprint 6
 
 Jedna aplikacja React + TypeScript + Vite z natywną mapą SVG. Silnik to czyste
 funkcje TypeScript: bez Reacta, DOM, zegara systemowego, I/O i losowości.
@@ -14,7 +14,7 @@ Nie ma dodatkowych zależności projektu ani backendu.
 | `src/simulation`     | Zegar, biznes, dostęp, walidacja zadań i przejścia stanu.            |
 | `src/application`    | Inicjalizacja, reset/reducer, projekcja dla gracza i selektory mapy. |
 | `src/ui`             | Mapa, inspektor, panele, formularze komend i polskie opisy zdarzeń.  |
-| `src/persistence`    | Miejsce na przyszłe adaptery zapisu i migracje.                      |
+| `src/persistence`    | Wersjonowane migawki, walidacja, localStorage i historia prób.                      |
 | `docs` / `prototype` | Dokumentacja, screenshoty i niezmieniony prototyp 0.1.               |
 
 `SimulationState` zawiera jeden `world: WorldState` oraz zegar, proces i bilans
@@ -372,7 +372,8 @@ priorytety na granicy tury, brak wycieku wiedzy, deterministyczność i reset.
 `npm run typecheck` sprawdza również silnik bez typów DOM. `npm run build` najpierw
 wykonuje te kontrole. Testy silnika działają w Node, bez emulacji przeglądarki.
 
-192 testy obejmują zachowane 123 i 69 nowych przypadków wariantów. W trzech
+192 testy poprzednich sprintów obejmują zachowane 123 i 69 przypadków wariantów.
+Sprint 6 dodaje 57 przypadków zapisu (łącznie 249). W Sprincie 5 w trzech
 starszych plikach doprecyzowano tylko typ referencyjnego fixture'a i jeden parametr
 typu redukcji; asercje i wyniki nie zmieniły się. Testy walidują referencje,
 brak przeciwnika, rzeczywiste legalne logowania, prywatność, reset i 12 pełnych
@@ -384,7 +385,45 @@ zawiera liczbowe porównanie i Chromium. Historyczne wyniki zachowują
 Trzy stałe definicje obejmują co najwyżej jednego przeciwnika, jeden trop, jeden protokół i trzy porcje danych.
 Nie ma adaptacyjnego szukania innych hostów, pełnego skanowania, zmieniania
 znanego hasła, pełnego SIEM/SOAR, sensorów ruchu, audytu plików, ekonomii, rozbudowanej kampanii,
-FastAPI ani trwałych zapisów. Zatrzymany planer nie zaczyna od nowa po wyczerpaniu
+FastAPI ani chmurowych zapisów. Zatrzymany planer nie zaczyna od nowa po wyczerpaniu
 prób; aktywny plan może zostać ucięty końcem okna 18 tur. GDD v1.0 i oryginalny
-HTML pozostają niezmienione. Żadne działanie nie wykonuje prawdziwej operacji
-sieciowej ani operacji na plikach lub danych użytkownika.
+HTML pozostają niezmienione. Żadna akcja symulacji nie wykonuje prawdziwej
+operacji sieciowej. Warstwa persistence korzysta z localStorage i plików JSON
+wybranych przez gracza.
+
+## Trwałość operacji i publikacja — Sprint 6
+
+`application/operationSession.ts` otacza jeden `SimulationState` metadanymi próby,
+dziennikiem komend i małym stanem widoku. Nie utrzymuje drugiego świata. Czas
+rzeczywisty oraz UUID pochodzą z adaptera UI i dotyczą wyłącznie identyfikacji
+próby, zapisu i zakończenia. Silnik oraz jego kolejność zdarzeń nie zmieniły się.
+
+`persistence/saveFormat.ts` definiuje `FortressSaveV1`. Pełna migawka zawiera
+infrastrukturę, dostęp, biznes, zadania, sensory, pozyskane dowody, narrację,
+ukrytych aktorów i pierwotną definicję scenariusza. Walidator ogranicza rozmiar,
+wersje, strukturę i komendy, następnie używa istniejącego reducera do odtworzenia
+kontrolnego stanu. Porównuje wszystkie pola migawki, bez pomijania ukrytej prawdy.
+To sprawdzenie spójności, a nie podpis kryptograficzny i nie drugi silnik.
+Dopiero sprawdzona migawka zastępuje bieżącą sesję, bez dodatkowej tury.
+
+`usePersistentOperations` odczytuje pamięć w leniwej inicjalizacji i blokuje
+pierwszy zapis do świadomego wznowienia, startu lub importu. Efekty reagują na
+zmianę sesji, nie na każdy render. Kontekst/mapa/briefing są zapisywane bez
+przesuwania czasu. Niezaakceptowane formularze i rozwinięte sekcje nie są
+nieodzownymi informacjami świata i nie są utrwalane.
+
+Adapter localStorage zapisuje osobno bieżącą próbę i maksymalnie 50 podsumowań.
+Podsumowanie pochodzi z istniejącego raportu po turze 18. Wariant B zachowuje
+`containmentMet: null` i nie otrzymuje fikcyjnego wyniku pokonania napastnika.
+ID chroni przed duplikacją, a ponowne zakończenie zaimportowanej wcześniejszej
+kopii aktualizuje ten sam wiersz. Jawna powtórka dostaje nowy UUID. Znacznik
+czyszczenia zapobiega powracaniu dawnych raportów po odświeżeniu, zachowując
+możliwość zapisania przyszłego wyniku aktywnej próby.
+
+Vite używa `/` w dev oraz `/cyber-fortress/` w buildzie i preview. CI sprawdza PR;
+workflow Pages sprawdza `main`, publikuje tylko `dist/` i dopiero potem wdraża
+artifact w środowisku `github-pages`. Ani PR, ani ręczne uruchomienie na innej
+gałęzi nie ma ścieżki do wdrożenia produkcyjnego.
+
+Szczegóły: [format, limity i błędy](persistence.md),
+[raport regresyjny](persistence-validation.md), [publikacja](github-pages.md).

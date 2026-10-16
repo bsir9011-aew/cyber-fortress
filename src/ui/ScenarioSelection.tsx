@@ -2,12 +2,15 @@ import type { ScenarioMode } from '../domain/scenario';
 
 export function ScenarioSelection({
   onSelect,
+  autoFocus = true,
 }: {
   onSelect: (mode: ScenarioMode) => void;
+  autoFocus?: boolean;
 }) {
   return (
     <main id="main" className="scenario-selection">
       <div className="selection-heading">
+        <p className="eyebrow">Rozpocznij nową grę · wybierz tryb</p>
         <span className="eyebrow">FORTRESS LAB / The Uncertainty Protocol</span>
         <h1>
           Ten sam sygnał.
@@ -35,7 +38,7 @@ export function ScenarioSelection({
           <button
             className="primary-button"
             onClick={() => onSelect('training')}
-            autoFocus
+            autoFocus={autoFocus}
           >
             Rozpocznij trening →
           </button>
