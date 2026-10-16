@@ -1,66 +1,230 @@
+import { useState } from 'react';
+import { createInitialWorld } from '../application/createInitialWorld';
+import {
+  getConnectionLayer,
+  selectLayerConnections,
+} from '../application/infrastructureSelectors';
+import type { MapLayer } from '../application/infrastructureSelectors';
 import { nexusLogistics } from '../content/organization';
+import { InfrastructureInspector } from './InfrastructureInspector';
+import { InfrastructureMap } from './InfrastructureMap';
+import { connectionLabels, layers } from './infrastructurePresentation';
+import type { MapSelection } from './infrastructurePresentation';
 
 export function App() {
+  const [world] = useState(createInitialWorld);
+  const [layer, setLayer] = useState<MapLayer>('network');
+  const [selection, setSelection] = useState<MapSelection>(null);
+  const visibleConnections = selectLayerConnections(world, layer);
+  const activeLayer = layers.find((item) => item.id === layer)!;
+  const relationKinds = [
+    ...new Set(visibleConnections.map((connection) => connection.kind)),
+  ];
+
+  function select(value: MapSelection) {
+    if (value?.kind === 'connection') {
+      const connection = world.connections.find((item) => item.id === value.id);
+      if (connection) setLayer(getConnectionLayer(connection.kind));
+    }
+    setSelection(value);
+  }
+
+  function changeLayer(next: MapLayer) {
+    setLayer(next);
+    // Zasób zachowuje kontekst; ukryta relacja nie pozostaje zaznaczona.
+    if (selection?.kind === 'connection') setSelection(null);
+  }
+
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main">
+        Przejdź do mapy
+      </a>
       <header className="topbar">
-        <a className="brand" href="#main" aria-label="FORTRESS LAB — ekran główny">
-          <span className="brand-mark" aria-hidden="true">⬡</span>
-          <span>FORTRESS <span className="accent">LAB</span></span>
+        <a
+          className="brand"
+          href="#main"
+          aria-label="FORTRESS LAB — mapa infrastruktury"
+        >
+          <span className="brand-mark" aria-hidden="true">
+            ⬡
+          </span>
+          <span>
+            FORTRESS <span className="accent">LAB</span>
+            <small>CYBER DEFENSE SIMULATION</small>
+          </span>
         </a>
-        <span className="version">Wersja developerska 0.2</span>
+        <div className="topbar-organization">
+          <span className="organization-mark" aria-hidden="true">
+            N
+          </span>
+          <div>
+            <small>Organizacja</small>
+            <strong>{nexusLogistics.name}</strong>
+          </div>
+        </div>
+        <span className="version">
+          DEV 0.2 <span>· Living Infrastructure</span>
+        </span>
       </header>
 
-      <main id="main">
-        <section className="intro" aria-labelledby="welcome-title">
-          <p className="eyebrow">Centrum operacyjne · {nexusLogistics.name}</p>
-          <h1 id="welcome-title">Firma musi działać.</h1>
-          <p className="lead">
-            Poznaj infrastrukturę. Zrozum zależności. Podejmuj decyzje,
-            których konsekwencje odczuje cała organizacja.
-          </p>
-        </section>
-
-        <section className="workspace" aria-labelledby="map-title">
-          <div className="panel-header">
-            <div>
-              <p className="eyebrow">Infrastruktura IT</p>
-              <h2 id="map-title">{nexusLogistics.name}</h2>
-            </div>
-            <span className="tag">Bootstrap 0.2</span>
+      <div className="command-layout">
+        <aside className="sidebar" aria-label="Warstwy i organizacja">
+          <p className="eyebrow muted">Centrum dowodzenia</p>
+          <div className="current-view">
+            <span aria-hidden="true">⌘</span> Architektura{' '}
+            <span className="current-indicator" />
           </div>
-          <div className="map-placeholder">
-            <svg className="map-grid" viewBox="0 0 800 280" role="img" aria-labelledby="map-description">
-              <title id="map-description">Obszar przyszłej mapy infrastruktury SVG. Brak wczytanego scenariusza.</title>
-              <defs>
-                <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
-                  <path d="M 32 0 H 0 V 32" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="800" height="280" fill="url(#grid)" />
-            </svg>
-            <div className="empty-state">
-              <span className="empty-symbol" aria-hidden="true">＋</span>
-              <h3>Przestrzeń dla infrastruktury</h3>
-              <p>Scenariusz nie jest jeszcze wczytany.</p>
-            </div>
-          </div>
-          <p className="panel-note">Mapa będzie przedstawiać zasoby i relacje między nimi.</p>
-        </section>
-
-        <aside className="development-note" aria-labelledby="development-title">
-          <span className="note-marker" aria-hidden="true">i</span>
-          <div>
-            <h2 id="development-title">Fundament pod kolejne decyzje</h2>
+          <nav aria-label="Warstwy mapy">
+            <p className="eyebrow muted">Warstwy infrastruktury</p>
+            {layers.map((item, index) => (
+              <button
+                key={item.id}
+                className={`layer-button${layer === item.id ? ' active' : ''}`}
+                aria-pressed={layer === item.id}
+                onClick={() => changeLayer(item.id)}
+              >
+                <span className="layer-number">0{index + 1}</span>
+                <span>{item.name}</span>
+                <span className="layer-count">
+                  {selectLayerConnections(world, item.id).length}
+                </span>
+              </button>
+            ))}
+          </nav>
+          <section
+            className="organization-card"
+            aria-labelledby="organization-title"
+          >
+            <p className="eyebrow">Profil organizacji</p>
+            <h2 id="organization-title">{nexusLogistics.name}</h2>
             <p>
-              To wersja developerska FORTRESS LAB. Symulacja, incydenty i pierwsza
-              misja zostaną dodane w kolejnych etapach.
+              Logistyka opiera się na ludziach, usługach i dostępie do danych.
+            </p>
+            <dl>
+              <div>
+                <dt>Zasoby na mapie</dt>
+                <dd>{world.assets.length.toString().padStart(2, '0')}</dd>
+              </div>
+              <div>
+                <dt>Strefy</dt>
+                <dd>{world.zones.length.toString().padStart(2, '0')}</dd>
+              </div>
+              <div>
+                <dt>Relacje</dt>
+                <dd>{world.connections.length.toString().padStart(2, '0')}</dd>
+              </div>
+            </dl>
+          </section>
+          <div className="sidebar-note">
+            <span aria-hidden="true">◈</span>
+            <p>
+              Najpierw zrozum firmę.
+              <br />
+              Potem zdecyduj, jak ją chronić.
             </p>
           </div>
         </aside>
-      </main>
 
-      <footer>Nauka cyberbezpieczeństwa poprzez decyzje i ich konsekwencje.</footer>
+        <main id="main" className="main-workspace">
+          <div className="page-heading">
+            <div>
+              <p className="eyebrow">Operacje / Architektura</p>
+              <h1>Żywa infrastruktura</h1>
+              <p>Poznaj systemy, które utrzymują firmę w ruchu.</p>
+            </div>
+            <span className="environment-badge">Środowisko symulowane</span>
+          </div>
+          <section className="map-panel" aria-labelledby="map-title">
+            <div className="map-panel-heading">
+              <div>
+                <span className="eyebrow muted">Mapa organizacji</span>
+                <h2 id="map-title">{activeLayer.name}</h2>
+              </div>
+              <span className="map-counter">
+                {world.assets.length} zasobów <span> / </span>{' '}
+                {visibleConnections.length} relacji
+              </span>
+            </div>
+            <div className="layer-summary">
+              <span className={`layer-dot layer-${layer}`} />
+              <p>{activeLayer.description}</p>
+              <button
+                className="clear-selection"
+                onClick={() => setSelection(null)}
+                disabled={!selection}
+              >
+                Wyczyść wybór <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            {visibleConnections.length === 0 && (
+              <div className="empty-layer" role="status">
+                <span aria-hidden="true">◎</span>
+                <div>
+                  <strong>Brak relacji w tej warstwie</strong>
+                  <p>{activeLayer.emptyMessage}</p>
+                </div>
+              </div>
+            )}
+            <InfrastructureMap
+              world={world}
+              connections={visibleConnections}
+              selection={selection}
+              onSelect={select}
+            />
+            <div className="map-legend" aria-label="Legenda mapy">
+              {relationKinds.map((kind) => (
+                <span key={kind}>
+                  <i className={`legend-line kind-${kind}`} />
+                  {connectionLabels[kind]} →
+                </span>
+              ))}
+              <span>
+                <i className="legend-node" />
+                Wybrany zasób
+              </span>
+              <span>
+                <i className="legend-related" />
+                Powiązany zasób
+              </span>
+            </div>
+          </section>
+          <div className="map-guidance">
+            <span aria-hidden="true">⌖</span>
+            <p>
+              Wybierz zasób lub relację, aby otworzyć inspektor. Przełączaj
+              warstwy, aby poznawać różne zależności.
+            </p>
+            <span className="keyboard-hint">Tab · Enter</span>
+          </div>
+          <section className="exploration-note">
+            <span className="note-marker" aria-hidden="true">
+              i
+            </span>
+            <div>
+              <h2>Jedna firma. Wiele zależności.</h2>
+              <p>
+                Połączenia pokazują komunikację i role usług. Ich obecność nie
+                potwierdza uprawnień ani skuteczności zabezpieczeń.
+              </p>
+            </div>
+          </section>
+        </main>
+
+        <InfrastructureInspector
+          world={world}
+          selection={selection}
+          onSelect={select}
+        />
+      </div>
+      <footer className="app-footer">
+        <span>
+          FORTRESS LAB <span className="muted">/</span> NEXUS Logistics
+        </span>
+        <span>
+          Rozpoznanie infrastruktury <span className="footer-dot" /> Sprint 2
+        </span>
+      </footer>
     </div>
   );
 }

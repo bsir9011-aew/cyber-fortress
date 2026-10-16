@@ -1,0 +1,211 @@
+import {
+  selectAssetConnections,
+  selectRelatedAssets,
+} from '../application/infrastructureSelectors';
+import type { WorldState } from '../domain/world';
+import { AssetIcon } from './AssetIcon';
+import {
+  assetLabels,
+  connectionLabels,
+  statusLabels,
+} from './infrastructurePresentation';
+import type { MapSelection } from './infrastructurePresentation';
+
+interface Props {
+  world: WorldState;
+  selection: MapSelection;
+  onSelect: (selection: MapSelection) => void;
+}
+
+export function InfrastructureInspector({ world, selection, onSelect }: Props) {
+  const asset =
+    selection?.kind === 'asset'
+      ? world.assets.find((item) => item.id === selection.id)
+      : undefined;
+  const connection =
+    selection?.kind === 'connection'
+      ? world.connections.find((item) => item.id === selection.id)
+      : undefined;
+
+  return (
+    <aside className="inspector" aria-label="Inspektor infrastruktury">
+      <div className="inspector-heading">
+        <span className="eyebrow">Inspektor</span>
+        <span className="eyebrow muted">
+          {asset ? 'Zasób' : connection ? 'Relacja' : 'Wybierz element'}
+        </span>
+      </div>
+      {asset ? (
+        <>
+          <div className="inspector-icon">
+            <AssetIcon kind={asset.kind} />
+          </div>
+          <p className="eyebrow muted">{assetLabels[asset.kind]}</p>
+          <h2>{asset.name}</h2>
+          <span className={`status-badge status-${asset.status}`}>
+            ● {statusLabels[asset.status]} operacyjnie
+          </span>
+          <p className="inspector-description">{asset.description}</p>
+          <dl className="facts">
+            <div>
+              <dt>Strefa</dt>
+              <dd>
+                {world.zones.find((zone) => zone.id === asset.zoneId)?.name ??
+                  asset.zoneId}
+              </dd>
+            </div>
+            <div>
+              <dt>Właściciel</dt>
+              <dd>
+                {world.teams.find((team) => team.id === asset.ownerTeamId)
+                  ?.name ?? asset.ownerTeamId}
+              </dd>
+            </div>
+          </dl>
+          {asset.businessRole && (
+            <section className="inspector-section">
+              <h3>Znaczenie dla firmy</h3>
+              <p>{asset.businessRole}</p>
+            </section>
+          )}
+          <section className="inspector-section">
+            <h3>Usługi i protokoły</h3>
+            <div className="chips">
+              {asset.protocols.map((protocol) => (
+                <span className="chip" key={protocol}>
+                  {protocol}
+                </span>
+              ))}
+            </div>
+          </section>
+          <section className="inspector-section">
+            <h3>
+              Powiązane zasoby{' '}
+              <span>{selectRelatedAssets(world, asset.id).length}</span>
+            </h3>
+            <div className="related-assets">
+              {selectRelatedAssets(world, asset.id).map((related) => (
+                <button
+                  key={related.id}
+                  onClick={() => onSelect({ kind: 'asset', id: related.id })}
+                >
+                  {related.name}
+                  <span aria-hidden="true">→</span>
+                </button>
+              ))}
+            </div>
+          </section>
+          <section className="inspector-section">
+            <h3>Relacje · wszystkie warstwy</h3>
+            <div className="relation-list">
+              {selectAssetConnections(world, asset.id).map((relation) => {
+                const outgoing = relation.sourceAssetId === asset.id;
+                const other = world.assets.find(
+                  (item) =>
+                    item.id ===
+                    (outgoing
+                      ? relation.targetAssetId
+                      : relation.sourceAssetId),
+                );
+                return (
+                  <button
+                    key={relation.id}
+                    onClick={() =>
+                      onSelect({ kind: 'connection', id: relation.id })
+                    }
+                  >
+                    <span className={`relation-kind kind-${relation.kind}`}>
+                      {connectionLabels[relation.kind]}
+                    </span>
+                    <span>
+                      {outgoing ? '→' : '←'} {other?.name}
+                    </span>
+                    <small>
+                      {relation.protocol ? `${relation.protocol} · ` : ''}
+                      {relation.label}
+                    </small>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+          <p className="inspector-footnote">
+            Status operacyjny opisuje dostępność. Stan zabezpieczeń nie został
+            oceniony.
+          </p>
+        </>
+      ) : connection ? (
+        <>
+          <div
+            className={`connection-emblem kind-${connection.kind}`}
+            aria-hidden="true"
+          >
+            ⇢
+          </div>
+          <p className={`eyebrow kind-${connection.kind}`}>
+            {connectionLabels[connection.kind]}
+          </p>
+          <h2>{connection.label}</h2>
+          <div className="connection-endpoints">
+            {(['sourceAssetId', 'targetAssetId'] as const).map((key, index) => {
+              const endpoint = world.assets.find(
+                (item) => item.id === connection[key],
+              );
+              return (
+                <div key={key}>
+                  <span className="eyebrow muted">
+                    {index === 0 ? 'Źródło' : 'Cel'}
+                  </span>
+                  <button
+                    onClick={() =>
+                      onSelect({ kind: 'asset', id: connection[key] })
+                    }
+                  >
+                    {endpoint?.name ?? connection[key]}
+                    <span aria-hidden="true">→</span>
+                  </button>
+                  {index === 0 && (
+                    <span className="endpoint-arrow" aria-hidden="true">
+                      ↓
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <dl className="facts">
+            <div>
+              <dt>Typ relacji</dt>
+              <dd>{connectionLabels[connection.kind]}</dd>
+            </div>
+            {connection.protocol && (
+              <div>
+                <dt>Protokół</dt>
+                <dd>{connection.protocol}</dd>
+              </div>
+            )}
+          </dl>
+          <section className="inspector-section">
+            <h3>Znaczenie relacji</h3>
+            <p>{connection.description}</p>
+          </section>
+          {connection.kind === 'network' && (
+            <div className="context-note">
+              Ścieżka komunikacji nie oznacza przyznanych uprawnień. Reguły
+              dostępu nie są tutaj określone.
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="inspector-empty">
+          <span aria-hidden="true">⌖</span>
+          <h2>Poznaj swoją infrastrukturę</h2>
+          <p>
+            Wybierz zasób lub strzałkę na mapie, aby poznać jego rolę i
+            powiązania.
+          </p>
+        </div>
+      )}
+    </aside>
+  );
+}

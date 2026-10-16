@@ -18,6 +18,19 @@ export interface InfrastructureAsset {
   readonly ownerTeamId: string;
   readonly status: AssetStatus;
   readonly protocols: readonly string[];
+  readonly description: string;
+  readonly businessRole?: string;
+}
+
+export interface InfrastructureZone {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+}
+
+export interface InfrastructureTeam {
+  readonly id: string;
+  readonly name: string;
 }
 
 export type ConnectionKind =
@@ -33,4 +46,7 @@ export interface InfrastructureConnection {
   readonly sourceAssetId: AssetId;
   readonly targetAssetId: AssetId;
   readonly kind: ConnectionKind;
+  readonly label: string;
+  readonly description: string;
+  readonly protocol?: string;
 }
