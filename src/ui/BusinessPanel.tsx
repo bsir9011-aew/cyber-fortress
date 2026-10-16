@@ -22,6 +22,37 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
           Cel 15:30: ≤ {view.maxFinalBacklog} zaległych
         </span>
       </div>
+      <details className="business-dependencies">
+        <summary>Od czego zależy wydajność firmy?</summary>
+        <ul>
+          <li>
+            {view.businessDependencies.localCapacity} zamówień / turę: lokalne
+            stanowiska → ERP przez HTTPS.
+          </li>
+          <li>
+            {view.businessDependencies.remoteCapacity} zamówień / turę: konto{' '}
+            {view.businessDependencies.remoteAccountId} → ERP przez VPN i HTTPS.
+          </li>
+          {view.businessDependencies.additionalWork.map((work) => (
+            <li key={work.id}>
+              <strong>
+                {work.capacity} zamówień / turę: {work.name}.
+              </strong>{' '}
+              Konto {work.accountId} potrzebuje własnej aktywnej sesji oraz{' '}
+              {work.services
+                .map(
+                  (service) => `${service.targetAssetId} / ${service.protocol}`,
+                )
+                .join(' i ')}
+              .
+            </li>
+          ))}
+        </ul>
+        <p>
+          Wydajność wynika z dostępności, sesji, reguł i uprawnień.
+          Niewykorzystana wydajność nie przechodzi na kolejne tury.
+        </p>
+      </details>
       <dl className="business-metrics">
         <div>
           <dt>Otrzymane zamówienia</dt>
@@ -59,6 +90,16 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
           {view.availability.localAvailable ? 'dostępna' : 'niedostępna'}
         </span>
       </div>
+      {view.availability.contributions && (
+        <div className="business-access">
+          {view.availability.contributions.map((work) => (
+            <span key={work.id}>
+              {work.name}: {work.available ? 'dostępne' : 'niedostępne'} ·{' '}
+              {work.capacity} / turę
+            </span>
+          ))}
+        </div>
+      )}
       <p className="business-last-report">
         {report
           ? `Ostatnie 5 minut: +${report.received} zamówień · obsłużono ${report.processed} · wydajność ${report.capacity}.`

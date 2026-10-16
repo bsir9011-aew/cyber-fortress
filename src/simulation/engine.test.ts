@@ -4,7 +4,7 @@ import { selectPlayerView } from '../application/selectPlayerView';
 import { simulationReducer } from '../application/simulationReducer';
 import type {
   SimulationCommand,
-  SimulationState,
+  ReferenceSimulationState as SimulationState,
   TaskAction,
 } from '../domain/simulation';
 import { canUseService, issueVpnSession } from './access';

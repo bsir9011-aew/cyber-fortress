@@ -174,6 +174,21 @@ export function OperationsPanel({
               obejmuje także istniejący ruch tego protokołu. Inne przepływy mają
               osobne reguły.
             </p>
+            {view.businessDependencies.additionalWork
+              .filter((work) =>
+                work.services.some(
+                  (service) =>
+                    service.targetAssetId === rule.targetAssetId &&
+                    service.protocol === rule.protocol,
+                ),
+              )
+              .map((work) => (
+                <p className="decision-warning" key={work.id}>
+                  Ten przepływ jest wymagany przez legalne konto{' '}
+                  {work.accountId} dla {work.capacity} zamówień na turę:{' '}
+                  {work.name}.
+                </p>
+              ))}
             <button
               disabled={disabled('set-network-rule')}
               onClick={() =>

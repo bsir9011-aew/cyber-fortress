@@ -49,7 +49,7 @@ export function SimulationTimeBar({
         className="reset-button"
         onClick={() => onCommand({ type: 'reset' })}
       >
-        {view.finished ? 'Zagraj ponownie' : 'Od nowa'}
+        {view.finished ? 'Powtórz ten sam incydent' : 'Powtórz próbę'}
       </button>
     </section>
   );

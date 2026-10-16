@@ -4,19 +4,15 @@ import type {
   SimulationEventData,
   SimulationState,
 } from '../domain/simulation';
-import { isAssetOnline, isSessionActive, issueVpnSession } from './access';
+import { isAssetOnline, isSessionActive } from './access';
 import { isBusinessGoalMet, settleBusiness } from './business';
 import { currentMinute, isFinished } from './clock';
 import { taskRejection, taskSpecs } from './tasks';
 import { stepAttacker } from './attacker';
-import {
-  recordAuthentication,
-  readAuthenticationLogs,
-  updateTelemetry,
-} from './telemetry';
+import { readAuthenticationLogs, updateTelemetry } from './telemetry';
 import { updateNarrative } from './narrative';
 import { completeDecision, rememberDecision } from './threatAssessment';
-import { nexusOwnerAccount } from '../content/nexusIncident';
+import { resumeLegitimateWork } from './legitimateActors';
 
 function record(
   state: SimulationState,
@@ -118,54 +114,6 @@ function applyTaskEffect(
   }
 }
 
-/** Jeden zagregowany legalny zespół, bez automatycznego odtwarzania S-19. */
-function resumeLegitimateWork(state: SimulationState): SimulationState {
-  const minute = currentMinute(state.clock);
-  const access = {
-    ...state.access,
-    sessions: state.access.sessions.map((session) =>
-      session.status === 'active' && session.expiresAtMinute <= minute
-        ? { ...session, status: 'expired' as const }
-        : session,
-    ),
-  };
-  const next = { ...state, access };
-  const account = access.accounts.find(
-    (item) => item.id === state.process.remoteAccountId,
-  );
-  if (
-    !account ||
-    access.sessions.some(
-      (session) =>
-        session.accountId === account.id && isSessionActive(session, minute),
-    )
-  )
-    return next;
-  const result = issueVpnSession(
-    state.world,
-    access,
-    {
-      sessionId: `B-reconnect-${String(state.clock.turn).padStart(2, '0')}`,
-      accountId: account.id,
-      credentialVersion: account.credentialVersion,
-    },
-    minute,
-  );
-  const observed = recordAuthentication(next, account.id, result);
-  if (!result.ok) return observed;
-  return {
-    ...observed,
-    access: result.access,
-    hidden: {
-      ...state.hidden,
-      sessionOrigins: {
-        ...state.hidden.sessionOrigins,
-        [result.session.id]: 'legitimate',
-      },
-    },
-  };
-}
-
 function observeVpnSessions(state: SimulationState): SimulationState {
   if (
     !state.telemetry.sessionSensor.enabled ||
@@ -219,10 +167,15 @@ function observeCompletedResearch(
     );
   }
   if (task.action.type === 'contact-account-owner') {
+    const accountId = task.action.accountId;
+    const witness = state.hidden.scenario.witnesses.find(
+      (item) => item.accountId === accountId,
+    );
+    if (!witness) return record(state, { kind: 'research-unavailable' });
     const statement = {
       id: task.id,
       kind: 'human-statement' as const,
-      ...nexusOwnerAccount,
+      ...witness,
       observedAtMinute: currentMinute(state.clock),
     };
     return record(

@@ -39,6 +39,7 @@ export interface IncidentState {
 
 /** Wyłącznie diagnoza po rozgrywce, nigdy wejście detektora lub narracji. */
 export interface ThreatAccessAssessment {
+  readonly applicable: boolean;
   readonly activeSessionIds: readonly string[];
   readonly usableSessionIds: readonly string[];
   readonly stolenCredentialStillCurrent: boolean;

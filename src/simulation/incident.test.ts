@@ -7,7 +7,7 @@ import { nexusTelemetry } from '../content/nexusIncident';
 import { nexusAttack } from '../content/nexusAttack';
 import type {
   SimulationCommand,
-  SimulationState,
+  ReferenceSimulationState as SimulationState,
   TaskAction,
 } from '../domain/simulation';
 import { createInitialAttacker } from './attacker';

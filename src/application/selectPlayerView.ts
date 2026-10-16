@@ -12,6 +12,9 @@ import { knownAccountIds } from '../simulation/tasks';
 /** Jawna projekcja: nigdy spread SimulationState/access/hidden do komponentów. */
 export function selectPlayerView(state: SimulationState) {
   return {
+    run: { ...state.run },
+    briefing: { ...state.hidden.scenario.briefing },
+    recordPool: state.hidden.scenario.goals.recordPool,
     world: state.world,
     clock: state.clock,
     minute: currentMinute(state.clock),
@@ -21,6 +24,12 @@ export function selectPlayerView(state: SimulationState) {
     maxFinalBacklog: state.process.maxFinalBacklog,
     goalMet: isBusinessGoalMet(state),
     availability: businessAvailability(state),
+    businessDependencies: {
+      localCapacity: state.process.localCapacity,
+      remoteCapacity: state.process.remoteCapacity,
+      remoteAccountId: state.process.remoteAccountId,
+      additionalWork: state.process.additionalWork ?? [],
+    },
     vpnAssetId: state.access.vpnAssetId,
     vpnOnline: isAssetOnline(state.world, state.access.vpnAssetId),
     erpOnline: isAssetOnline(state.world, state.process.erpAssetId),

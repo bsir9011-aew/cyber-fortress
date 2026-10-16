@@ -2,7 +2,9 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { createInitialSimulation } from '../application/createInitialSimulation';
 import { selectPlayerView } from '../application/selectPlayerView';
 import { selectMissionReport } from '../application/selectMissionReport';
-import { simulationReducer } from '../application/simulationReducer';
+import { scenarioReducer } from '../application/scenarioReducer';
+import { nextRun } from '../application/scenarioSelectors';
+import type { ScenarioMode } from '../domain/scenario';
 import type { SimulationCommand } from '../domain/simulation';
 import {
   getConnectionLayer,
@@ -20,11 +22,13 @@ import { SimulationEventLog } from './SimulationEventLog';
 import { SimulationTimeBar } from './SimulationTimeBar';
 import { InvestigationPanel } from './InvestigationPanel';
 import { MissionBriefing } from './MissionBriefing';
+import { ScenarioSelection } from './ScenarioSelection';
 import { MissionReportPanel } from './MissionReportPanel';
 import { NarrativeFeed } from './NarrativeFeed';
 import { eventLabel } from './simulationPresentation';
 import './simulation.css';
 import './mission.css';
+import './scenario.css';
 
 type Context = 'cases' | 'operations' | 'architecture';
 const contexts: { id: Context; label: string; number: string }[] = [
@@ -35,7 +39,7 @@ const contexts: { id: Context; label: string; number: string }[] = [
 
 export function App() {
   const [simulation, dispatch] = useReducer(
-    simulationReducer,
+    scenarioReducer,
     undefined,
     createInitialSimulation,
   );
@@ -43,6 +47,7 @@ export function App() {
   const report = selectMissionReport(simulation);
   const { world } = view;
   const [briefing, setBriefing] = useState(true);
+  const [choosingMode, setChoosingMode] = useState(true);
   const [context, setContext] = useState<Context>('cases');
   const [layer, setLayer] = useState<MapLayer>('network');
   const [selection, setSelection] = useState<MapSelection>(null);
@@ -63,8 +68,8 @@ export function App() {
     (view.sessionObservation ? 1 : 0);
 
   useEffect(() => {
-    if (!briefing) headingRef.current?.focus();
-  }, [briefing, context, view.finished]);
+    if (!briefing && !choosingMode) headingRef.current?.focus();
+  }, [briefing, choosingMode, context, view.finished]);
 
   function select(value: MapSelection) {
     if (value?.kind === 'connection') {
@@ -86,6 +91,19 @@ export function App() {
       setAttempt((value) => value + 1);
     }
     dispatch(command);
+  }
+  function startRun(mode: ScenarioMode, seed: number) {
+    dispatch({ type: 'start-run', mode, seed });
+    setChoosingMode(false);
+    setBriefing(true);
+    setContext('cases');
+    setLayer('network');
+    setSelection(null);
+    setAttempt((value) => value + 1);
+  }
+  function newIncident() {
+    const run = nextRun(view.run);
+    startRun(run.mode, run.seed);
   }
 
   return (
@@ -117,14 +135,26 @@ export function App() {
           </div>
         </div>
         <span className="version">
-          DEV 0.2 <span>· First Playable Incident</span>
+          DEV 0.2 <span>· The Uncertainty Protocol</span>
         </span>
       </header>
-      {briefing ? (
-        <MissionBriefing onStart={() => setBriefing(false)} />
+      {choosingMode ? (
+        <ScenarioSelection
+          onSelect={(mode) => startRun(mode, mode === 'training' ? 0 : 1)}
+        />
+      ) : briefing ? (
+        <MissionBriefing view={view} onStart={() => setBriefing(false)} />
       ) : (
         <>
           <SimulationTimeBar view={view} onCommand={onCommand} />
+          <div className="run-mode-bar">
+            <span>
+              {view.run.mode === 'training' ? 'Trening' : 'Nieznany incydent'} ·
+              próba {String(view.run.seed).padStart(3, '0')}
+            </span>
+            <span>Powtórka zachowuje identyczny stan początkowy.</span>
+            <button onClick={() => setChoosingMode(true)}>Wybór trybu</button>
+          </div>
           {report ? (
             <main id="main" className="report-workspace">
               <h1 ref={headingRef} tabIndex={-1} className="sr-only">
@@ -133,6 +163,7 @@ export function App() {
               <MissionReportPanel
                 report={report}
                 onReplay={() => onCommand({ type: 'reset' })}
+                onNewIncident={newIncident}
               />
             </main>
           ) : (
@@ -402,7 +433,7 @@ export function App() {
           FORTRESS LAB <span className="muted">/</span> NEXUS Logistics
         </span>
         <span>
-          First Playable Incident <span className="footer-dot" /> Sprint 4B
+          The Uncertainty Protocol <span className="footer-dot" /> Sprint 5
         </span>
       </footer>
     </div>

@@ -6,7 +6,6 @@ import type {
 } from '../domain/simulation';
 import { isAssetOnline, isSessionActive } from './access';
 import { currentMinute } from './clock';
-import { nexusOwnerAccount } from '../content/nexusIncident';
 
 export function knownAccountIds(
   state: Pick<SimulationState, 'knowledge' | 'incident'>,
@@ -91,7 +90,9 @@ export function taskRejection(
     case 'contact-account-owner':
       if (!knownAccountIds(state).includes(action.accountId))
         return 'target-not-observed';
-      return action.accountId === nexusOwnerAccount.accountId
+      return state.hidden.scenario.witnesses.some(
+        (witness) => witness.accountId === action.accountId,
+      )
         ? null
         : 'unknown-target';
     case 'terminate-session':

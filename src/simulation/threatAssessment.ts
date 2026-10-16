@@ -16,7 +16,18 @@ import { currentMinute } from './clock';
 export function assessThreatAccess(
   state: SimulationState,
 ): ThreatAccessAssessment {
-  const definition = state.hidden.attacker.definition;
+  const definition = state.hidden.attacker?.definition;
+  if (!definition)
+    return {
+      applicable: false,
+      activeSessionIds: [],
+      usableSessionIds: [],
+      stolenCredentialStillCurrent: false,
+      newAuthenticationAllowed: false,
+      accessAfterNewAuthentication: false,
+      targetAccessCutOff: false,
+      accountContained: false,
+    };
   const minute = currentMinute(state.clock);
   const active = state.access.sessions.filter(
     (session) =>
@@ -73,6 +84,7 @@ export function assessThreatAccess(
     account.credentialVersion !== definition.stolenCredentialVersion ||
     account.mfaPolicy === 'required';
   return {
+    applicable: true,
     activeSessionIds: active.map((session) => session.id),
     usableSessionIds: usable.map((session) => session.id),
     stolenCredentialStillCurrent: state.access.accounts.some(
@@ -147,7 +159,7 @@ export function completeDecision(
                 remoteCapacityBefore,
                 remoteCapacityAfter,
                 exposedRecordsAtCompletion:
-                  before.hidden.attacker.transfer.exposedRecords,
+                  before.hidden.attacker?.transfer.exposedRecords ?? 0,
                 changedCapabilities:
                   JSON.stringify(beforeAccess) !==
                     JSON.stringify(afterAccess) ||
