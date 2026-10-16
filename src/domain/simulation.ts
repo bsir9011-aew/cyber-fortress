@@ -1,5 +1,6 @@
 import type { AccessState, NetworkRule } from './access';
 import type { WorldState } from './world';
+import type { AttackerState } from './attack';
 
 export interface SimulationClock {
   readonly startMinute: number;
@@ -135,6 +136,7 @@ export interface SimulationState {
   /** Dziennik potwierdzeń działań i raportów biznesowych, nie log uwierzytelnień. */
   readonly history: readonly SimulationEvent[];
   readonly hidden: {
+    readonly attacker: AttackerState;
     readonly sessionOrigins: Readonly<
       Record<string, 'unauthorized' | 'legitimate'>
     >;

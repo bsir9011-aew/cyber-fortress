@@ -8,6 +8,7 @@ import { isAssetOnline, isSessionActive, issueVpnSession } from './access';
 import { isBusinessGoalMet, settleBusiness } from './business';
 import { currentMinute, isFinished } from './clock';
 import { taskRejection, taskSpecs } from './tasks';
+import { stepAttacker } from './attacker';
 
 function record(
   state: SimulationState,
@@ -146,6 +147,7 @@ function resumeLegitimateWork(state: SimulationState): SimulationState {
     ...next,
     access: result.access,
     hidden: {
+      ...state.hidden,
       sessionOrigins: {
         ...state.hidden.sessionOrigins,
         [result.session.id]: 'legitimate',
@@ -218,8 +220,9 @@ function advanceTurn(state: SimulationState): SimulationState {
     if (task.workerId === 'administrator')
       next = record(next, { kind: 'configuration-changed', task: completed });
   }
-  // 3. Wygaśnięcia i legalne ponowne logowanie po zmianach konfiguracji.
+  // 3. Wygaśnięcia oraz legalny zespół i przeciwnik po zmianach konfiguracji.
   next = resumeLegitimateWork(next);
+  next = stepAttacker(next);
   // 4. Tylko ukończone badanie ujawnia dozwoloną obserwację.
   for (const task of due)
     if (task.action.type === 'inspect-vpn-sessions')

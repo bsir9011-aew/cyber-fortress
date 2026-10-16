@@ -1,10 +1,17 @@
 import { nexusSimulation } from '../content/nexusSimulation';
 import type { SimulationState } from '../domain/simulation';
 import { createInitialWorld } from './createInitialWorld';
+import { nexusAttack } from '../content/nexusAttack';
+import { createInitialAttacker } from '../simulation/attacker';
 
 export function createInitialSimulation(): SimulationState {
+  const scenario = structuredClone(nexusSimulation);
   return {
-    ...structuredClone(nexusSimulation),
+    ...scenario,
+    hidden: {
+      ...scenario.hidden,
+      attacker: createInitialAttacker(nexusAttack),
+    },
     world: createInitialWorld(),
     business: {
       totalReceived: 0,

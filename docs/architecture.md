@@ -1,4 +1,4 @@
-# Architektura FORTRESS LAB — Sprint 3
+# Architektura FORTRESS LAB — Sprint 4A
 
 Jedna aplikacja React + TypeScript + Vite z natywną mapą SVG. Silnik to czyste
 funkcje TypeScript: bez Reacta, DOM, zegara systemowego, I/O i losowości.
@@ -19,7 +19,9 @@ Nie ma dodatkowych zależności projektu ani backendu.
 
 `SimulationState` zawiera jeden `world: WorldState` oraz zegar, proces i bilans
 biznesowy, fakty dostępu, zadania, wiedzę gracza, historię i ukryte pochodzenie
-sesji. Dostępność zasobu istnieje tylko w `world.assets[].status`: nie ma drugiej
+sesji. W Sprincie 4A `hidden.attacker` przechowuje plan, własną wiedzę, licznik
+ujawnionych rekordów i prywatną historię przeciwnika. Dostępność zasobu istnieje
+tylko w `world.assets[].status`: nie ma drugiej
 flagi VPN w React ani w stanie dostępu. `WorldState` nadal zawiera 9 zasobów,
 5 stref i 11 relacji topologii. Konta i uprawnienia są odrębnymi faktami silnika.
 
@@ -37,7 +39,7 @@ komend nie przesuwa zegara. Na granicy tury:
 
 1. Rozliczamy napływ i obsługę zamówień za zakończony przedział według starej konfiguracji.
 2. Kończymy należne zadania, sortując po terminie, priorytecie i stabilnym ID. Zmiany administratora poprzedzają odczyt analityka.
-3. Wygaszamy sesje i rozstrzygamy ponowne logowanie legalnego zespołu przy aktualnej konfiguracji.
+3. Wygaszamy sesje, rozstrzygamy ponowne logowanie legalnego zespołu i najwyżej jedną akcję przeciwnika przy aktualnej konfiguracji.
 4. Ukończone badanie odczytuje dozwolone pola aktywnych sesji z dostępnej bramy.
 5. Po turze 18 oceniamy cel biznesowy i blokujemy dalszą rozgrywkę. Reset pozostaje dostępny.
 
@@ -112,7 +114,90 @@ powoduje odmowę wydania sesji w tym silniku.
 To jawna semantyka fikcyjnej bramy. Nie modelujemy routingu wszystkich urządzeń,
 pełnego AD, stanowego firewalla ani osobnych sesji aplikacyjnych ERP i chmury.
 Lokalny kanał biznesowy zakłada istniejące uprawnienia stanowisk do ERP; zdalne
-uprawnienia są sprawdzane jawnie. Nie symulujemy odczytu ani kopiowania danych.
+uprawnienia są sprawdzane jawnie. Kopiowanie jest rozliczane abstrakcyjnymi
+rekordami, bez fizycznych plików i operacji sieciowych.
+
+## Przeciwnik (Sprint 4A)
+
+`domain/attack.ts` definiuje prywatny stan i wyniki prób. Parametry znajdują się w
+`content/nexusAttack.ts`, a czyste przejścia w `simulation/attacker.ts`.
+`createInitialSimulation` inicjalizuje nowy, niezależny stan przeciwnika; reset
+odtwarza także jego wiedzę, harmonogram, licznik i prywatną historię.
+
+`selectAttackerAction` przyjmuje wyłącznie stan przeciwnika i numer tury. Nie
+otrzymuje świata, nowych reguł, stanu konta ani jego aktualnej wersji hasła.
+`stepAttacker` jest resolverem: sprawdza wykonanie planu na rzeczywistych danych
+przez dotychczasowe `canUseService`, `isSessionActive` i `issueVpnSession`.
+Oddzielenie wyboru od rozstrzygnięcia pozwala wymienić planer bez zmiany dostępu
+i rozliczania porcji. Nie powstaje drugi model infrastruktury lub czasu.
+
+Początkowe informacje to przejęte poświadczenie `magazyn-07` w wersji 1, znany
+tunel S-19, brama VPN i jedyny trop celu FS-01/SMB. Rekonesans potwierdza dostęp
+do tego celu; nie skanuje całego grafu ani nie podaje przeciwnikowi nowych
+alternatywnych dróg. Sukces lub ogólna odmowa są wynikami własnej próby. Odmowa
+nie zdradza ID reguły, dokładnego uprawnienia ani przyczyny błędu logowania.
+Własny odczyt pozostaje migawką: zmiana świata nie aktualizuje go automatycznie.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Rekonesans
+    Rekonesans --> StartTransferu: dostęp potwierdzony
+    StartTransferu --> Transfer: dostęp nadal działa
+    Transfer --> Transfer: następna porcja / następna tura
+    Transfer --> Ukończony: osiągnięto limit rekordów
+    Rekonesans --> Logowanie: utrata zapamiętanego tunelu
+    StartTransferu --> Logowanie: utrata zapamiętanego tunelu
+    Transfer --> Logowanie: utrata zapamiętanego tunelu
+    Logowanie --> Rekonesans: nowy tunel / brak rozpoznania
+    Logowanie --> StartTransferu: nowy tunel / rozpoznano cel
+    Logowanie --> Transfer: nowy tunel / transfer był rozpoczęty
+    Rekonesans --> Zatrzymany: 3 kolejne niepowodzenia
+    StartTransferu --> Zatrzymany: 3 kolejne niepowodzenia
+    Transfer --> Zatrzymany: 3 kolejne niepowodzenia
+    Logowanie --> Zatrzymany: 3 kolejne niepowodzenia
+    Ukończony --> [*]
+    Zatrzymany --> [*]
+```
+
+Nazwy diagramu opisują `nextAction.kind`; terminalne stany odpowiadają
+`status: completed/blocked`. Nie utrzymujemy drugiej, konkurencyjnej flagi fazy.
+Czekanie wynika z `nextAction.dueTurn`. Niepowodzenie poniżej limitu powtarza
+bieżącą akcję po dwóch turach (10 minutach); utrata tunelu kieruje wtedy do
+logowania. Wykrycie utraty tunelu też zużywa próbę i wlicza się do trzech kolejnych
+niepowodzeń. Sukces zeruje licznik. Po wyczerpaniu limitu przeciwnik nie wznawia
+działania wskutek późniejszej zmiany reguł. To jawna granica pierwszego planera.
+
+Każda udana akcja zajmuje osobną granicę tury. Bez obrony: rekonesans o 14:10,
+start transferu o 14:15, porcje 400/800/800 o 14:20/14:25/14:30. Przed rekonesansem,
+startem oraz **każdą** porcją wymagane są własny aktywny tunel i poprawne warunki
+usługi, topologii, SMB oraz uprawnienia. Historia i licznik zmieniają się dopiero
+po rozstrzygnięciu. Sam termin nie przyznaje danych.
+
+Utrata sesji nie powoduje przejęcia dowolnej innej sesji tego konta. Przeciwnik
+próbuje zalogować się sam, używając wyłącznie znanej starej wersji poświadczenia.
+Nowy neutralny ID (S-20, S-21 itd.) przydziela resolver spośród wolnych ID;
+nazwy nie zawierają etykiety napastnika. Wiedza o aktualnym haśle legalnego zespołu
+nie jest przekazywana napastnikowi. Poprawne logowanie nie kopiuje nic w tej samej
+turze: następna tura wznawia etap wynikający z wcześniej zdobytej wiedzy.
+
+Przykładowo zakończenie S-19 o 14:10 powoduje wykrycie utraty tunelu, próbę
+logowania o 14:20 i — gdy się uda — rekonesans o 14:25, start o 14:30, porcje
+o 14:35/14:40/14:45. Przy wznowieniu przerwanego transferu zachowujemy już ujawnione
+rekordy i numer kolejnej porcji. Nie ma bankowania pominiętych okien transferu.
+Każda granica tury rozstrzyga najwyżej jedną akcję przeciwnika.
+
+Zastosowana o 14:25 blokada SMB zatrzymuje próbę z 14:25. Jeżeli 400 rekordów
+dotarło o 14:20, pozostaje ujawnione. Licznik rośnie monotonnie i jest ograniczony
+limitem 2000; ostatnia porcja jest przycinana do pozostałej liczby rekordów.
+Dostarczenie porcji przez tunel VPN jest ujawnieniem: nie ma dodatkowego etapu
+przesyłania jej przez firmowy Internet. Konto, tunel i HTTPS do ERP zachowują
+semantykę Sprintu 3; zablokowanie SMB nie jest uniwersalną blokadą usług.
+
+`advanceTurn` wywołuje przeciwnika po zakończeniu zadań i zmianach konfiguracji,
+przed końcowym odczytem analityka. Legalny zespół i przeciwnik mają w tym wariancie
+stałą kolejność: legalny zespół pierwszy, przeciwnik drugi. To różne akcje aktorów,
+nie dzielony budżet jednego napastnika. Po 18 turach cały silnik zatrzymuje się,
+także gdy prywatny plan przewiduje późniejszą próbę. Nie przyznajemy mu dodatkowych tur.
 
 ## Wiedza gracza i obserwacje
 
@@ -133,6 +218,20 @@ publicznej. Nie ma modelowanego źródła logów uwierzytelnienia ani sensorów 
 więc komenda pobrania logów jest odrzucana, a warstwa telemetrii pozostaje pusta.
 Dziennik operacyjny to potwierdzenia działań i raporty firmy, nie pozorowany SIEM.
 
+`PrivateAttackEvent` jest osobnym kontraktem od publicznego `SimulationEvent`.
+`stepAttacker` zapisuje go wyłącznie do `hidden.attacker.privateHistory` i nigdy
+nie dopisuje do `state.history`. Nie ma jeszcze modelowanych obserwowalnych
+zdarzeń ataku: przyszłe sensory będą musiały jawnie zdecydować, jakie pola można
+przekazać dalej. Sama prywatna akcja nie stanowi dowodu dla gracza.
+
+`selectPlayerView` i interfejs pozostają bez zmian. Nie ujawniają planu, postępu
+transferu, etykiet pochodzenia ani rzeczywistego wyniku cyberataku — również po
+18 turach, bo końcowy ekran nadal zawiera tylko podsumowanie biznesowe. Nie należy
+interpretować sukcesu biznesowego jako ochrony poufności. Diagnostykę wykonują
+testy odczytujące prywatny stan; szczegółowe dochodzenie i raport gracza to Sprint 4B.
+Ukończone badanie bramy może pokazać nową sesję, lecz tylko dozwolone pola migawki,
+bez automatycznego rozpoznania, kto ją utworzył i co przez nią przesłał.
+
 ## Mapa, testy i granice etapu
 
 Zachowano warstwy, kierunki, legendę, klawiaturę i inspektor Sprintu 2.
@@ -147,7 +246,15 @@ priorytety na granicy tury, brak wycieku wiedzy, deterministyczność i reset.
 `npm run typecheck` sprawdza również silnik bez typów DOM. `npm run build` najpierw
 wykonuje te kontrole. Testy silnika działają w Node, bez emulacji przeglądarki.
 
-Nie ma maszyny przeciwnika, transferu plików, SIEM/SOAR, detekcji, ekonomii,
-rozbudowanej kampanii, FastAPI ani trwałych zapisów. GDD v1.0 i oryginalny HTML
-pozostają niezmienionymi materiałami referencyjnymi; Sprint 3 realizuje fundament
-przyczynowo-skutkowej symulacji, bez implementacji pełnej pierwszej misji.
+87 testów obejmuje dotychczasowe 47 i 40 nowych przypadków przeciwnika. Pełne
+ścieżki A/B/C drukują rzeczywiste liczniki rekordów, zamówień, tur i zaległości
+przy uruchomieniu reportera verbose. [Raport](threat-simulation-validation.md)
+zawiera wyniki i dokładne komendy odtwarzania.
+
+Modeluje się jednego przeciwnika, jeden trop, jeden protokół i trzy porcje danych.
+Nie ma adaptacyjnego szukania innych hostów, pełnego skanowania, zmieniania
+znanego hasła, SIEM/SOAR, sensorów, detekcji, ekonomii, rozbudowanej kampanii,
+FastAPI ani trwałych zapisów. Zatrzymany planer nie zaczyna od nowa po wyczerpaniu
+prób; aktywny plan może zostać ucięty końcem okna 18 tur. GDD v1.0 i oryginalny
+HTML pozostają niezmienione. Żadne działanie nie wykonuje prawdziwej operacji
+sieciowej ani operacji na plikach lub danych użytkownika.
