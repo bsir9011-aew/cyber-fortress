@@ -386,7 +386,21 @@ describe('zadania i granice tury', () => {
       ],
     ];
     for (const [command, reason] of commands) {
-      const result = simulationReducer(state, command);
+      // Od 4B źródło istnieje domyślnie; ten sam przypadek nadal sprawdza jego brak.
+      const input =
+        reason === 'source-unavailable'
+          ? {
+              ...state,
+              telemetry: {
+                ...state.telemetry,
+                authenticationSensor: {
+                  ...state.telemetry.authenticationSensor,
+                  enabled: false,
+                },
+              },
+            }
+          : state;
+      const result = simulationReducer(input, command);
       expect(result.tasks).toHaveLength(0);
       expect(result.history.at(-1)).toMatchObject({
         kind: 'command-rejected',
@@ -406,11 +420,12 @@ describe('zadania i granice tury', () => {
 });
 
 describe('wiedza, deterministyczność i restart', () => {
-  it('nie ujawnia sesji ani kont przed badaniem, a po badaniu nie ujawnia pochodzenia ani wersji hasła', () => {
+  it('ujawnia konto wskazane przez alert, lecz sesje dopiero po badaniu, bez pochodzenia i wersji hasła', () => {
     const initial = createInitialSimulation();
     const publicBefore = JSON.stringify(selectPlayerView(initial));
     expect(publicBefore).not.toContain('S-19');
-    expect(publicBefore).not.toContain('magazyn-07');
+    expect(selectPlayerView(initial).alerts[0]?.accountId).toBe('magazyn-07');
+    expect(initial.knowledge.authObservations).toEqual([]);
     const after = observe();
     const publicAfter = JSON.stringify(selectPlayerView(after));
     expect(publicAfter).toContain('S-19');

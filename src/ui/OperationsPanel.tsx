@@ -5,7 +5,6 @@ import type {
   TaskAction,
   WorkerId,
 } from '../domain/simulation';
-import { formatMinute } from '../simulation/clock';
 import { taskSpecs } from '../simulation/tasks';
 import { actionLabel } from './simulationPresentation';
 
@@ -18,19 +17,44 @@ export function OperationsPanel({
 }) {
   const [ruleId, setRuleId] = useState('');
   const [sessionId, setSessionId] = useState('');
+  const [accountId, setAccountId] = useState('');
   const rule = view.rules.find((item) => item.id === ruleId) ?? view.rules[0];
-  const observation = view.sessionObservation;
+  const knownSessions = [
+    ...new Map([
+      ...(view.sessionObservation?.sessions ?? []).map(
+        (session) =>
+          [
+            session.id,
+            { id: session.id, accountId: session.accountId },
+          ] as const,
+      ),
+      ...view.authObservations.flatMap((observation) =>
+        observation.records.flatMap((record) =>
+          record.sessionId
+            ? [
+                [
+                  record.sessionId,
+                  { id: record.sessionId, accountId: record.accountId },
+                ] as const,
+              ]
+            : [],
+        ),
+      ),
+    ]).values(),
+  ];
   const session =
-    observation?.sessions.find((item) => item.id === sessionId) ??
-    observation?.sessions[0];
+    knownSessions.find((item) => item.id === sessionId) ?? knownSessions[0];
+  const account = view.knownAccountIds.includes(accountId)
+    ? accountId
+    : view.knownAccountIds[0];
   const busy = (workerId: WorkerId) =>
     view.tasks.find(
       (task) => task.workerId === workerId && task.status === 'running',
     );
-  const disabled = (actionType: TaskAction['type']) =>
+  const disabled = (type: TaskAction['type']) =>
     view.finished ||
-    Boolean(busy(taskSpecs[actionType].workerId)) ||
-    view.clock.turn + taskSpecs[actionType].turns > view.clock.turnLimit;
+    Boolean(busy(taskSpecs[type].workerId)) ||
+    view.clock.turn + taskSpecs[type].turns > view.clock.turnLimit;
   const schedule = (action: TaskAction) =>
     onCommand({
       type: 'schedule-task',
@@ -39,9 +63,14 @@ export function OperationsPanel({
     });
 
   return (
-    <section className="operations-panel" aria-label="Zespół operacyjny">
-      <p className="eyebrow">Zespół operacyjny</p>
-      <h2>Praca ma swój czas</h2>
+    <section
+      id="team-actions"
+      tabIndex={-1}
+      className="operations-panel"
+      aria-label="Zespół operacyjny"
+    >
+      <p className="eyebrow">Twoje zasoby</p>
+      <h2>Zbadać czy ograniczyć?</h2>
       {(['analyst', 'administrator'] as const).map((workerId) => {
         const task = busy(workerId);
         return (
@@ -55,48 +84,72 @@ export function OperationsPanel({
             </span>
             <div>
               <strong>
-                {workerId === 'analyst' ? 'Analityk' : 'Administrator'}
+                {workerId === 'analyst' ? 'Analityk' : 'Bartek · administrator'}
               </strong>
               <p>
                 {task
                   ? `${actionLabel(task.action)} · pozostało ${(task.dueTurn - view.clock.turn) * view.clock.turnMinutes} min`
                   : view.finished
-                    ? 'Okno operacyjne zamknięte'
+                    ? 'Misja zakończona'
                     : 'Gotowy do pracy'}
               </p>
             </div>
             <span className={task ? 'worker-busy' : 'worker-ready'}>
-              {task ? 'Zajęty' : '—'}
+              {task ? 'Zajęty' : 'Wolny'}
             </span>
           </div>
         );
       })}
+      <h3 className="action-group-title">
+        Pozyskaj dowód <span>analityk</span>
+      </h3>
       <div className="operation-actions">
         <button
-          disabled={disabled('inspect-vpn-sessions') || !view.vpnOnline}
+          disabled={
+            disabled('inspect-auth-logs') ||
+            !view.vpnOnline ||
+            !view.sensors.authentication.enabled
+          }
+          onClick={() => schedule({ type: 'inspect-auth-logs' })}
+        >
+          Zbadaj logi uwierzytelnienia · 5 min
+        </button>
+        <button
+          disabled={
+            disabled('inspect-vpn-sessions') ||
+            !view.vpnOnline ||
+            !view.sensors.sessions.enabled
+          }
           onClick={() => schedule({ type: 'inspect-vpn-sessions' })}
         >
           Sprawdź sesje VPN · 5 min
         </button>
         <button
-          className="vpn-action"
-          disabled={disabled('set-vpn')}
+          disabled={
+            disabled('contact-account-owner') ||
+            !view.knownAccountIds.includes('magazyn-07')
+          }
           onClick={() =>
-            schedule({
-              type: 'set-vpn',
-              assetId: view.vpnAssetId,
-              enabled: !view.vpnOnline,
-            })
+            schedule({ type: 'contact-account-owner', accountId: 'magazyn-07' })
           }
         >
-          {view.vpnOnline ? 'Wyłącz VPN' : 'Włącz VPN'} · 5 min
+          Porozmawiaj z Martą · 5 min
         </button>
       </div>
       <p className="source-note">
-        Logi uwierzytelnienia: brak dostępnego źródła.
+        Wynik po zakończeniu zadania. Czytanie dowodów nie zajmuje czasu.
       </p>
+      {!view.vpnOnline && (
+        <p className="decision-warning">
+          VPN jest wyłączony: odczyt lokalnych sensorów bramy jest niedostępny.
+          Pozyskane wcześniej dowody pozostają w sprawie.
+        </p>
+      )}
+      <h3 className="action-group-title">
+        Zmień dostęp <span>administrator</span>
+      </h3>
       <details className="policy-controls">
-        <summary>Polityka komunikacji</summary>
+        <summary>Polityka komunikacji · 10 min</summary>
         <label htmlFor="network-rule">Reguła sieciowa</label>
         <select
           id="network-rule"
@@ -117,8 +170,9 @@ export function OperationsPanel({
         {rule && (
           <>
             <p className="source-note">
-              Decyzja: {rule.action === 'allow' ? 'dopuszczaj' : 'blokuj'}.
-              Zmiana obejmuje również istniejący ruch.
+              Obecnie: <strong>{rule.action.toUpperCase()}</strong>. Reguła
+              obejmuje także istniejący ruch tego protokołu. Inne przepływy mają
+              osobne reguły.
             </p>
             <button
               disabled={disabled('set-network-rule')}
@@ -138,86 +192,112 @@ export function OperationsPanel({
           </>
         )}
       </details>
-      <details className="session-controls" open={Boolean(observation)}>
-        <summary>Badanie sesji VPN</summary>
-        {observation ? (
+      <details className="session-controls">
+        <summary>Zakończenie tunelu · 5 min</summary>
+        {session ? (
           <>
-            <p className="source-note">
-              Odczyt bramy z {formatMinute(observation.observedAtMinute)}. To
-              zapis chwili badania; ponów odczyt, aby odświeżyć listę.
-            </p>
-            <ul className="observed-sessions">
-              {observation.sessions.map((item) => (
-                <li key={item.id}>
-                  <strong>{item.id}</strong>
-                  <span>{item.accountId}</span>
-                  <small>początek {formatMinute(item.startedAtMinute)}</small>
-                </li>
+            <label htmlFor="observed-session">
+              Sesja znana z pozyskanych dowodów
+            </label>
+            <select
+              id="observed-session"
+              value={session.id}
+              onChange={(event) => setSessionId(event.target.value)}
+            >
+              {knownSessions.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.id} · {item.accountId}
+                </option>
               ))}
-            </ul>
-            {session ? (
-              <>
-                <label htmlFor="observed-session">Zaobserwowana sesja</label>
-                <select
-                  id="observed-session"
-                  value={session.id}
-                  onChange={(event) => setSessionId(event.target.value)}
-                >
-                  {observation.sessions.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.id} · {item.accountId}
-                    </option>
-                  ))}
-                </select>
-                <div className="operation-actions">
-                  <button
-                    disabled={disabled('terminate-session')}
-                    onClick={() =>
-                      schedule({
-                        type: 'terminate-session',
-                        sessionId: session.id,
-                      })
-                    }
-                  >
-                    Zakończ sesję · 5 min
-                  </button>
-                  <button
-                    disabled={disabled('block-account')}
-                    onClick={() =>
-                      schedule({
-                        type: 'block-account',
-                        accountId: session.accountId,
-                      })
-                    }
-                  >
-                    Zablokuj nowe logowania · 5 min
-                  </button>
-                  <button
-                    disabled={disabled('reset-credential')}
-                    onClick={() =>
-                      schedule({
-                        type: 'reset-credential',
-                        accountId: session.accountId,
-                      })
-                    }
-                  >
-                    Resetuj poświadczenie · 10 min
-                  </button>
-                </div>
-              </>
-            ) : (
-              <p className="source-note">
-                W chwili odczytu nie było aktywnych sesji.
-              </p>
-            )}
+            </select>
+            <p className="source-note">
+              Historyczny log nie potwierdza, że tunel nadal działa. Zakończenie
+              sesji nie blokuje nowych logowań.
+            </p>
+            <button
+              disabled={disabled('terminate-session')}
+              onClick={() =>
+                schedule({ type: 'terminate-session', sessionId: session.id })
+              }
+            >
+              Zakończ sesję · 5 min
+            </button>
           </>
         ) : (
           <p className="source-note">
-            Nie przeprowadzono badania. Zleć analitykowi sprawdzenie aktywnych
-            sesji.
+            Najpierw zbadaj logi lub aktywne sesje, aby wskazać tunel.
           </p>
         )}
       </details>
+      <details className="account-controls">
+        <summary>Konto i poświadczenie</summary>
+        {account ? (
+          <>
+            <label htmlFor="known-account">Konto znane ze sprawy</label>
+            <select
+              id="known-account"
+              value={account}
+              onChange={(event) => setAccountId(event.target.value)}
+            >
+              {view.knownAccountIds.map((id) => (
+                <option key={id} value={id}>
+                  {id}
+                </option>
+              ))}
+            </select>
+            <p className="source-note">
+              Obie zmiany dotyczą nowych uwierzytelnień. Nie kończą wcześniej
+              wydanych sesji.
+            </p>
+            <div className="operation-actions">
+              <button
+                disabled={disabled('block-account')}
+                onClick={() =>
+                  schedule({ type: 'block-account', accountId: account })
+                }
+              >
+                Zablokuj nowe logowania · 5 min
+              </button>
+              <button
+                disabled={disabled('reset-credential')}
+                onClick={() =>
+                  schedule({ type: 'reset-credential', accountId: account })
+                }
+              >
+                Resetuj poświadczenie · 10 min
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="source-note">
+            Brak kont wskazanych przez dostępne obserwacje.
+          </p>
+        )}
+      </details>
+      <details className="vpn-controls">
+        <summary>Szerokie odcięcie VPN · 5 min</summary>
+        <p className="decision-warning">
+          Wyłączenie bramy kończy wszystkie tunele i odbiera zdalnym
+          dyspozytorom dostęp do ERP. Obsługa lokalna pozostaje dostępna.
+        </p>
+        <button
+          className="vpn-action"
+          disabled={disabled('set-vpn')}
+          onClick={() =>
+            schedule({
+              type: 'set-vpn',
+              assetId: view.vpnAssetId,
+              enabled: !view.vpnOnline,
+            })
+          }
+        >
+          {view.vpnOnline ? 'Wyłącz VPN' : 'Włącz VPN'} · 5 min
+        </button>
+      </details>
+      <p className="source-note">
+        Zlecenie rezerwuje pracownika. Zmiana zaczyna działać dopiero po jej
+        ukończeniu.
+      </p>
     </section>
   );
 }

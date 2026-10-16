@@ -6,6 +6,40 @@ import type {
 } from '../domain/simulation';
 import { isAssetOnline, isSessionActive } from './access';
 import { currentMinute } from './clock';
+import { nexusOwnerAccount } from '../content/nexusIncident';
+
+export function knownAccountIds(
+  state: Pick<SimulationState, 'knowledge' | 'incident'>,
+): readonly string[] {
+  return [
+    ...new Set([
+      ...state.incident.alerts.map((alert) => alert.accountId),
+      ...(state.knowledge.sessionObservation?.sessions.map(
+        (session) => session.accountId,
+      ) ?? []),
+      ...state.knowledge.authObservations.flatMap((observation) =>
+        observation.records.map((record) => record.accountId),
+      ),
+    ]),
+  ];
+}
+
+export function knownSessionIds(
+  state: Pick<SimulationState, 'knowledge'>,
+): readonly string[] {
+  return [
+    ...new Set([
+      ...(state.knowledge.sessionObservation?.sessions.map(
+        (session) => session.id,
+      ) ?? []),
+      ...state.knowledge.authObservations.flatMap((observation) =>
+        observation.records.flatMap((record) =>
+          record.sessionId ? [record.sessionId] : [],
+        ),
+      ),
+    ]),
+  ];
+}
 
 export const taskSpecs: Record<
   TaskAction['type'],
@@ -13,6 +47,7 @@ export const taskSpecs: Record<
 > = {
   'inspect-vpn-sessions': { workerId: 'analyst', turns: 1 },
   'inspect-auth-logs': { workerId: 'analyst', turns: 1 },
+  'contact-account-owner': { workerId: 'analyst', turns: 1 },
   'terminate-session': { workerId: 'administrator', turns: 1 },
   'block-account': { workerId: 'administrator', turns: 1 },
   'reset-credential': { workerId: 'administrator', turns: 2 },
@@ -37,16 +72,30 @@ export function taskRejection(
     return 'worker-busy';
   if (state.clock.turn + spec.turns > state.clock.turnLimit)
     return 'outside-time-window';
-  const observed = state.knowledge.sessionObservation?.sessions ?? [];
   switch (action.type) {
     case 'inspect-vpn-sessions':
-      return isAssetOnline(state.world, state.access.vpnAssetId)
+      return state.telemetry.sessionSensor.enabled &&
+        state.telemetry.sessionSensor.sourceAssetId ===
+          state.access.vpnAssetId &&
+        isAssetOnline(state.world, state.telemetry.sessionSensor.sourceAssetId)
         ? null
         : 'source-unavailable';
     case 'inspect-auth-logs':
-      return 'source-unavailable';
+      return state.telemetry.authenticationSensor.enabled &&
+        isAssetOnline(
+          state.world,
+          state.telemetry.authenticationSensor.sourceAssetId,
+        )
+        ? null
+        : 'source-unavailable';
+    case 'contact-account-owner':
+      if (!knownAccountIds(state).includes(action.accountId))
+        return 'target-not-observed';
+      return action.accountId === nexusOwnerAccount.accountId
+        ? null
+        : 'unknown-target';
     case 'terminate-session':
-      if (!observed.some((session) => session.id === action.sessionId))
+      if (!knownSessionIds(state).includes(action.sessionId))
         return 'target-not-observed';
       return state.access.sessions.some(
         (session) =>
@@ -57,7 +106,7 @@ export function taskRejection(
         : 'invalid-state';
     case 'block-account':
     case 'reset-credential': {
-      if (!observed.some((session) => session.accountId === action.accountId))
+      if (!knownAccountIds(state).includes(action.accountId))
         return 'target-not-observed';
       const account = state.access.accounts.find(
         (item) => item.id === action.accountId,

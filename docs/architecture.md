@@ -1,4 +1,4 @@
-# Architektura FORTRESS LAB — Sprint 4A
+# Architektura FORTRESS LAB — Sprint 4B
 
 Jedna aplikacja React + TypeScript + Vite z natywną mapą SVG. Silnik to czyste
 funkcje TypeScript: bez Reacta, DOM, zegara systemowego, I/O i losowości.
@@ -18,15 +18,16 @@ Nie ma dodatkowych zależności projektu ani backendu.
 | `docs` / `prototype` | Dokumentacja, screenshoty i niezmieniony prototyp 0.1.               |
 
 `SimulationState` zawiera jeden `world: WorldState` oraz zegar, proces i bilans
-biznesowy, fakty dostępu, zadania, wiedzę gracza, historię i ukryte pochodzenie
-sesji. W Sprincie 4A `hidden.attacker` przechowuje plan, własną wiedzę, licznik
+biznesowy, fakty dostępu, zadania, telemetrię, sprawę, wiedzę gracza, historię
+i ukryte pochodzenie sesji oraz ślad decyzji. W Sprincie 4A `hidden.attacker` przechowuje plan, własną wiedzę, licznik
 ujawnionych rekordów i prywatną historię przeciwnika. Dostępność zasobu istnieje
 tylko w `world.assets[].status`: nie ma drugiej
 flagi VPN w React ani w stanie dostępu. `WorldState` nadal zawiera 9 zasobów,
 5 stref i 11 relacji topologii. Konta i uprawnienia są odrębnymi faktami silnika.
 
 `createInitialSimulation` głęboko kopiuje dane scenariusza i inicjalizuje pustą
-wiedzę oraz historię. `simulationReducer` obsługuje reset przez nową inicjalizację;
+wiedzę oraz historię. Dane źródłowe telemetrii są kopiowane z treści scenariusza;
+rejestracja i detekcja tworzą początkowy alert. `simulationReducer` obsługuje reset przez nową inicjalizację;
 pozostałe komendy przekazuje do `applySimulationCommand`. React korzysta z tego
 reducera i przechowuje osobno tylko wybór mapy, warstwę i wartości formularzy.
 Nie ma timerów, osobnych liczników biznesowych ani reguł gry w komponentach.
@@ -40,8 +41,9 @@ komend nie przesuwa zegara. Na granicy tury:
 1. Rozliczamy napływ i obsługę zamówień za zakończony przedział według starej konfiguracji.
 2. Kończymy należne zadania, sortując po terminie, priorytecie i stabilnym ID. Zmiany administratora poprzedzają odczyt analityka.
 3. Wygaszamy sesje, rozstrzygamy ponowne logowanie legalnego zespołu i najwyżej jedną akcję przeciwnika przy aktualnej konfiguracji.
-4. Ukończone badanie odczytuje dozwolone pola aktywnych sesji z dostępnej bramy.
-5. Po turze 18 oceniamy cel biznesowy i blokujemy dalszą rozgrywkę. Reset pozostaje dostępny.
+4. Rejestrujemy w sensorach wytworzone zdarzenia uwierzytelnienia i wykonujemy detekcję.
+5. Ukończone badania pozyskują dozwolone obserwacje logów i sesji; rozmowa tworzy relację człowieka.
+6. Oceniamy koniec misji i wyprowadzamy wiadomości z jawnych faktów. Po turze 18 blokujemy dalsze komendy; osobny selektor udostępnia raport. Reset pozostaje dostępny.
 
 Włączenie VPN o 14:15 nie poprawia wyniku okresu 14:10–14:15. Raport poprzedniego
 przedziału oraz bieżąca wydajność są celowo osobnymi wartościami. Zmiany dokonane
@@ -49,8 +51,8 @@ na granicy poprzedzają próbę nowego logowania, zgodnie z kontraktem GDD.
 
 Jeden analityk i jeden administrator pracują równolegle, ale każdy może mieć
 najwyżej jedno zadanie. Zajęty wykonawca oznacza jawne odrzucenie, bez kolejki.
-Badanie sesji, zakończenie tunelu, blokada nowych logowań i zmiana stanu VPN trwają
-jedną turę. Reset poświadczenia i zmiana konkretnej reguły trwają dwie tury.
+Badanie logów, badanie sesji, kontakt z właścicielką konta, zakończenie tunelu,
+blokada nowych logowań i zmiana stanu VPN trwają jedną turę. Reset poświadczenia i zmiana konkretnej reguły trwają dwie tury.
 Zadania nie kończące się do 15:30 są odrzucane już przy zleceniu.
 
 Walidacja obejmuje rodzaj komendy, wykonawcę, jego zajętość, cel, stan symulacji,
@@ -199,38 +201,116 @@ stałą kolejność: legalny zespół pierwszy, przeciwnik drugi. To różne akc
 nie dzielony budżet jednego napastnika. Po 18 turach cały silnik zatrzymuje się,
 także gdy prywatny plan przewiduje późniejszą próbę. Nie przyznajemy mu dodatkowych tur.
 
-## Wiedza gracza i obserwacje
+## Sensory, detekcja i wiedza gracza — Sprint 4B
 
-`selectPlayerView` tworzy jawną projekcję, zamiast przekazywać cały stan do paneli.
-Jawne źródła to dokumentacja infrastruktury i polityk, bieżący raport operacyjny
-usług/procesu, potwierdzenia własnych zadań i ukończony odczyt bramy VPN. Raport
-biznesowy jest agregatem; nie ujawnia prywatnych danych kont lub pochodzenia sesji.
+```mermaid
+flowchart LR
+    A[Modelowana próba w usłudze VPN] --> B[Zdarzenie źródłowe]
+    B --> C{Pokrycie sensora}
+    C -->|brak| X[Brak zapisu, bez odzyskania wstecz]
+    C -->|jest| D[Zarejestrowane pola]
+    D --> E[Retencja i opóźnienie]
+    E --> F[Dostępne obserwacje]
+    F --> G[Reguła detekcji]
+    G --> H[Alert: sygnał do zbadania]
+    F --> I[Badanie analityka: 5 minut]
+    I --> J[Dowód z czasem pozyskania]
+    K[Marta: treść scenariusza] --> L[Kontakt analityka: 5 minut]
+    L --> M[Odrębna relacja człowieka]
+    H --> N[Sprawa i hipoteza gracza]
+    J --> N
+    M --> N
+```
 
-`S-19` z konta `magazyn-07` istnieje od 13:58, ale przed badaniem nie trafia do
-interfejsu. Lista aktywnych sesji jest migawką z czasem odczytu; zawiera tylko ID,
-konto, bramę i czas początku, bez stanu logowania, wersji hasła i etykiety sprawcy.
-Zmiany świata nie aktualizują magicznie starego odczytu. Badanie należy ponowić.
-Jeżeli brama przestanie działać przed zakończeniem badania, nie powstaje fikcyjna
-pusta lista. Historia zgłasza brak nowej obserwacji, zachowując wcześniejszą.
+Kontrakty `domain/telemetry.ts` rozdzielają `AuthenticationEvent` od
+`AuthenticationRecord` i `AuthenticationObservation`. `content/nexusIncident.ts`
+definiuje dane i parametry źródeł. Zdarzenie zawiera wyłącznie czas, źródło,
+konto, wynik i ewentualne ID wydanej sesji. Nie ma adresów IP, powodu zdobycia
+hasła, wersji poświadczenia, etykiety sprawcy ani informacji o kopiowaniu.
 
-Ukryte pochodzenie S-19 jest zgodne z GDD, ale nie trafia do projekcji ani historii
-publicznej. Nie ma modelowanego źródła logów uwierzytelnienia ani sensorów ruchu,
-więc komenda pobrania logów jest odrzucana, a warstwa telemetrii pozostaje pusta.
-Dziennik operacyjny to potwierdzenia działań i raporty firmy, nie pozorowany SIEM.
+Historia scenariusza obejmuje 52 odmowy w 13:40–13:57, sukces S-19 o 13:58
+oraz legalne uwierzytelnienie B-01 o 14:00. To 53 zdarzenia sprzed startu i jedno
+na początku misji. `recordAuthentication` zapisuje kolejne wyniki rzeczywistych
+wywołań `issueVpnSession` obu aktorów. Niedziałająca brama nie wytwarza własnego
+logu uwierzytelnienia. Ocena możliwości w raporcie nie emituje logów.
+Sam `access.ts` pozostaje czystym mechanizmem decyzji, bez efektów telemetrycznych.
 
-`PrivateAttackEvent` jest osobnym kontraktem od publicznego `SimulationEvent`.
-`stepAttacker` zapisuje go wyłącznie do `hidden.attacker.privateHistory` i nigdy
-nie dopisuje do `state.history`. Nie ma jeszcze modelowanych obserwowalnych
-zdarzeń ataku: przyszłe sensory będą musiały jawnie zdecydować, jakie pola można
-przekazać dalej. Sama prywatna akcja nie stanowi dowodu dla gracza.
+| Sensor | Pokrycie | Retencja | Opóźnienie | Pozyskanie przez gracza |
+| --- | --- | --- | --- | --- |
+| VPN Authentication | Lokalne zdarzenia bramy od 13:30; jawne pola powyżej | 120 min według czasu zdarzenia | 0 min w scenariuszu | Badanie logów, 5 min |
+| VPN Active Sessions | Aktywne tunele tej bramy w chwili odczytu | 0 — migawka | 0 | Badanie sesji, 5 min |
 
-`selectPlayerView` i interfejs pozostają bez zmian. Nie ujawniają planu, postępu
-transferu, etykiet pochodzenia ani rzeczywistego wyniku cyberataku — również po
-18 turach, bo końcowy ekran nadal zawiera tylko podsumowanie biznesowe. Nie należy
-interpretować sukcesu biznesowego jako ochrony poufności. Diagnostykę wykonują
-testy odczytujące prywatny stan; szczegółowe dochodzenie i raport gracza to Sprint 4B.
-Ukończone badanie bramy może pokazać nową sesję, lecz tylko dozwolone pola migawki,
-bez automatycznego rozpoznania, kto ją utworzył i co przez nią przesłał.
+Zegar kolekcji i detekcji jest tym samym zegarem tur. Kolektor konsumuje nowe
+zdarzenia również przy braku pokrycia; późniejsze włączenie sensora nie odzyskuje
+utraconych zapisów. Rejestracja ma własny czas i termin dostępności. Test wariantu
+z opóźnieniem 5 minut potwierdza, że wcześniej nie powstaje alert ani dostępny
+zapis. Retencja usuwa stare zapisy ze źródła odczytu, lecz nie usuwa już
+pozyskanych dowodów gracza.
+
+`detectVpnAlerts` przyjmuje tylko zarejestrowane i dostępne pola oraz czas i
+istniejące alerty. Próg to ≥20 odmów konta z tego samego sensora w ostatnich
+20 minutach; granice okna są włączone. Powstaje najwyżej jeden alert na konto
+oraz sensor w misji. Alert zachowuje swój czas i licznik, nie aktualizuje ich
+wstecz. Nie jest potwierdzeniem incydentu i nie korzysta z `hidden.attacker`,
+`sessionOrigins`, transferu ani prywatnego planu.
+
+`inspect-auth-logs` i `inspect-vpn-sessions` odczytują lokalne źródła dopiero po
+ukończeniu pracy analityka; brama i właściwy sensor muszą być wtedy dostępne.
+Brak źródła nie tworzy fikcyjnego pustego wyniku i nie usuwa wcześniejszego dowodu.
+Odczyty sesji pozostają migawką. Kolejne badania logów tworzą nowe dowody, a
+starsze można nadal czytać. Konto z alertu może być celem blokady/resetu;
+zaobserwowane ID udanego logowania albo migawki może być celem zakończenia tunelu.
+Nie oznacza to potwierdzenia jego aktualnej aktywności — silnik waliduje komendę.
+
+`contact-account-owner` wymaga znanego konta i zdefiniowanej postaci. Marta
+odpowiada po 5 minutach pracy analityka także bez VPN. Powstaje `human-statement`
+z czasem rozmowy i odniesieniem do 13:58. Nie jest to techniczny log ani
+uniwersalny system dialogów. Nieznani właściciele nie otrzymują wymyślonych relacji.
+
+`selectPlayerView` jawnie wybiera konfigurację, biznes, zadania, potwierdzenia,
+alerty i pozyskane dowody; nigdy nie rozprowadza całego stanu. Prywatna historia
+przeciwnika nie trafia do `state.history`. Nie modelujemy sensora ruchu ani audytu
+plików. Brak takich dowodów nie pozwala ocenić poufności podczas rozgrywki.
+Oznaczenie hipotezy jest bezpłatną komendą notatki, bez wpływu na świat lub oceny
+poprawności.
+
+## Narracja, decyzje i raport po rozgrywce
+
+`simulation/narrative.ts` wyprowadza krótkie komunikaty z jawnych faktów.
+Typ wejścia `deriveNarrative` wyklucza `hidden`, stan dostępu i surową telemetrię.
+Bartek potwierdza ukończone prace, analityk pozyskane dowody, Marta własną relację,
+a Ewa rzeczywistą kolejkę lub przywrócenie ERP. Potwierdzenie działania ERP po
+zmianie SMB wymaga rozliczonego następnego przedziału biznesowego. Stabilne ID
+reguł i zadań zapobiegają duplikatom. Nie ma dialogu „atak zatrzymany”.
+
+Przy zleceniu pracy administratora prywatny `decisionHistory` utrwala ówczesne
+źródła wiedzy i hipotezę. Po ukończeniu porównuje przed/po rzeczywiste możliwości
+oraz wydajność. Obejmuje czas ukończenia i już ujawnione rekordy **przed** próbą
+przeciwnika na tej granicy. Nie stanowi wejścia narracji ani publicznej projekcji.
+Raport wybiera do trzech pierwszych ukończonych zmian możliwości, a osobno pokazuje
+wszystkie ukończone prace. Nie twierdzi, że każda zmiana lub hipoteza była poprawna.
+
+`application/selectMissionReport` zwraca `null` do końca tury 17. Po turze 18
+udostępnia osobno poufność, bilans biznesu, rzeczywisty przebieg i diagnozę
+możliwości z `simulation/threatAssessment.ts`. Przedstawia aktywne tunele sprawcy,
+dostęp do FS-01, aktualność skradzionej wersji, możliwość nowego logowania i
+potencjalnego dostępu po takim logowaniu. Wydanie sesji jest oceniane czysto,
+bez dodawania jej do świata lub źródła.
+
+`targetAccessCutOff` wymaga braku dostępu zarówno istniejącym tunelem, jak i po
+ponownym logowaniu. `accountContained` wymaga braku aktywnych tuneli oraz
+odrzucenia skradzionego poświadczenia przez tożsamość: blokadę, reset, wymóg MFA
+lub brak konta. Sam przestój VPN nie spełnia tego warunku. `retryBudgetExhausted`
+i `stoppedOnlyByRetryBudget` są osobne: przy przywróceniu SMB po wyczerpaniu prób
+raport potrafi pokazać 0 ujawnionych rekordów i nadal możliwy dostęp.
+Ocena to stan o 15:30 w granicach modelu, nie gwarancja trwałego bezpieczeństwa.
+
+React przełącza lekkie konteksty Sprawy/Operacje/Architektura bez routera.
+Briefing, wybór kontekstu i formularze są stanem interfejsu; reguły i narracja
+pozostają w silniku. Skróty, fokus klawiatury, etykiety i oznaczenia tekstowe
+uzupełniają kolor. Na telefonie stałe skróty prowadzą do dowodów i zleceń.
+Reset inicjalizuje na nowo telemetrię, alert, wiedzę, hipotezę, zadania, narrację,
+przeciwnika i ślad decyzji oraz przywraca briefing i formularze.
 
 ## Mapa, testy i granice etapu
 
@@ -246,14 +326,18 @@ priorytety na granicy tury, brak wycieku wiedzy, deterministyczność i reset.
 `npm run typecheck` sprawdza również silnik bez typów DOM. `npm run build` najpierw
 wykonuje te kontrole. Testy silnika działają w Node, bez emulacji przeglądarki.
 
-87 testów obejmuje dotychczasowe 47 i 40 nowych przypadków przeciwnika. Pełne
-ścieżki A/B/C drukują rzeczywiste liczniki rekordów, zamówień, tur i zaległości
-przy uruchomieniu reportera verbose. [Raport](threat-simulation-validation.md)
-zawiera wyniki i dokładne komendy odtwarzania.
+123 testy obejmują dotychczasowe 87 i 36 nowych przypadków misji. Dwa historyczne
+oczekiwania zaktualizowano zgodnie z nowym źródłem: brak sensora jest teraz
+jawnym wariantem fixture, a konto wskazane przez alert jest wiedzą gracza.
+Żaden przypadek nie został usunięty lub pominięty. Wyniki przeciwnika i biznesu
+z 4A pozostają bez zmian. Pięć pełnych ścieżek drukuje rzeczywiste liczby.
+[Raport 4B](incident-gameplay-validation.md) opisuje walidację, regresje i przegląd
+pierwszych minut. [Raport 4A](threat-simulation-validation.md) zachowuje wyniki
+bazowego silnika.
 
 Modeluje się jednego przeciwnika, jeden trop, jeden protokół i trzy porcje danych.
 Nie ma adaptacyjnego szukania innych hostów, pełnego skanowania, zmieniania
-znanego hasła, SIEM/SOAR, sensorów, detekcji, ekonomii, rozbudowanej kampanii,
+znanego hasła, pełnego SIEM/SOAR, sensorów ruchu, audytu plików, ekonomii, rozbudowanej kampanii,
 FastAPI ani trwałych zapisów. Zatrzymany planer nie zaczyna od nowa po wyczerpaniu
 prób; aktywny plan może zostać ucięty końcem okna 18 tur. GDD v1.0 i oryginalny
 HTML pozostają niezmienione. Żadne działanie nie wykonuje prawdziwej operacji
