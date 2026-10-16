@@ -1,14 +1,32 @@
 # cyber-fortress
+
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — Bootstrap 0.2
+## FORTRESS LAB — Living Infrastructure (Sprint 2)
 
 Strategiczno-techniczna gra o cyberbezpieczeństwie fikcyjnej firmy **NEXUS
 Logistics**. Uczymy poprzez decyzje i ich konsekwencje dla działalności firmy.
 
-Obecny etap to minimalny fundament: ekran startowy, miejsce na mapę SVG, typy
-infrastruktury i testy inicjalizacji świata. **Nie zawiera jeszcze silnika,
-pierwszej misji ani zapisu gry.** Bez backendu i wymaganych kluczy API.
+Obecny etap to interaktywna mapa dziewięciu zasobów NEXUS Logistics, strefy,
+kierunkowe relacje i inspektor. Wszystkie systemy i powiązania pochodzą z jednego
+modelu świata. **Nie zawiera jeszcze silnika, incydentów, pierwszej misji ani
+zapisu gry.** Bez backendu i wymaganych kluczy API.
+
+### Poznawanie infrastruktury
+
+- Kliknij zasób, aby poznać jego funkcję, właściciela, usługi i powiązania.
+- Kliknij strzałkę lub jej etykietę, aby zobaczyć źródło, cel, protokół i znaczenie.
+- Przełączaj warstwy: sieć, tożsamość i dostęp, procesy biznesowe oraz telemetria.
+- Wybór relacji z inspektora automatycznie otwiera jej warstwę.
+- `Tab` i `Enter`/`Spacja` obsługują węzły i relacje; „Wyczyść wybór” usuwa zaznaczenie.
+- Na małym ekranie mapę można przewijać poziomo wewnątrz jej panelu.
+
+Telemetria jest celowo pusta: scenariusz nie definiuje jeszcze źródeł obserwacji.
+Nie ma fikcyjnych audytów, napraw ani niepotwierdzonych ocen bezpieczeństwa.
+Relacja sieciowa nie oznacza uprawnienia do usługi, a zależność biznesowa wskazuje
+usługę potrzebną do pracy, nie trasę pakietów.
+
+![Mapa NEXUS Logistics z wybraną bramą VPN](docs/screenshots/nexus-infrastructure-map.png)
 
 ### Wymagania i uruchomienie
 
@@ -34,14 +52,14 @@ działała również w środowiskach z niezapisywalnym katalogiem domowym.
 
 ### Polecenia
 
-| Polecenie | Działanie |
-| --- | --- |
-| `npm run dev` | Serwer deweloperski Vite z odświeżaniem zmian. |
-| `npm run typecheck` | Ścisłe sprawdzanie typów aplikacji, testów i konfiguracji. |
-| `npm test` | Jednorazowe uruchomienie testów Vitest w Node. |
-| `npm run test:watch` | Testy w trybie obserwowania zmian. |
-| `npm run build` | Sprawdzenie typów i produkcyjny build do `dist/`. |
-| `npm run preview` | Lokalny podgląd zbudowanego `dist/` (domyślny port: 4173). |
+| Polecenie            | Działanie                                                  |
+| -------------------- | ---------------------------------------------------------- |
+| `npm run dev`        | Serwer deweloperski Vite z odświeżaniem zmian.             |
+| `npm run typecheck`  | Ścisłe sprawdzanie typów aplikacji, testów i konfiguracji. |
+| `npm test`           | Jednorazowe uruchomienie testów Vitest w Node.             |
+| `npm run test:watch` | Testy w trybie obserwowania zmian.                         |
+| `npm run build`      | Sprawdzenie typów i produkcyjny build do `dist/`.          |
+| `npm run preview`    | Lokalny podgląd zbudowanego `dist/` (domyślny port: 4173). |
 
 Walidacja przed commitem:
 
@@ -57,8 +75,8 @@ npm run build
 src/
   domain/       # typy i kontrakty świata
   simulation/   # miejsce na przyszły silnik niezależny od Reacta
-  application/  # inicjalizacja; później komendy i selektory
-  content/      # dane organizacji i przyszłych scenariuszy
+  application/  # inicjalizacja świata i selektory warstw/powiązań
+  content/      # dane organizacji oraz scenariusz NEXUS Logistics
   ui/           # React, style i SVG
   persistence/  # miejsce na przyszłe adaptery zapisu
 docs/           # architektura i GDD
