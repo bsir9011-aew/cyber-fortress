@@ -1,6 +1,8 @@
 # FortressSaveV4 — zgodność V1–V4
 
-Aktywny UI używa `gameSaveV4.ts` i `resilienceGameStorage.ts`:
+Historyczny kontrakt Sprintu 9–10. Aktywny UI używa teraz [V5](detection-engineering.md#zapis-v5); poniższy opis dotyczy V4 i pozostaje podstawą jego odczytu.
+
+Sprint 9–10 używał `gameSaveV4.ts` i `resilienceGameStorage.ts`:
 
 ```json
 {

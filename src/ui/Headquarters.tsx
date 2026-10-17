@@ -1,3 +1,4 @@
+import { DetectionConfiguration } from './DetectionConfiguration';
 import { AfterActionExport } from './AfterActionExport';
 import { campaignAarMissionId } from '../application/createAfterActionReport';
 import { ResilienceStatus } from './ResilienceStatus';
@@ -200,15 +201,48 @@ export function Headquarters({
         <button
           className="primary-button"
           disabled={
-            !view.history.some(
-              (r) => r.scenarioId !== 'nexus-last-clean-copy',
-            ) || view.preparation.hour !== 4
+            !view.history.some((r) => !r.integrity) ||
+            view.preparation.hour !== 4
           }
           onClick={() => onCommand({ type: 'start-integrity-incident' })}
         >
           Rozpocznij Misję 02 →
         </button>
       </section>
+      <section
+        className="integrity-mission-card"
+        aria-label="Misja 02 — Nieznany przypadek"
+      >
+        <div>
+          <p className="eyebrow">Rodzina integralności / nieznany przypadek</p>
+          <h2>Misja 02 — Nieznany przypadek</h2>
+          <p>
+            Zespół prosi o sprawdzenie aktywności dokumentów FS-01. Ustal, co
+            się dzieje, zbierz dowody i zachowaj ciągłość wysyłek. EDR jest
+            opcjonalnym źródłem, nie warunkiem rozpoczęcia.
+          </p>
+        </div>
+        <button
+          className="primary-button"
+          disabled={
+            !view.history.some((r) => !r.integrity) ||
+            view.preparation.hour !== 4
+          }
+          onClick={() =>
+            onCommand({
+              type: 'start-detection-incident',
+              familyId: 'nexus-integrity-detection-v1',
+            })
+          }
+        >
+          Rozpocznij nieznany przypadek →
+        </button>
+      </section>
+      <DetectionConfiguration
+        key={`${session.attemptId}-${view.preparation.number}`}
+        campaign={session.campaign}
+        onCommand={onCommand}
+      />
       <nav className="hq-tabs" aria-label="Konteksty centrali">
         {tabs.map((tab) => (
           <button
@@ -487,6 +521,11 @@ export function Headquarters({
         <>
           <div className="worker-plan">
             {(['administrator', 'analyst'] as const).map((worker) => {
+              const detectionBusy =
+                worker === 'analyst' &&
+                session.campaign.detectionChanges?.some(
+                  (w) => w.completedHour === null,
+                );
               const busy = activeWork(worker);
               const options = view.projects.filter(
                 (p) =>
@@ -503,7 +542,11 @@ export function Headquarters({
                       : 'Analityk'}
                   </span>
                   <h2>
-                    {busy ? 'W trakcie wdrożenia' : 'Gotowy do przydziału'}
+                    {detectionBusy
+                      ? 'Konfiguracja EDR — 1 h'
+                      : busy
+                        ? 'W trakcie wdrożenia'
+                        : 'Gotowy do przydziału'}
                   </h2>
                   <p>
                     {busy
@@ -519,7 +562,7 @@ export function Headquarters({
                   <select
                     id={`assign-${worker}`}
                     value={chosen?.id ?? ''}
-                    disabled={Boolean(busy) || !options.length}
+                    disabled={detectionBusy || Boolean(busy) || !options.length}
                     onChange={(e) =>
                       setAssignment((a) => ({
                         ...a,
@@ -539,7 +582,10 @@ export function Headquarters({
                   <button
                     className="secondary-button"
                     disabled={
-                      Boolean(busy) || !chosen || view.preparation.hour === 4
+                      detectionBusy ||
+                      Boolean(busy) ||
+                      !chosen ||
+                      view.preparation.hour === 4
                     }
                     onClick={() =>
                       chosen &&
@@ -583,11 +629,18 @@ export function Headquarters({
                                 .remaining[worker]
                             : 0),
                   );
+                  const detection =
+                    worker === 'analyst' &&
+                    session.campaign.detectionChanges?.find(
+                      (d) =>
+                        d.window === view.preparation.number &&
+                        d.startHour === hour,
+                    );
                   return (
                     <div
                       key={hour}
                       className={
-                        w
+                        w || detection
                           ? hour < view.preparation.hour
                             ? 'work-done'
                             : 'work-planned'
@@ -595,7 +648,13 @@ export function Headquarters({
                       }
                     >
                       <small>{hour + 1}. godzina okna</small>
-                      <span>{w ? workName(w.projectId) : 'Wolne'}</span>
+                      <span>
+                        {detection
+                          ? 'Konfiguracja EDR'
+                          : w
+                            ? workName(w.projectId)
+                            : 'Wolne'}
+                      </span>
                     </div>
                   );
                 })}

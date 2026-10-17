@@ -15,6 +15,7 @@ import { testBackupProcedure } from '../simulation/backupReadiness';
 import {
   createCampaignIncident,
   createIntegrityIncident,
+  createDetectionIncident,
 } from './prepareCampaignIncident';
 import { simulationReducer } from './simulationReducer';
 import { selectMissionReport } from './selectMissionReport';
@@ -275,9 +276,7 @@ export function campaignReducer(
   if (state.phase !== 'preparation')
     return reject('Planowanie jest dostępne w centrali, poza incydentem.');
   if (command.type === 'accept-resilience-funding') {
-    const report = state.history.find(
-      (r) => r.scenarioId === 'nexus-last-clean-copy',
-    );
+    const report = state.history.find((r) => r.integrity !== undefined);
     if (!report)
       return reject(
         'Finansowanie Etapu II wymaga ukończenia Misji 02 i powrotu do centrali.',
@@ -315,13 +314,20 @@ export function campaignReducer(
   }
   if (
     command.type === 'start-incident' ||
-    command.type === 'start-integrity-incident'
+    command.type === 'start-integrity-incident' ||
+    command.type === 'start-detection-incident'
   ) {
     if (
-      command.type === 'start-integrity-incident' &&
-      !state.history.some((r) => r.scenarioId !== 'nexus-last-clean-copy')
+      (command.type === 'start-integrity-incident' ||
+        command.type === 'start-detection-incident') &&
+      !state.history.some((r) => !r.integrity)
     )
       return reject('Najpierw ukończ co najmniej jeden incydent Misji 01.');
+    if (
+      command.type === 'start-detection-incident' &&
+      command.familyId !== 'nexus-integrity-detection-v1'
+    )
+      return reject('Nieznana rodzina incydentu.');
     if (state.preparation.hour !== 4)
       return reject('Najpierw rozlicz czterogodzinne okno przygotowawcze.');
     return decide(
@@ -330,9 +336,73 @@ export function campaignReducer(
         ...state,
         phase: 'incident',
         incident:
-          command.type === 'start-integrity-incident'
-            ? createIntegrityIncident(state.nextSeed, state.posture)
-            : createCampaignIncident(state.nextSeed, state.posture),
+          command.type === 'start-detection-incident'
+            ? createDetectionIncident(
+                state.nextSeed,
+                state.posture,
+                command.familyId,
+              )
+            : command.type === 'start-integrity-incident'
+              ? createIntegrityIncident(state.nextSeed, state.posture)
+              : createCampaignIncident(state.nextSeed, state.posture),
+      },
+      command,
+    );
+  }
+  if (command.type === 'configure-endpoint-detection') {
+    const c = state.posture.endpointCoverage;
+    if (
+      !c ||
+      !state.projects.some(
+        (p) => p.id === 'endpoint-edr' && p.status === 'completed',
+      )
+    )
+      return reject('Najpierw ukończ wdrożenie EDR.');
+    if (
+      command.endpointId !== c.endpointId ||
+      !Number.isSafeInteger(command.threshold) ||
+      command.threshold < 2 ||
+      command.threshold > 30 ||
+      ![5, 10, 20].includes(command.windowMinutes)
+    )
+      return reject(
+        'Wybierz istniejący endpoint, próg 2–30 i okno 5, 10 lub 20 minut.',
+      );
+    if (state.preparation.hour >= 4)
+      return reject('Okno przygotowania jest zamknięte.');
+    if (
+      state.detectionChanges?.some((w) => w.completedHour === null) ||
+      state.work.some(
+        (w) =>
+          w.window === state.preparation.number &&
+          w.workerId === 'analyst' &&
+          w.status === 'running',
+      )
+    )
+      return reject(
+        'Analityk jest zajęty. Konfiguracja wymaga 1 h wolnej pracy.',
+      );
+    if (
+      c.detection.threshold === command.threshold &&
+      c.detection.windowMinutes === command.windowMinutes
+    )
+      return reject('Te parametry reguły są już aktywne.');
+    return decide(
+      state,
+      {
+        ...state,
+        detectionChanges: [
+          ...(state.detectionChanges ?? []),
+          {
+            id: `DE-${(state.detectionChanges?.length ?? 0) + 1}`,
+            endpointId: command.endpointId,
+            threshold: command.threshold,
+            windowMinutes: command.windowMinutes,
+            window: state.preparation.number,
+            startHour: state.preparation.hour,
+            completedHour: null,
+          },
+        ],
       },
       command,
     );
@@ -389,6 +459,9 @@ export function campaignReducer(
     if (state.preparation.hour >= 4)
       return reject('Okno przygotowania jest zamknięte.');
     const hour = state.preparation.hour + 1;
+    const pendingDetection = state.detectionChanges?.find(
+      (w) => w.window === state.preparation.number && w.completedHour === null,
+    );
     let projects = [...state.projects];
     const work = state.work.map((w) => {
       if (w.window !== state.preparation.number || w.status !== 'running')
@@ -445,6 +518,13 @@ export function campaignReducer(
         ...state,
         projects,
         work,
+        ...(state.detectionChanges
+          ? {
+              detectionChanges: state.detectionChanges.map((w) =>
+                w === pendingDetection ? { ...w, completedHour: hour } : w,
+              ),
+            }
+          : {}),
         preparation: { ...state.preparation, hour },
         posture: {
           ...state.posture,
@@ -455,6 +535,20 @@ export function campaignReducer(
             ? {
                 endpointCoverage:
                   state.posture.endpointCoverage ?? pilotEndpointCoverage,
+              }
+            : {}),
+          ...(pendingDetection && state.posture.endpointCoverage
+            ? {
+                endpointCoverage: {
+                  ...state.posture.endpointCoverage,
+                  detection: {
+                    ...state.posture.endpointCoverage.detection,
+                    counting: 'unique-documents-v2' as const,
+                    name: 'Unusual Document Modification Activity',
+                    threshold: pendingDetection.threshold,
+                    windowMinutes: pendingDetection.windowMinutes,
+                  },
+                },
               }
             : {}),
           ...(newlyTestedBackup
@@ -525,6 +619,11 @@ export function campaignReducer(
     );
   }
   if (command.type === 'assign-work') {
+    if (
+      command.workerId === 'analyst' &&
+      state.detectionChanges?.some((w) => w.completedHour === null)
+    )
+      return reject('Analityk konfiguruje regułę EDR (1 h).');
     if (
       state.preparation.hour === 4 ||
       !['reserved', 'in-progress'].includes(project.status) ||

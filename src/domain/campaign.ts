@@ -5,6 +5,7 @@ import type {
   BackupReadiness,
   CampaignFunding,
   EndpointCoverage,
+  DetectionConfigurationWork,
 } from './resilience';
 import type {
   SimulationState,
@@ -89,6 +90,7 @@ export interface CampaignMissionReport {
   readonly fullCapacity: number;
 }
 export interface CampaignState {
+  readonly detectionChanges?: readonly DetectionConfigurationWork[];
   readonly funding?: CampaignFunding;
   readonly phase: 'preparation' | 'incident' | 'report';
   readonly budget: SecurityBudget;
@@ -113,6 +115,16 @@ export interface CampaignState {
   }[];
 }
 export type CampaignCommand =
+  | {
+      readonly type: 'configure-endpoint-detection';
+      readonly endpointId: 'pakowanie-03';
+      readonly threshold: number;
+      readonly windowMinutes: 5 | 10 | 20;
+    }
+  | {
+      readonly type: 'start-detection-incident';
+      readonly familyId: 'nexus-integrity-detection-v1';
+    }
   | { readonly type: 'accept-resilience-funding' }
   | { readonly type: 'plan-project'; readonly projectId: ProjectId }
   | { readonly type: 'reserve-project'; readonly projectId: ProjectId }

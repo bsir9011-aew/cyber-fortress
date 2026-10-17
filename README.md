@@ -2,7 +2,19 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — After Action Review (Sprint 10)
+## FORTRESS LAB — Detection Engineering (Sprint 11)
+
+Po wdrożeniu EDR skonfiguruj w Centrali próg 2–30 dokumentów oraz ruchome
+okno 5/10/20 minut. Zmiana zajmuje 1 h analityka. Rozegraj **Misję 02 —
+Nieznany przypadek**, zbadaj sygnały i reaguj z uwzględnieniem pracy firmy.
+Po misji zobaczysz FP, niewykryte szkodliwe operacje, źródła i rzeczywiste
+skutki decyzji; te dane trafiają także do AAR JSON/Markdown.
+
+Nowy zapis V5 obsługuje V1–V4, zachowuje ich oryginały oraz dotychczasowe
+seedy i referencyjną M02. Nieznany przypadek jest dostępny także bez EDR.
+[Mechanika, ograniczenia i format V5](docs/detection-engineering.md).
+
+### After Action Review (Sprint 10)
 
 Po zakończeniu każdej misji pobierzesz **raport JSON do analizy AI** oraz
 **czytelny raport Markdown**. Pokazują wiedzę dostępną przed decyzją,
@@ -17,7 +29,7 @@ gry. Prywatna prawda AAR jest dostępna dopiero po 18. turze.
 W Centrali można odtworzyć raport wcześniejszej misji z pełnego dziennika
 kampanii. Samodzielna historia udostępnia raport dla próby z zachowanym
 pełnym dziennikiem; przy samym podsumowaniu uczciwie informuje o braku
-chronologii. Nie zmieniono mechanik ani zapisu V4.
+chronologii. Sprint 10 zachował mechaniki i zapis V4; Sprint 11 dodaje zgodny odczyt w V5.
 
 [Kontrakt i rekonstrukcja wiedzy](docs/after-action-review.md) ·
 [Trzy prawdziwe raporty do analizy](docs/aar-examples/README.md) ·
@@ -123,7 +135,7 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 - **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
   strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
   Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu. Nowe zapisy mają
-  format V4; poprzednie oryginały V1/V2/V3 pozostają zachowane i możliwe do wyeksportowania.
+  format V5; poprzednie oryginały V1/V2/V3/V4 pozostają zachowane i możliwe do wyeksportowania.
 - **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
   działalność, ograniczenie dostępu i działania samodzielnych misji. Wyniki strategii
   znajdziesz w Centrali w historii bieżącej kampanii. Powtórka tworzy nową próbę tego
@@ -302,7 +314,7 @@ src/
   application/  # inicjalizacja, reducer misji/kampanii, sesje gry, projekcje i raporty
   content/      # infrastruktura, trzy stabilne warianty VPN, odrębna Misja 02 i projekty
   ui/           # React, style i SVG
-  persistence/  # zapis V4, zgodność V1/V2/V3, walidacja, localStorage i historia prób
+  persistence/  # zapis V5, zgodność V1/V2/V3/V4, walidacja, localStorage i historia prób
 docs/           # architektura i GDD
 prototype/      # archiwalny prototyp HTML 0.1
 ```

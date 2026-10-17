@@ -1,5 +1,15 @@
 import type { LocalOperation } from './integrity';
 
+export interface DetectionConfigurationWork {
+  readonly id: string;
+  readonly endpointId: 'pakowanie-03';
+  readonly threshold: number;
+  readonly windowMinutes: 5 | 10 | 20;
+  readonly window: number;
+  readonly startHour: number;
+  readonly completedHour: number | null;
+}
+
 export interface FundingAllocation {
   readonly id: 'board-resilience-ii';
   readonly source: 'integrity-risk-review';
@@ -21,6 +31,8 @@ export interface EndpointCoverage {
   readonly retentionMinutes: number;
   readonly delayMinutes: number;
   readonly detection: {
+    /** Absent on historical V4 rules: retain their original detector. */
+    readonly counting?: 'unique-documents-v2';
     readonly id: string;
     readonly name: string;
     readonly operation: 'modify';
@@ -65,6 +77,11 @@ export interface EndpointAlert {
   readonly minute: number;
   readonly windowStartMinute: number;
   readonly windowEndMinute: number;
+  /** Deduplication cursor derived only from delivered observable records. */
+  readonly lastSeriesActivityMinute?: number;
+  readonly threshold?: number;
+  readonly windowMinutes?: number;
+  readonly counting?: 'unique-documents-v2';
   readonly modificationCount: number;
   readonly eventIds: readonly string[];
   readonly assessment: 'requires-investigation';

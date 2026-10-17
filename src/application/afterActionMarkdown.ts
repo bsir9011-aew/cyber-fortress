@@ -76,7 +76,7 @@ export function renderAfterActionMarkdown(
     '## 2. Kontekst firmy',
     `${r.organization.name}: ${r.organization.employees} pracowników, ${r.organization.computers} komputerów.`,
     c
-      ? `Kampania: misja ${c.missionNumber}, okno przygotowania ${c.preparationWindow}. Budżet na starcie: ${c.budgetAtStart.total} PLN; wydano ${c.budgetAtStart.spent}; zarezerwowano ${c.budgetAtStart.reserved}; dostępne ${c.budgetAtStart.available}.\n\nFinansowanie:\n\n${details(c.funding as unknown as AarData)}\n\nProjekty:\n\n${c.projects.map((p) => `- **${text(p.name)}**: ${p.status}; koszt ${p.costPLN} PLN; pozostało admin ${p.remaining.administrator} h / analityk ${p.remaining.analyst} h. Mechanizm: ${text(p.mechanism)} Granica: ${text(p.limitation)}`).join('\n')}\n\nPraca przygotowawcza (godziny poza zegarem incydentu):\n\n${details(c.work as unknown as AarData)}\n\nRejestr inwestycji:\n\n${details(c.investmentLedger as unknown as AarData)}\n\nOdziedziczona konfiguracja:\n\n${details(c.posture as unknown as AarData)}`
+      ? `Kampania: misja ${c.missionNumber}, okno przygotowania ${c.preparationWindow}. Budżet na starcie: ${c.budgetAtStart.total} PLN; wydano ${c.budgetAtStart.spent}; zarezerwowano ${c.budgetAtStart.reserved}; dostępne ${c.budgetAtStart.available}.\n\nFinansowanie:\n\n${details(c.funding as unknown as AarData)}\n\nProjekty:\n\n${c.projects.map((p) => `- **${text(p.name)}**: ${p.status}; koszt ${p.costPLN} PLN; pozostało admin ${p.remaining.administrator} h / analityk ${p.remaining.analyst} h. Mechanizm: ${text(p.mechanism)} Granica: ${text(p.limitation)}`).join('\n')}\n\nPraca przygotowawcza (godziny poza zegarem incydentu):\n\n${details(c.work as unknown as AarData)}${c.detectionChanges ? `\n\nZmiany reguły w Centrali (aktywnie po ukończeniu 1 h):\n\n${details(c.detectionChanges as unknown as AarData)}` : ''}\n\nRejestr inwestycji:\n\n${details(c.investmentLedger as unknown as AarData)}\n\nOdziedziczona konfiguracja:\n\n${details(c.posture as unknown as AarData)}`
       : 'Samodzielna misja, bez budżetu i przygotowania kampanii.',
     '## 3. Cele misji',
     details(r.missionObjectives),
@@ -124,6 +124,13 @@ export function renderAfterActionMarkdown(
       ? `RPO: ${i.rpoMinutes === null ? 'nie dotyczy' : i.rpoMinutes + ' min'}. RTO od początku okna do skutecznej kontroli danych: ${i.rtoMinutes === null ? 'niepotwierdzone' : i.rtoMinutes + ' min'}. Ostatnia kopia: ${text(i.backupId)}. Źródło nadal może zapisywać: ${yes(i.sourceHasWrite)}. Brakujące zmiany z kopii: ${i.missingChanges}; odtworzone jawnie z ERP: ${i.reconstructed}; nadal do uzgodnienia: ${i.reconcile}.\n\nKopie i wykonane odtworzenia:\n\n${details(r.groundTruth.backups)}`
       : 'Brak modelu integralności kopii w tej misji.',
     `Rzeczywiste wykorzystanie inwestycji:\n\n${details(s.investmentUse)}`,
+    ...(s.detectionReview
+      ? [
+          '### Detection Engineering — wynik tego przebiegu',
+          details(s.detectionReview),
+          'Alert jest przesłanką do badania. Etykieta FP/FN jest dostępna dopiero po misji; nie stanowi oceny racjonalności decyzji. Następstwa i stany po decyzji opisano także w sekcjach 4 i 8.',
+        ]
+      : []),
     '## 8. Skutki biznesowe',
     `Wpłynęło **${b.ordersReceived}**; obsłużono **${b.ordersProcessed}**; zaległe **${b.finalBacklog}**; szczyt kolejki **${b.peakBacklog}**. Nie przeliczamy zamówień na straty w PLN.`,
     '| Tura / przedział | Wydajność | Wpłynęło | Obsłużono | Zaległe |',

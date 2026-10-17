@@ -9,7 +9,7 @@ import pendingV4 from '../persistence/fixtures/sprint9-restore-pending-v4.json?r
 import {
   readCurrentGameSave,
   createCurrentGameSave,
-} from '../persistence/gameSaveV4';
+} from '../persistence/gameSaveV5';
 import { createAfterActionReport } from './createAfterActionReport';
 import { currentOperation, applyCampaignSession } from './gameSession';
 import { applyOperationCommand } from './operationSession';
@@ -49,7 +49,7 @@ it.each([
   ['V3 restore', pendingV3],
   ['V4 restore', pendingV4],
 ])(
-  'AAR po rzeczywistym %s, bez zmiany silnika i formatu zapisu',
+  'AAR po rzeczywistym %s, z zachowaniem świata i historycznego AAR',
   (_name, text) => {
     const loaded = readCurrentGameSave(text);
     expect(loaded.ok).toBe(true);

@@ -181,6 +181,7 @@ export interface AarCampaignContext {
   readonly work: readonly PreparationWork[];
   readonly investmentLedger: readonly BudgetOperation[];
   readonly posture: SecurityPosture;
+  readonly detectionChanges?: readonly import('./resilience').DetectionConfigurationWork[];
 }
 export interface FortressAfterActionReportV1 {
   readonly format: 'FORTRESS_AAR';
@@ -190,8 +191,8 @@ export interface FortressAfterActionReportV1 {
   readonly generatedAt: string;
   readonly gameVersion: {
     readonly application: '0.2.0';
-    readonly engine: '9.0.0';
-    readonly reportGenerator: '1.0.0';
+    readonly engine: '9.0.0' | '11.0.0';
+    readonly reportGenerator: '1.0.0' | '1.1.0';
   };
   readonly fieldGuide: Readonly<Record<string, string>>;
   readonly organization: {
@@ -202,6 +203,7 @@ export interface FortressAfterActionReportV1 {
   readonly scenario: {
     readonly id: string;
     readonly family: 'M01' | 'M02';
+    readonly variantFamilyId?: 'nexus-integrity-detection-v1';
     readonly name: string;
     readonly kind: string;
     readonly mode: string;
@@ -245,6 +247,7 @@ export interface FortressAfterActionReportV1 {
     };
     readonly integrity: IntegrityMissionSummary | null;
     readonly investmentUse: AarData;
+    readonly detectionReview?: AarData;
   };
   readonly businessConsequences: {
     readonly ordersReceived: number;

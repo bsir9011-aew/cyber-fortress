@@ -35,6 +35,11 @@ export interface IntegrityDefinition {
   readonly businessReadAccountId: string;
   readonly documentIds: readonly string[];
   readonly initialDamage: number;
+  /** Private scenario plan; operations are resolved through the real SMB path. */
+  readonly legitimateModifications?: {
+    readonly turns: readonly number[];
+    readonly chunkSize: number;
+  };
   readonly attack: {
     readonly compromised: boolean;
     readonly turns: readonly number[];

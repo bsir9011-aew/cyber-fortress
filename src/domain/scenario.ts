@@ -35,6 +35,7 @@ export interface HistoricalAuthenticationAttempt {
 }
 
 export interface ScenarioDefinition {
+  readonly familyId?: 'nexus-integrity-detection-v1';
   readonly backupReadiness?: BackupReadiness;
   readonly integrity?: IntegrityDefinition;
   readonly id: string;
