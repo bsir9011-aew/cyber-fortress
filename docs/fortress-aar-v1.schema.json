@@ -1,0 +1,1818 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bsir9011-aew.github.io/cyber-fortress/schemas/fortress-aar-v1.json",
+  "title": "FortressAfterActionReportV1",
+  "description": "Standalone analytical report, never a game save. Times: fictional minutes since midnight; turns 0–18. Budgets PLN, preparation work hours, RPO/RTO minutes. See fieldGuide for epistemic and causal boundaries. Export limited to 2 MiB.",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "FORTRESS_AAR"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "reportId": {
+      "type": "string"
+    },
+    "missionId": {
+      "type": "string"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "gameVersion": {
+      "type": "object",
+      "properties": {
+        "application": {
+          "const": "0.2.0"
+        },
+        "engine": {
+          "const": "9.0.0"
+        },
+        "reportGenerator": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "application",
+        "engine",
+        "reportGenerator"
+      ],
+      "additionalProperties": false
+    },
+    "fieldGuide": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "minProperties": 10
+    },
+    "organization": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "const": "NEXUS Logistics"
+        },
+        "employees": {
+          "const": 120
+        },
+        "computers": {
+          "const": 94
+        }
+      },
+      "required": [
+        "name",
+        "employees",
+        "computers"
+      ],
+      "additionalProperties": false
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "family": {
+          "enum": [
+            "M01",
+            "M02"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "unauthorized-session",
+            "legitimate-session",
+            "stolen-credential",
+            "local-integrity"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "training",
+            "unknown"
+          ]
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "startMinute": {
+          "type": "integer"
+        },
+        "endMinute": {
+          "type": "integer"
+        },
+        "turnMinutes": {
+          "const": 5
+        },
+        "turnLimit": {
+          "const": 18
+        }
+      },
+      "required": [
+        "id",
+        "family",
+        "name",
+        "kind",
+        "mode",
+        "seed",
+        "startMinute",
+        "endMinute",
+        "turnMinutes",
+        "turnLimit"
+      ],
+      "additionalProperties": false
+    },
+    "campaignContext": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "missionNumber": {
+              "type": "integer"
+            },
+            "preparationWindow": {
+              "type": "integer"
+            },
+            "budgetAtStart": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer"
+                },
+                "spent": {
+                  "type": "integer"
+                },
+                "reserved": {
+                  "type": "integer"
+                },
+                "available": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "total",
+                "spent",
+                "reserved",
+                "available"
+              ],
+              "additionalProperties": false
+            },
+            "funding": {
+              "$ref": "#/$defs/data"
+            },
+            "projects": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/data"
+              },
+              "maxItems": 5
+            },
+            "work": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/data"
+              },
+              "maxItems": 10000
+            },
+            "investmentLedger": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/data"
+              },
+              "maxItems": 10000
+            },
+            "posture": {
+              "$ref": "#/$defs/data"
+            }
+          },
+          "required": [
+            "missionNumber",
+            "preparationWindow",
+            "budgetAtStart",
+            "funding",
+            "projects",
+            "work",
+            "investmentLedger",
+            "posture"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "missionObjectives": {
+      "$ref": "#/$defs/data"
+    },
+    "finalOutcome": {
+      "type": "object",
+      "properties": {
+        "confidentialityMet": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "continuityMet": {
+          "type": "boolean"
+        },
+        "containmentMet": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "integrityMet": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "allObjectivesMet": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "confidentialityMet",
+        "continuityMet",
+        "containmentMet",
+        "integrityMet",
+        "allObjectivesMet"
+      ],
+      "additionalProperties": false
+    },
+    "timeline": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/timeline"
+      },
+      "maxItems": 10000
+    },
+    "playerDecisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/decision"
+      },
+      "maxItems": 256
+    },
+    "knownEvidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      },
+      "maxItems": 10000
+    },
+    "groundTruth": {
+      "type": "object",
+      "properties": {
+        "explanation": {
+          "type": "string"
+        },
+        "initialState": {
+          "$ref": "#/$defs/actualState"
+        },
+        "finalState": {
+          "$ref": "#/$defs/actualState"
+        },
+        "authentication": {
+          "$ref": "#/$defs/data"
+        },
+        "vpnThreat": {
+          "$ref": "#/$defs/data"
+        },
+        "vpnAttackerActivity": {
+          "$ref": "#/$defs/data"
+        },
+        "localOperations": {
+          "$ref": "#/$defs/data"
+        },
+        "localThreatAttempts": {
+          "$ref": "#/$defs/data"
+        },
+        "telemetry": {
+          "$ref": "#/$defs/data"
+        },
+        "backups": {
+          "$ref": "#/$defs/data"
+        }
+      },
+      "required": [
+        "explanation",
+        "initialState",
+        "finalState",
+        "authentication",
+        "vpnThreat",
+        "vpnAttackerActivity",
+        "localOperations",
+        "localThreatAttempts",
+        "telemetry",
+        "backups"
+      ],
+      "additionalProperties": false
+    },
+    "securityConsequences": {
+      "type": "object",
+      "properties": {
+        "exposedRecords": {
+          "type": "integer"
+        },
+        "containment": {
+          "type": "object",
+          "properties": {
+            "applicable": {
+              "type": "boolean"
+            },
+            "activeSessionIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 10000
+            },
+            "usableSessionIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 10000
+            },
+            "stolenCredentialStillCurrent": {
+              "type": "boolean"
+            },
+            "newAuthenticationAllowed": {
+              "type": "boolean"
+            },
+            "accessAfterNewAuthentication": {
+              "type": "boolean"
+            },
+            "targetAccessCutOff": {
+              "type": "boolean"
+            },
+            "accountContained": {
+              "type": "boolean"
+            },
+            "required": {
+              "type": "boolean"
+            },
+            "goalMet": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "retryBudgetExhausted": {
+              "type": "boolean"
+            },
+            "stoppedOnlyByRetryBudget": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "applicable",
+            "activeSessionIds",
+            "usableSessionIds",
+            "stolenCredentialStillCurrent",
+            "newAuthenticationAllowed",
+            "accessAfterNewAuthentication",
+            "targetAccessCutOff",
+            "accountContained",
+            "required",
+            "goalMet",
+            "retryBudgetExhausted",
+            "stoppedOnlyByRetryBudget"
+          ],
+          "additionalProperties": false
+        },
+        "integrity": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer"
+                },
+                "correct": {
+                  "type": "integer"
+                },
+                "damaged": {
+                  "type": "integer"
+                },
+                "reconcile": {
+                  "type": "integer"
+                },
+                "recovered": {
+                  "type": "integer"
+                },
+                "everDamaged": {
+                  "type": "integer"
+                },
+                "missingChanges": {
+                  "type": "integer"
+                },
+                "reconstructed": {
+                  "type": "integer"
+                },
+                "limitedDataMinutes": {
+                  "type": "integer"
+                },
+                "peakBacklog": {
+                  "type": "integer"
+                },
+                "serviceOnline": {
+                  "type": "boolean"
+                },
+                "dataAvailable": {
+                  "type": "boolean"
+                },
+                "sourceHasWrite": {
+                  "type": "boolean"
+                },
+                "endpointIsolated": {
+                  "type": "boolean"
+                },
+                "writesRestricted": {
+                  "type": "boolean"
+                },
+                "verified": {
+                  "type": "boolean"
+                },
+                "backupId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "rpoMinutes": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "rtoMinutes": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "total",
+                "correct",
+                "damaged",
+                "reconcile",
+                "recovered",
+                "everDamaged",
+                "missingChanges",
+                "reconstructed",
+                "limitedDataMinutes",
+                "peakBacklog",
+                "serviceOnline",
+                "dataAvailable",
+                "sourceHasWrite",
+                "endpointIsolated",
+                "writesRestricted",
+                "verified",
+                "backupId",
+                "rpoMinutes",
+                "rtoMinutes"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "investmentUse": {
+          "$ref": "#/$defs/data"
+        }
+      },
+      "required": [
+        "exposedRecords",
+        "containment",
+        "integrity",
+        "investmentUse"
+      ],
+      "additionalProperties": false
+    },
+    "businessConsequences": {
+      "type": "object",
+      "properties": {
+        "ordersReceived": {
+          "type": "integer"
+        },
+        "ordersProcessed": {
+          "type": "integer"
+        },
+        "finalBacklog": {
+          "type": "integer"
+        },
+        "peakBacklog": {
+          "type": "integer"
+        },
+        "perTurn": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "capacity": {
+                "type": "integer"
+              },
+              "localAvailable": {
+                "type": "boolean"
+              },
+              "remoteAvailable": {
+                "type": "boolean"
+              },
+              "status": {
+                "enum": [
+                  "available",
+                  "degraded",
+                  "unavailable"
+                ]
+              },
+              "contributions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "capacity": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "available",
+                    "capacity"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 10000
+              },
+              "turn": {
+                "type": "integer"
+              },
+              "received": {
+                "type": "integer"
+              },
+              "processed": {
+                "type": "integer"
+              },
+              "backlog": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "capacity",
+              "localAvailable",
+              "remoteAvailable",
+              "status",
+              "turn",
+              "received",
+              "processed",
+              "backlog"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 18
+        },
+        "capacityTransitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {
+                "$ref": "#/$defs/time"
+              },
+              "intervalStartMinute": {
+                "type": "integer"
+              },
+              "previousCapacity": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "capacity": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "at",
+              "intervalStartMinute",
+              "previousCapacity",
+              "capacity"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 18
+        }
+      },
+      "required": [
+        "ordersReceived",
+        "ordersProcessed",
+        "finalBacklog",
+        "peakBacklog",
+        "perTurn",
+        "capacityTransitions"
+      ],
+      "additionalProperties": false
+    },
+    "lessonsContext": {
+      "type": "object",
+      "properties": {
+        "hypothesesAreUnverified": {
+          "const": true
+        },
+        "reasoningQuestions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10000
+        },
+        "replay": {
+          "$ref": "#/$defs/data"
+        }
+      },
+      "required": [
+        "hypothesesAreUnverified",
+        "reasoningQuestions",
+        "replay"
+      ],
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10000
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "const": "validated-command-replay"
+        },
+        "commandCount": {
+          "type": "integer"
+        },
+        "ordering": {
+          "type": "string"
+        },
+        "sourceMap": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "method",
+        "commandCount",
+        "ordering",
+        "sourceMap"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "format",
+    "schemaVersion",
+    "reportId",
+    "missionId",
+    "generatedAt",
+    "gameVersion",
+    "fieldGuide",
+    "organization",
+    "scenario",
+    "campaignContext",
+    "missionObjectives",
+    "finalOutcome",
+    "timeline",
+    "playerDecisions",
+    "knownEvidence",
+    "groundTruth",
+    "securityConsequences",
+    "businessConsequences",
+    "lessonsContext",
+    "limitations",
+    "provenance"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "data": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/data"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/data"
+          }
+        }
+      ]
+    },
+    "time": {
+      "type": "object",
+      "properties": {
+        "minute": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1439
+        },
+        "turn": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 18
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "minute",
+        "turn"
+      ],
+      "additionalProperties": false
+    },
+    "actualState": {
+      "type": "object",
+      "properties": {
+        "threatAccess": {
+          "type": "object",
+          "properties": {
+            "applicable": {
+              "type": "boolean"
+            },
+            "activeSessionIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 10000
+            },
+            "usableSessionIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 10000
+            },
+            "stolenCredentialStillCurrent": {
+              "type": "boolean"
+            },
+            "newAuthenticationAllowed": {
+              "type": "boolean"
+            },
+            "accessAfterNewAuthentication": {
+              "type": "boolean"
+            },
+            "targetAccessCutOff": {
+              "type": "boolean"
+            },
+            "accountContained": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "applicable",
+            "activeSessionIds",
+            "usableSessionIds",
+            "stolenCredentialStillCurrent",
+            "newAuthenticationAllowed",
+            "accessAfterNewAuthentication",
+            "targetAccessCutOff",
+            "accountContained"
+          ],
+          "additionalProperties": false
+        },
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "identityId": {
+                "type": "string"
+              },
+              "loginStatus": {
+                "enum": [
+                  "enabled",
+                  "blocked"
+                ]
+              },
+              "credentialVersion": {
+                "type": "integer"
+              },
+              "mfaPolicy": {
+                "enum": [
+                  "required",
+                  "not-required"
+                ]
+              },
+              "secondFactorVersion": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "identityId",
+              "loginStatus",
+              "credentialVersion",
+              "mfaPolicy"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        },
+        "sessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "accountId": {
+                "type": "string"
+              },
+              "gatewayAssetId": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "active",
+                  "terminated",
+                  "expired"
+                ]
+              },
+              "startedAtMinute": {
+                "type": "integer"
+              },
+              "expiresAtMinute": {
+                "type": "integer"
+              },
+              "origin": {
+                "enum": [
+                  "legitimate",
+                  "unauthorized",
+                  "unclassified"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "accountId",
+              "gatewayAssetId",
+              "status",
+              "startedAtMinute",
+              "expiresAtMinute",
+              "origin"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        },
+        "serviceAccess": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "type": "string"
+              },
+              "targetAssetId": {
+                "type": "string"
+              },
+              "protocol": {
+                "type": "string"
+              },
+              "allowed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "sessionId",
+              "targetAssetId",
+              "protocol",
+              "allowed"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        },
+        "exposedRecords": {
+          "type": "integer"
+        },
+        "endpoint": {
+          "$ref": "#/$defs/data"
+        },
+        "documents": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer"
+                },
+                "correct": {
+                  "type": "integer"
+                },
+                "damaged": {
+                  "type": "integer"
+                },
+                "reconcile": {
+                  "type": "integer"
+                },
+                "recovered": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "total",
+                "correct",
+                "damaged",
+                "reconcile",
+                "recovered"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "availability": {
+          "type": "object",
+          "properties": {
+            "capacity": {
+              "type": "integer"
+            },
+            "localAvailable": {
+              "type": "boolean"
+            },
+            "remoteAvailable": {
+              "type": "boolean"
+            },
+            "status": {
+              "enum": [
+                "available",
+                "degraded",
+                "unavailable"
+              ]
+            },
+            "contributions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "capacity": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "available",
+                  "capacity"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 10000
+            }
+          },
+          "required": [
+            "capacity",
+            "localAvailable",
+            "remoteAvailable",
+            "status"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "threatAccess",
+        "accounts",
+        "sessions",
+        "serviceAccess",
+        "exposedRecords",
+        "endpoint",
+        "documents",
+        "availability"
+      ],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "obtainedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "obtainedByCommand": {
+          "type": "integer"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assertion": {
+          "enum": [
+            "signal",
+            "observation",
+            "human-statement",
+            "message"
+          ]
+        },
+        "details": {
+          "$ref": "#/$defs/data"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "source",
+        "obtainedAt",
+        "obtainedByCommand",
+        "taskId",
+        "assertion",
+        "details"
+      ],
+      "additionalProperties": false
+    },
+    "knownAtDecision": {
+      "type": "object",
+      "properties": {
+        "asOfCommand": {
+          "type": "integer"
+        },
+        "at": {
+          "$ref": "#/$defs/time"
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10000
+        },
+        "alertIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10000
+        },
+        "knownSessionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10000
+        },
+        "sessions": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "accountId": {
+                    "type": "string"
+                  },
+                  "gatewayAssetId": {
+                    "type": "string"
+                  },
+                  "startedAtMinute": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id",
+                  "accountId",
+                  "gatewayAssetId",
+                  "startedAtMinute"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 10000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hypotheses": {
+          "type": "object",
+          "properties": {
+            "vpn": {
+              "type": "string"
+            },
+            "integrity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "vpn",
+            "integrity"
+          ],
+          "additionalProperties": false
+        },
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "assets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "status"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 10000
+            },
+            "networkRules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "sourceAssetId": {
+                    "type": "string"
+                  },
+                  "targetAssetId": {
+                    "type": "string"
+                  },
+                  "protocol": {
+                    "type": "string"
+                  },
+                  "priority": {
+                    "type": "integer"
+                  },
+                  "action": {
+                    "enum": [
+                      "allow",
+                      "deny"
+                    ]
+                  },
+                  "accountIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 10000
+                  }
+                },
+                "required": [
+                  "id",
+                  "sourceAssetId",
+                  "targetAssetId",
+                  "protocol",
+                  "priority",
+                  "action"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 10000
+            },
+            "knownAccounts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "blocked": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "blocked"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 10000
+            },
+            "sensors": {
+              "$ref": "#/$defs/data"
+            },
+            "endpoint": {
+              "$ref": "#/$defs/data"
+            },
+            "backupReadiness": {
+              "$ref": "#/$defs/data"
+            }
+          },
+          "required": [
+            "assets",
+            "networkRules",
+            "knownAccounts",
+            "sensors",
+            "endpoint",
+            "backupReadiness"
+          ],
+          "additionalProperties": false
+        },
+        "business": {
+          "type": "object",
+          "properties": {
+            "totalReceived": {
+              "type": "integer"
+            },
+            "totalProcessed": {
+              "type": "integer"
+            },
+            "backlog": {
+              "type": "integer"
+            },
+            "lastReport": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "capacity": {
+                      "type": "integer"
+                    },
+                    "localAvailable": {
+                      "type": "boolean"
+                    },
+                    "remoteAvailable": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "enum": [
+                        "available",
+                        "degraded",
+                        "unavailable"
+                      ]
+                    },
+                    "contributions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "available": {
+                            "type": "boolean"
+                          },
+                          "capacity": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "available",
+                          "capacity"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "maxItems": 10000
+                    },
+                    "turn": {
+                      "type": "integer"
+                    },
+                    "received": {
+                      "type": "integer"
+                    },
+                    "processed": {
+                      "type": "integer"
+                    },
+                    "backlog": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "capacity",
+                    "localAvailable",
+                    "remoteAvailable",
+                    "status",
+                    "turn",
+                    "received",
+                    "processed",
+                    "backlog"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "totalReceived",
+            "totalProcessed",
+            "backlog",
+            "lastReport"
+          ],
+          "additionalProperties": false
+        },
+        "pendingTasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "workerId": {
+                "enum": [
+                  "analyst",
+                  "administrator"
+                ]
+              },
+              "action": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "additionalProperties": {
+                  "$ref": "#/$defs/data"
+                }
+              },
+              "startTurn": {
+                "type": "integer"
+              },
+              "dueTurn": {
+                "type": "integer"
+              },
+              "status": {
+                "enum": [
+                  "running",
+                  "completed"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "workerId",
+              "action",
+              "startTurn",
+              "dueTurn",
+              "status"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        },
+        "sourceLimitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10000
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "asOfCommand",
+        "at",
+        "evidenceIds",
+        "alertIds",
+        "knownSessionIds",
+        "sessions",
+        "hypotheses",
+        "configuration",
+        "business",
+        "pendingTasks",
+        "sourceLimitations",
+        "unknowns"
+      ],
+      "additionalProperties": false
+    },
+    "timeline": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "at": {
+          "$ref": "#/$defs/time"
+        },
+        "phase": {
+          "enum": [
+            "initial",
+            "command",
+            "interval-settlement",
+            "task-completion",
+            "actor-resolution",
+            "telemetry",
+            "observation",
+            "finish"
+          ]
+        },
+        "kind": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "commandOrdinal": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decisionId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidenceId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "details": {
+          "$ref": "#/$defs/data"
+        }
+      },
+      "required": [
+        "id",
+        "at",
+        "phase",
+        "kind",
+        "source",
+        "status",
+        "commandOrdinal",
+        "decisionId",
+        "taskId",
+        "evidenceId",
+        "details"
+      ],
+      "additionalProperties": false
+    },
+    "decision": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "commandOrdinal": {
+          "type": "integer"
+        },
+        "issuedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "completedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "workerId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "action": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": {
+            "$ref": "#/$defs/data"
+          }
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string"
+            },
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "resourceIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 10000
+            },
+            "flow": {
+              "$ref": "#/$defs/data"
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "resourceIds",
+            "flow"
+          ],
+          "additionalProperties": false
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "running",
+            "rejected",
+            "recorded"
+          ]
+        },
+        "rejection": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "knownAtDecision": {
+          "$ref": "#/$defs/knownAtDecision"
+        },
+        "actualStateAtDecision": {
+          "$ref": "#/$defs/actualState"
+        },
+        "expectedEffect": {
+          "type": "null"
+        },
+        "intentRecorded": {
+          "const": false
+        },
+        "actualEffect": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "scope": {
+                  "const": "completion-boundary-including-concurrent-events"
+                },
+                "boundaryState": {
+                  "$ref": "#/$defs/actualState"
+                },
+                "immediateAccessImpact": {
+                  "$ref": "#/$defs/data"
+                },
+                "eventIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 10000
+                }
+              },
+              "required": [
+                "scope",
+                "boundaryState",
+                "immediateAccessImpact",
+                "eventIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subsequentConsequences": {
+          "type": "object",
+          "properties": {
+            "afterEventId": {
+              "type": "string"
+            },
+            "throughEventId": {
+              "type": "string"
+            },
+            "includesOtherCauses": {
+              "const": true
+            },
+            "finalSecurityRef": {
+              "const": "securityConsequences"
+            },
+            "finalBusinessRef": {
+              "const": "businessConsequences"
+            }
+          },
+          "required": [
+            "afterEventId",
+            "throughEventId",
+            "includesOtherCauses",
+            "finalSecurityRef",
+            "finalBusinessRef"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "commandOrdinal",
+        "issuedAt",
+        "completedAt",
+        "workerId",
+        "action",
+        "target",
+        "taskId",
+        "status",
+        "rejection",
+        "knownAtDecision",
+        "actualStateAtDecision",
+        "expectedEffect",
+        "intentRecorded",
+        "actualEffect",
+        "subsequentConsequences"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

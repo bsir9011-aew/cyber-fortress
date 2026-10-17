@@ -60,7 +60,7 @@ export function App() {
           </div>
         </div>
         <span className="version">
-          DEV 0.2 <span>· Defense Investment Program</span>
+          DEV 0.2 <span>· After Action Review</span>
         </span>
       </header>
       <PersistenceToolbar
@@ -86,6 +86,7 @@ export function App() {
       />
       {operations.historyVisible ? (
         <AttemptHistory
+          game={game}
           entries={operations.history}
           error={operations.historyError}
           onBack={() => operations.setHistoryVisible(false)}
@@ -161,7 +162,7 @@ export function App() {
       <footer className="app-footer">
         <span>FORTRESS LAB / NEXUS Logistics</span>
         <span>
-          Defense Investment Program <span className="footer-dot" /> Sprint 9
+          After Action Review <span className="footer-dot" /> Sprint 10
         </span>
       </footer>
     </div>

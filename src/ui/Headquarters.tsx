@@ -1,3 +1,5 @@
+import { AfterActionExport } from './AfterActionExport';
+import { campaignAarMissionId } from '../application/createAfterActionReport';
 import { ResilienceStatus } from './ResilienceStatus';
 import { useEffect, useRef, useState } from 'react';
 import type {
@@ -334,6 +336,17 @@ export function Headquarters({
                         ? 'Cel ograniczenia dostępu osiągnięty.'
                         : 'Dostęp wymaga dalszej uwagi.'}
                   </p>
+                  <details>
+                    <summary>Raport szczegółowy tej operacji</summary>
+                    <AfterActionExport
+                      game={session}
+                      missionId={campaignAarMissionId(
+                        session.attemptId,
+                        r.number,
+                      )}
+                      compact
+                    />
+                  </details>
                 </article>
               ))
             )}

@@ -1,3 +1,5 @@
+import type { GameSession } from '../application/gameSession';
+import { AfterActionExport } from './AfterActionExport';
 import { useEffect, useRef } from 'react';
 import type { AttemptSummary } from '../persistence/attemptHistory';
 import { HISTORY_LIMIT } from '../persistence/attemptHistory';
@@ -17,6 +19,7 @@ function outcome(entry: AttemptSummary) {
 }
 export function AttemptHistory({
   entries,
+  game,
   error,
   onBack,
   onClear,
@@ -24,6 +27,7 @@ export function AttemptHistory({
   onReplay,
 }: {
   entries: readonly AttemptSummary[];
+  game: GameSession;
   error: string;
   onBack: () => void;
   onClear: () => void;
@@ -84,6 +88,7 @@ export function AttemptHistory({
                 <th scope="col">Tury / działania</th>
                 <th scope="col">Wynik</th>
                 <th scope="col">Powtórka</th>
+                <th scope="col">Raport szczegółowy</th>
               </tr>
             </thead>
             <tbody>
@@ -142,6 +147,19 @@ export function AttemptHistory({
                     >
                       Powtórz
                     </button>
+                  </td>
+                  <td className="history-aar">
+                    {game.kind === 'incident' &&
+                    game.operation.attemptId === entry.attemptId &&
+                    game.operation.simulation.clock.turn === 18 ? (
+                      <AfterActionExport game={game} compact />
+                    ) : (
+                      <p>
+                        Ta próba zawiera wynik, ale pełna chronologia nie jest
+                        dostępna w bieżącym zapisie. Nie można odtworzyć
+                        szczegółowego raportu z samych liczników.
+                      </p>
+                    )}
                   </td>
                 </tr>
               ))}

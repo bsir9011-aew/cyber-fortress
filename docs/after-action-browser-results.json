@@ -1,0 +1,69 @@
+{
+  "chromium": "154.0.8037.57",
+  "widths": [
+    1366,
+    375
+  ],
+  "checks": [
+    "no overflow: M01 export 375",
+    "no overflow: standalone history 375",
+    "M01 account block → later logs/sessions; no hindsight knowledge",
+    "reload before finish preserves journal",
+    "offline JSON/Markdown export and clipboard, no game-save writes",
+    "AAR rejected by game-save import",
+    "replay with precise SMB block changes outcome",
+    "clipboard denial offers selectable text",
+    "history current journal export and explicit missing chronology for older summary",
+    "no overflow: M02 report 375",
+    "no overflow: campaign history 375",
+    "genuine Sprint 9 V4 import and in-progress restore",
+    "reload before M02 finish preserves journal",
+    "EDR/prepared backup AAR: correct100, orders360, RPO10/RTO30",
+    "historical campaign M02 reconstructed without later funding or projects",
+    "campaign reload preserves funding; no AAR storage archive"
+  ],
+  "errors": [],
+  "badResponses": [],
+  "externalRequests": [],
+  "reports": [
+    {
+      "scenario": "B",
+      "reportId": "AAR-098ccefc-9c23-4186-9ef8-8acf389a5a65",
+      "exposed": 2000,
+      "jsonBytes": 187783,
+      "markdownBytes": 79252
+    },
+    {
+      "scenario": "A",
+      "reportId": "AAR-a5ad340b-1ace-43a4-9551-71be365cdf81",
+      "exposed": 0
+    },
+    {
+      "scenario": "F",
+      "reportId": "AAR-7aa29aa8-4bbc-4cc1-b1a4-94895b20bd6d-M4",
+      "integrity": {
+        "serviceOnline": true,
+        "dataAvailable": true,
+        "total": 100,
+        "correct": 100,
+        "damaged": 0,
+        "reconcile": 0,
+        "recovered": 12,
+        "everDamaged": 12,
+        "sourceHasWrite": false,
+        "endpointIsolated": false,
+        "writesRestricted": true,
+        "backupId": "FS-1350",
+        "rpoMinutes": 10,
+        "rtoMinutes": 30,
+        "missingChanges": 0,
+        "reconstructed": 0,
+        "verified": true,
+        "limitedDataMinutes": 20,
+        "peakBacklog": 4
+      },
+      "jsonBytes": 416191,
+      "markdownBytes": 172929
+    }
+  ]
+}
