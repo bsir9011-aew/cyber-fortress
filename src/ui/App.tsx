@@ -1,8 +1,6 @@
-import { useEffect, useReducer, useRef, useState } from 'react';
-import { createInitialSimulation } from '../application/createInitialSimulation';
+import { useEffect, useRef, useState } from 'react';
 import { selectPlayerView } from '../application/selectPlayerView';
 import { selectMissionReport } from '../application/selectMissionReport';
-import { scenarioReducer } from '../application/scenarioReducer';
 import { nextRun } from '../application/scenarioSelectors';
 import type { ScenarioMode } from '../domain/scenario';
 import type { SimulationCommand } from '../domain/simulation';
@@ -29,6 +27,10 @@ import { eventLabel } from './simulationPresentation';
 import './simulation.css';
 import './mission.css';
 import './scenario.css';
+import './persistence.css';
+import { usePersistentOperations } from './usePersistentOperations';
+import { PersistenceToolbar } from './PersistenceToolbar';
+import { AttemptHistory } from './AttemptHistory';
 
 type Context = 'cases' | 'operations' | 'architecture';
 const contexts: { id: Context; label: string; number: string }[] = [
@@ -38,20 +40,19 @@ const contexts: { id: Context; label: string; number: string }[] = [
 ];
 
 export function App() {
-  const [simulation, dispatch] = useReducer(
-    scenarioReducer,
-    undefined,
-    createInitialSimulation,
-  );
+  const operations = usePersistentOperations();
+  const { session, updateUi } = operations;
+  const simulation = session.simulation;
+  const { briefing, context, layer, selection } = session.uiState;
   const view = selectPlayerView(simulation);
   const report = selectMissionReport(simulation);
   const { world } = view;
-  const [briefing, setBriefing] = useState(true);
   const [choosingMode, setChoosingMode] = useState(true);
-  const [context, setContext] = useState<Context>('cases');
-  const [layer, setLayer] = useState<MapLayer>('network');
-  const [selection, setSelection] = useState<MapSelection>(null);
   const [attempt, setAttempt] = useState(0);
+  const setBriefing = (briefing: boolean) => updateUi({ briefing });
+  const setContext = (context: Context) => updateUi({ context });
+  const setLayer = (layer: MapLayer) => updateUi({ layer });
+  const setSelection = (selection: MapSelection) => updateUi({ selection });
   const headingRef = useRef<HTMLHeadingElement>(null);
   const visibleConnections = selectLayerConnections(world, layer);
   const activeLayer = layers.find((item) => item.id === layer)!;
@@ -69,7 +70,13 @@ export function App() {
 
   useEffect(() => {
     if (!briefing && !choosingMode) headingRef.current?.focus();
-  }, [briefing, choosingMode, context, view.finished]);
+  }, [
+    briefing,
+    choosingMode,
+    context,
+    view.finished,
+    operations.historyVisible,
+  ]);
 
   function select(value: MapSelection) {
     if (value?.kind === 'connection') {
@@ -84,22 +91,26 @@ export function App() {
   }
   function onCommand(command: SimulationCommand) {
     if (command.type === 'reset') {
-      setSelection(null);
-      setLayer('network');
-      setContext('cases');
-      setBriefing(true);
-      setAttempt((value) => value + 1);
+      startRun(view.run.mode, view.run.seed);
+      return;
     }
-    dispatch(command);
+    operations.command(command);
   }
   function startRun(mode: ScenarioMode, seed: number) {
-    dispatch({ type: 'start-run', mode, seed });
+    if (
+      (operations.hasSave || operations.active) &&
+      !window.confirm(
+        'Nowa próba zastąpi bieżącą grę i lokalny zapis. Zakończone wyniki pozostaną w historii. Kontynuować?',
+      )
+    )
+      return;
+    operations.start(mode, seed);
     setChoosingMode(false);
-    setBriefing(true);
-    setContext('cases');
-    setLayer('network');
-    setSelection(null);
     setAttempt((value) => value + 1);
+  }
+  function resume() {
+    operations.resume();
+    setChoosingMode(false);
   }
   function newIncident() {
     const run = nextRun(view.run);
@@ -135,13 +146,72 @@ export function App() {
           </div>
         </div>
         <span className="version">
-          DEV 0.2 <span>· The Uncertainty Protocol</span>
+          DEV 0.2 <span>· Persistent Operations</span>
         </span>
       </header>
-      {choosingMode ? (
-        <ScenarioSelection
-          onSelect={(mode) => startRun(mode, mode === 'training' ? 0 : 1)}
+      <PersistenceToolbar
+        session={session}
+        canExport={operations.canResume}
+        status={operations.saveStatus}
+        error={operations.saveError}
+        onRetry={operations.retrySave}
+        onHistory={() => operations.setHistoryVisible(true)}
+        onImport={(save) => {
+          if (
+            !window.confirm(
+              'Import zastąpi bieżącą próbę i lokalny zapis. Historia wyników pozostanie. Kontynuować?',
+            )
+          )
+            return;
+          operations.restore(save);
+          setChoosingMode(false);
+          setAttempt((value) => value + 1);
+        }}
+      />
+      {operations.historyVisible ? (
+        <AttemptHistory
+          entries={operations.history}
+          error={operations.historyError}
+          onBack={() => operations.setHistoryVisible(false)}
+          onClear={() => {
+            if (
+              window.confirm(
+                'Usunąć historię wyników? Bieżący zapis pozostanie.',
+              )
+            )
+              operations.clearHistory();
+          }}
+          onRetry={operations.retryHistory}
+          onReplay={(entry) => startRun(entry.mode, entry.seed)}
         />
+      ) : choosingMode ? (
+        <>
+          {operations.canResume && (
+            <section className="resume-card" aria-label="Wznowienie rozgrywki">
+              <div>
+                <p className="eyebrow">Świat czeka na Twoją decyzję</p>
+                <h1>
+                  {view.finished
+                    ? 'Wróć do zakończonej próby'
+                    : 'Kontynuuj rozgrywkę'}
+                </h1>
+                <p>
+                  {String(Math.floor(view.minute / 60)).padStart(2, '0')}:
+                  {String(view.minute % 60).padStart(2, '0')} · tura{' '}
+                  {view.clock.turn} / {view.clock.turnLimit}. Czas nie płynął
+                  podczas Twojej nieobecności.
+                </p>
+              </div>
+              <button className="advance-button" onClick={resume} autoFocus>
+                Kontynuuj rozgrywkę
+              </button>
+            </section>
+          )}
+          <ScenarioSelection
+            autoFocus={!operations.canResume}
+            onSelect={(mode) => startRun(mode, mode === 'training' ? 0 : 1)}
+          />
+        </>
       ) : briefing ? (
         <MissionBriefing view={view} onStart={() => setBriefing(false)} />
       ) : (
@@ -433,7 +503,7 @@ export function App() {
           FORTRESS LAB <span className="muted">/</span> NEXUS Logistics
         </span>
         <span>
-          The Uncertainty Protocol <span className="footer-dot" /> Sprint 5
+          Persistent Operations <span className="footer-dot" /> Sprint 6
         </span>
       </footer>
     </div>

@@ -2,12 +2,47 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — The Uncertainty Protocol (Sprint 5)
+## FORTRESS LAB — Persistent Operations (Sprint 6)
 
 Trzy warianty misji **„Ostatnie okno wysyłkowe”** w NEXUS Logistics.
 Jako Security Engineer otrzymujesz sygnał nietypowych logowań VPN, pozyskujesz
 dowody i decydujesz, jak chronić dane, zachowując obsługę zamówień do 15:30.
 Bez backendu, kluczy API, timerów czasu rzeczywistego i nowych zależności.
+
+### Zapis, powrót i porównanie prób
+
+Gra automatycznie zapisuje pełny stan po komendach oraz zmianie kontekstu/mapy.
+Po ponownym otwarciu wybierz **Kontynuuj rozgrywkę** lub rozpocznij nową grę.
+Zegar świata stoi również po zamknięciu karty. Wznowienie zachowuje zadania w toku,
+sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
+
+- **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
+  strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
+  Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu.
+- **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
+  działalność, ograniczenie dostępu i działania. Powtórka tworzy nową próbę tego
+  samego wariantu i seedu. Historia ma osobne potwierdzenie czyszczenia.
+- Wskaźnik informuje o powodzeniu zapisu. Przy braku miejsca lub zablokowanej
+  pamięci gra działa dalej; wyeksportuj plik, aby zachować postęp.
+- Zapis jest lokalny dla przeglądarki i originu. Nie ma synchronizacji ani kont.
+  Eksport zawiera fikcyjną ukrytą prawdę incydentu; nie jest zabezpieczeniem przed
+  oszukiwaniem. Po załadowaniu zasobów rozgrywka działa bez sieci.
+
+[Format i architektura zapisu](docs/persistence.md) ·
+[Raport deterministyczności i Chromium](docs/persistence-validation.md) ·
+[Konfiguracja publikacji GitHub Pages](docs/github-pages.md).
+
+![Wznowienie o 14:25](docs/screenshots/persistence-01-resume.png)
+
+[Historia wyników](docs/screenshots/persistence-02-history.png) i
+[widok 375 px](docs/screenshots/persistence-03-history-mobile.png).
+
+### Wersja przeglądarkowa
+
+Docelowy adres: **https://bsir9011-aew.github.io/cyber-fortress/**.
+Publikacja Sprintu 6 czeka na zatwierdzenie PR i włączenie GitHub Pages
+w ustawieniach repozytorium. Nie została jeszcze potwierdzona jako działająca.
+Workflow wdraża wyłącznie `main`, po testach i produkcyjnym buildzie.
 
 ### Rozpoczęcie misji
 
@@ -142,7 +177,7 @@ działała również w środowiskach z niezapisywalnym katalogiem domowym.
 | `npm test`           | Jednorazowe uruchomienie testów Vitest w Node.                   |
 | `npm run test:watch` | Testy w trybie obserwowania zmian.                               |
 | `npm run build`      | Sprawdzenie typów i produkcyjny build do `dist/`.                |
-| `npm run preview`    | Lokalny podgląd zbudowanego `dist/` (domyślny port: 4173).       |
+| `npm run preview`    | Podgląd `dist/` pod `/cyber-fortress/` (domyślny port: 4173). |
 
 Walidacja przed commitem:
 
@@ -161,11 +196,14 @@ src/
   application/  # inicjalizacja, reducer, publiczna projekcja, raport końcowy i selektory mapy
   content/      # infrastruktura i trzy konfiguracje NEXUS w scenarios/
   ui/           # React, style i SVG
-  persistence/  # miejsce na przyszłe adaptery zapisu
+  persistence/  # wersjonowany JSON, walidacja, localStorage i historia prób
 docs/           # architektura i GDD
 prototype/      # archiwalny prototyp HTML 0.1
 ```
 
+- [Format zapisu i historia](docs/persistence.md)
+- [Walidacja Sprintu 6](docs/persistence-validation.md)
+- [Publikacja przez GitHub Pages](docs/github-pages.md)
 - [Konfiguracja scenariuszy](docs/scenario-configuration.md)
 - [Raport porównawczy i walidacja Sprintu 5](docs/scenario-variants-validation.md)
 - [Architektura i granice modułów](docs/architecture.md)
@@ -177,9 +215,9 @@ Licencja: [MIT](LICENSE).
 ### Granice etapu
 
 Jedna organizacja, trzy stałe warianty i co najwyżej jeden deterministyczny przeciwnik. Kopiowanie zmienia wyłącznie
-licznik abstrakcyjnych rekordów w TypeScript. Nie ma prawdziwych operacji
-sieciowych, plików, SOC/SIEM, sensorów ruchu, generatywnych dialogów, kampanii,
-ekonomii ani zapisu gry. Odświeżenie strony rozpoczyna nową próbę.
+licznik abstrakcyjnych rekordów w TypeScript. Działania symulacji nie wykonują
+operacji w prawdziwej sieci ani na plikach. Nie ma SOC/SIEM, sensorów ruchu, generatywnych dialogów, kampanii,
+ekonomii, kont ani chmurowych zapisów. Odświeżenie strony proponuje wznowienie lokalnej próby.
 
 Prosty planer nadal kończy próby po 3 kolejnych porażkach; raport odróżnia ten limit
 od odcięcia technicznych możliwości. Wyłączenie VPN nie zmienia ważności

@@ -1,0 +1,247 @@
+.persistence-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 14px 28px;
+  border-bottom: 1px solid #365168;
+  background: #101f30;
+  font-size: 13px;
+}
+.save-indicator {
+  display: grid;
+  gap: 4px;
+  margin-right: auto;
+}
+.save-indicator strong {
+  color: #9fe4c4;
+}
+.save-indicator span {
+  color: #bed0df;
+  font-size: 12px;
+}
+.persistence-actions,
+.history-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.persistence-toolbar button,
+.history-screen button {
+  min-height: 40px;
+  padding: 9px 13px;
+  color: #e1f3fa;
+  border: 1px solid #52788f;
+  background: #192f43;
+  border-radius: 5px;
+  font-size: 13px;
+}
+.persistence-toolbar button:hover:not(:disabled),
+.history-screen button:hover:not(:disabled) {
+  background: #24485b;
+}
+.persistence-message {
+  width: 100%;
+  margin: 0;
+  color: #f4d6a7;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.resume-card {
+  max-width: 1060px;
+  margin: 36px auto 0;
+  padding: 28px;
+  border: 1px solid #5c959b;
+  border-left: 4px solid #9de5d7;
+  background: #142e3c;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.resume-card h1 {
+  font-size: 26px;
+  margin: 10px 0;
+}
+.resume-card p {
+  color: #d2e4ed;
+  line-height: 1.7;
+  margin: 0;
+}
+.resume-card button {
+  min-height: 46px;
+  font-size: 14px;
+}
+.history-screen {
+  max-width: 1440px;
+  margin: auto;
+  padding: 36px 28px 70px;
+}
+.history-screen h1 {
+  font-size: clamp(28px, 4vw, 42px);
+}
+.history-screen > p {
+  max-width: 800px;
+  color: #c6d9e6;
+  line-height: 1.8;
+  font-size: 15px;
+}
+.history-controls {
+  margin: 24px 0;
+}
+.history-table-wrap {
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid #39576c;
+  border-radius: 6px;
+}
+.history-screen table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 1020px;
+  text-align: left;
+  background: #102234;
+  font-size: 14px;
+}
+.history-screen caption {
+  text-align: left;
+  padding: 16px;
+  font-size: 13px;
+  color: #c1d8e6;
+  background: #142c3e;
+}
+.history-screen th,
+.history-screen td {
+  padding: 18px 14px;
+  vertical-align: top;
+  border-bottom: 1px solid #365166;
+  line-height: 1.6;
+}
+.history-screen thead th {
+  color: #a8e5e5;
+  font-size: 13px;
+}
+.history-screen tbody th {
+  min-width: 235px;
+  font-weight: 400;
+}
+.history-screen small,
+.history-screen time {
+  display: block;
+  color: #c1d0dd;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.empty-history {
+  padding: 30px;
+  border: 1px dashed #52788f;
+}
+/* Sprint 6: zachowujemy układ; tekst pomocniczy i decyzje są czytelniejsze. */
+.mission-shell .eyebrow {
+  font-size: 11px;
+  color: #b4d4df;
+}
+.mission-shell .right-column {
+  --muted: #c0d2e1;
+}
+.mission-shell
+  .right-column
+  :is(
+    p,
+    label,
+    small,
+    dt,
+    dd,
+    .inspector-subtitle,
+    .action-group-title,
+    .operation-selection label,
+    .operation-selection select
+  ) {
+  font-size: 13px;
+  line-height: 1.65;
+}
+.mission-shell .right-column :is(button, strong) {
+  font-size: 13px;
+}
+.mission-shell .right-column button {
+  min-height: 42px;
+  line-height: 1.5;
+}
+.mission-shell .worker-status {
+  border-radius: 5px;
+  padding: 14px 8px;
+}
+.mission-shell .worker-status:has(.worker-busy) {
+  background: #28352f;
+  border-left: 3px solid #efce91;
+}
+.mission-shell :is(.worker-busy, .worker-ready) {
+  font-size: 12px;
+}
+.mission-shell
+  :is(
+    .turn-progress small,
+    .source-note,
+    .run-mode-bar,
+    .business-result p,
+    .sidebar-note,
+    .map-guidance p,
+    .event-log-list,
+    .narrative-message-meta
+  ) {
+  font-size: 13px;
+  color: #c0d3e2;
+}
+.mission-shell .turn-progress small {
+  line-height: 1.5;
+}
+.mission-shell .run-mode-bar button {
+  min-height: 36px;
+}
+.mission-shell button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.mission-shell :is(button, a, select, input, [tabindex]):focus-visible {
+  outline: 3px solid #a9fff0;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .persistence-toolbar {
+    padding: 14px 16px;
+    gap: 14px;
+  }
+  .persistence-actions {
+    width: 100%;
+  }
+  .persistence-actions button {
+    flex: 1 1 130px;
+    min-height: 44px;
+  }
+  .resume-card {
+    margin: 20px 16px 0;
+    padding: 20px;
+  }
+  .resume-card button {
+    width: 100%;
+  }
+  .resume-card h1 {
+    font-size: 24px;
+  }
+  .history-screen {
+    padding: 24px 16px 60px;
+  }
+  .history-controls button {
+    min-height: 44px;
+  }
+  .mission-shell .right-column .worker-status {
+    flex-wrap: wrap;
+  }
+  .mission-shell .right-column .worker-status > div {
+    flex: 1;
+  }
+  .mission-shell .simulation-timebar {
+    gap: 12px;
+  }
+}

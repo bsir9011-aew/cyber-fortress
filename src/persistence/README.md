@@ -1,5 +1,9 @@
-# Zapis i odczyt
+# Zapis i odczyt — Sprint 6
 
-Miejsce na przyszły zapis stanu, wersjonowanie formatu i migracje.
-Bootstrap 0.2 nie zapisuje danych ani nie korzysta z LocalStorage lub IndexedDB.
-Adaptery przeglądarkowe powinny pozostać tutaj, poza `domain` i `simulation`.
+- `saveFormat.ts`: FortressSaveV1, kontrola wersji i limitów, walidacja pełnej migawki przez istniejący reducer.
+- `localStorage.ts`: adapter bieżącego zapisu i historii, bezpieczne wyniki błędów pamięci.
+- `attemptHistory.ts`: podsumowanie istniejącego raportu, maksymalnie 50 unikalnych prób i walidacja historii.
+- `saveFormat.test.ts`: zgodność ciągłej/wznawianej rozgrywki, niezaufane pliki i błędy pamięci.
+
+Nie ma drugiego mechanizmu symulacji, backendu ani sekretów użytkownika.
+Pełny kontrakt: [docs/persistence.md](../../docs/persistence.md).
