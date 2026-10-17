@@ -210,4 +210,5 @@ Pages pozostaje na scalonym main. API potwierdza udany deployment 173d135
 nie ogłaszamy testu nowego publicznego UI na podstawie API. Produkcyjny build
 Sprintu 7 i zasoby pod `/cyber-fortress/` zostały sprawdzone lokalnie w Chromium.
 PR nie może publikować: dotychczasowy workflow nadal dopuszcza wyłącznie `main`.
-Link do PR zostanie przekazany w raporcie końcowym po opublikowaniu gałęzi.
+Pull Request: [#8 — Strategic Command](https://github.com/bsir9011-aew/cyber-fortress/pull/8).
+Gałąź opublikowano do przeglądu; bez merge i bez produkcyjnego wdrożenia Sprintu 7.
