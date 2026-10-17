@@ -27,7 +27,10 @@ export function resumeLegitimateWork(state: SimulationState): SimulationState {
     if (!account) continue;
     const active = next.access.sessions.some(
       (session) =>
-        session.accountId === account.id && isSessionActive(session, minute),
+        session.accountId === account.id &&
+        isSessionActive(session, minute) &&
+        (account.id !== next.access.vendorAuthorization?.accountId ||
+          next.hidden.sessionOrigins[session.id] === 'legitimate'),
     );
     let dueTurn = actor.nextAuthenticationTurn;
     if (active) dueTurn = null;

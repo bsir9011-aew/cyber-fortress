@@ -1,3 +1,4 @@
+import { initializeVendor } from '../simulation/vendor';
 import type { RunIdentity, ScenarioDefinition } from '../domain/scenario';
 import type { SimulationState } from '../domain/simulation';
 import { createInitialAttacker } from '../simulation/attacker';
@@ -315,12 +316,19 @@ export function validateScenario(
           ) &&
           definition.integrity.endpoint.businessCapacity <=
             process.localCapacity
-      : definition.kind === 'legitimate-session'
-        ? definition.attacker === null &&
-          Object.values(definition.initialSessionOrigins).every(
-            (origin) => origin === 'legitimate',
-          )
-        : definition.attacker !== null,
+      : definition.vendor
+        ? definition.kind === 'third-party-access' &&
+          definition.vendor.familyId === 'nexus-vendor-access-v1' &&
+          access.vendorAuthorization?.accountId === 'cargo-link-operator' &&
+          [6, 12].includes(definition.vendor.requiredBatches) &&
+          Boolean(account('cargo-link-operator')) &&
+          service('carrier-api', 'HTTPS')
+        : definition.kind === 'legitimate-session'
+          ? definition.attacker === null &&
+            Object.values(definition.initialSessionOrigins).every(
+              (origin) => origin === 'legitimate',
+            )
+          : definition.attacker !== null,
     'Scenario truth disagrees with actors',
   );
   return errors;
@@ -421,5 +429,5 @@ export function createScenario(
         },
       };
   }
-  return updateTelemetry(initializeIntegrity(state));
+  return updateTelemetry(initializeVendor(initializeIntegrity(state)));
 }

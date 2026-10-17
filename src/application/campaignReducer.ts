@@ -16,6 +16,7 @@ import {
   createCampaignIncident,
   createIntegrityIncident,
   createDetectionIncident,
+  createVendorIncident,
 } from './prepareCampaignIncident';
 import { simulationReducer } from './simulationReducer';
 import { selectMissionReport } from './selectMissionReport';
@@ -159,6 +160,18 @@ export function campaignReducer(
       ? [
           ...state.history,
           {
+            ...(report.vendor
+              ? {
+                  vendor: {
+                    approvalId: report.vendor.summary.approvalId,
+                    approvedScope: report.vendor.summary.approvedScope,
+                    expiresAtMinute: report.vendor.summary.expiresAtMinute,
+                    completedBatches: report.vendor.summary.completedBatches,
+                    requiredBatches: report.vendor.summary.requiredBatches,
+                    exposedRecords: report.vendor.summary.exposedRecords,
+                  },
+                }
+              : {}),
             ...(report.integrity
               ? { integrity: report.integrity.summary }
               : {}),
@@ -349,6 +362,94 @@ export function campaignReducer(
       command,
     );
   }
+  if (command.type === 'start-vendor-incident') {
+    if (command.familyId !== 'nexus-vendor-access-v1')
+      return reject('Nieznana rodzina dostawcy.');
+    if (!state.history.some((r) => r.integrity))
+      return reject('Najpierw ukończ co najmniej jedną Misję 02.');
+    if (state.preparation.hour !== 4)
+      return reject('Najpierw rozlicz czterogodzinne przygotowanie.');
+    const approval = [...(state.vendorApprovals ?? [])]
+      .reverse()
+      .find(
+        (a) =>
+          a.window === state.preparation.number &&
+          a.completedHour !== null &&
+          a.usedInWindow === null,
+      );
+    return decide(
+      state,
+      {
+        ...state,
+        phase: 'incident',
+        ...(state.vendorApprovals
+          ? {
+              vendorApprovals: state.vendorApprovals.map((a) =>
+                a === approval
+                  ? { ...a, usedInWindow: state.preparation.number }
+                  : a,
+              ),
+            }
+          : {}),
+        incident: createVendorIncident(
+          state.nextSeed,
+          state.posture,
+          command.familyId,
+          approval,
+        ),
+      },
+      command,
+    );
+  }
+  if (command.type === 'prepare-vendor-exception') {
+    if (!state.history.some((r) => r.integrity))
+      return reject('Wyjątek CARGO-LINK jest dostępny po Misji 02.');
+    if (
+      !['api-only', 'api-and-files'].includes(command.scope) ||
+      ![870, 900, 930].includes(command.expiresAtMinute)
+    )
+      return reject(
+        'Wybierz istniejący zakres i termin 14:30, 15:00 lub 15:30.',
+      );
+    if (state.preparation.hour >= 4)
+      return reject('Okno przygotowania jest zamknięte.');
+    if (
+      state.vendorApprovals?.some((a) => a.completedHour === null) ||
+      state.work.some(
+        (w) =>
+          w.window === state.preparation.number &&
+          w.workerId === 'administrator' &&
+          w.status === 'running',
+      )
+    )
+      return reject('Administrator jest zajęty. Wyjątek wymaga 1 h pracy.');
+    const previous = state.vendorApprovals?.at(-1);
+    if (
+      previous?.window === state.preparation.number &&
+      previous.scope === command.scope &&
+      previous.expiresAtMinute === command.expiresAtMinute
+    )
+      return reject('Ten wyjątek jest już przygotowany.');
+    return decide(
+      state,
+      {
+        ...state,
+        vendorApprovals: [
+          ...(state.vendorApprovals ?? []),
+          {
+            id: `CARGO-APPROVAL-${(state.vendorApprovals?.length ?? 0) + 1}`,
+            scope: command.scope,
+            expiresAtMinute: command.expiresAtMinute,
+            window: state.preparation.number,
+            startHour: state.preparation.hour,
+            completedHour: null,
+            usedInWindow: null,
+          },
+        ],
+      },
+      command,
+    );
+  }
   if (command.type === 'configure-endpoint-detection') {
     const c = state.posture.endpointCoverage;
     if (
@@ -408,6 +509,11 @@ export function campaignReducer(
     );
   }
   if (command.type === 'set-segmentation-scope') {
+    if (
+      state.posture.segmentation &&
+      state.vendorApprovals?.some((a) => a.completedHour === null)
+    )
+      return reject('Administrator przygotowuje wyjątek CARGO-LINK.');
     if (state.preparation.hour === 4)
       return reject('Okno konfiguracji zakończone.');
     if (state.posture.segmentationScope === command.scope)
@@ -459,6 +565,9 @@ export function campaignReducer(
     if (state.preparation.hour >= 4)
       return reject('Okno przygotowania jest zamknięte.');
     const hour = state.preparation.hour + 1;
+    const pendingVendor = state.vendorApprovals?.find(
+      (a) => a.window === state.preparation.number && a.completedHour === null,
+    );
     const pendingDetection = state.detectionChanges?.find(
       (w) => w.window === state.preparation.number && w.completedHour === null,
     );
@@ -518,6 +627,13 @@ export function campaignReducer(
         ...state,
         projects,
         work,
+        ...(state.vendorApprovals
+          ? {
+              vendorApprovals: state.vendorApprovals.map((a) =>
+                a === pendingVendor ? { ...a, completedHour: hour } : a,
+              ),
+            }
+          : {}),
         ...(state.detectionChanges
           ? {
               detectionChanges: state.detectionChanges.map((w) =>
@@ -619,6 +735,11 @@ export function campaignReducer(
     );
   }
   if (command.type === 'assign-work') {
+    if (
+      command.workerId === 'administrator' &&
+      state.vendorApprovals?.some((a) => a.completedHour === null)
+    )
+      return reject('Administrator przygotowuje wyjątek CARGO-LINK (1 h).');
     if (
       command.workerId === 'analyst' &&
       state.detectionChanges?.some((w) => w.completedHour === null)

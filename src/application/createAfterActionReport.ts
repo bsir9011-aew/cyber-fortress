@@ -18,7 +18,7 @@ import { validateGameSession, MAX_GAME_BYTES } from '../persistence/gameSave';
 import {
   isCurrentCampaignCommand,
   isCurrentRecordedCommand,
-} from '../persistence/gameSaveV5';
+} from '../persistence/gameSaveV6';
 import { sameJson, timestamp } from '../persistence/saveFormat';
 import { MissionTrace } from './aar/missionTrace';
 import { actualState, facts, timeAt } from './aar/facts';
@@ -90,6 +90,7 @@ function campaignContext(s: CampaignState): AarCampaignContext {
     work: s.work,
     investmentLedger: s.budget.ledger,
     posture: s.posture,
+    ...(s.vendorApprovals ? { vendorApprovals: s.vendorApprovals } : {}),
     ...(s.detectionChanges ? { detectionChanges: s.detectionChanges } : {}),
   };
 }
@@ -220,8 +221,12 @@ export function createAfterActionReport(
       generatedAt,
       gameVersion: {
         application: '0.2.0',
-        engine: detectionEngineering ? '11.0.0' : '9.0.0',
-        reportGenerator: detectionEngineering ? '1.1.0' : '1.0.0',
+        engine: s.vendor ? '12.0.0' : detectionEngineering ? '11.0.0' : '9.0.0',
+        reportGenerator: s.vendor
+          ? '1.2.0'
+          : detectionEngineering
+            ? '1.1.0'
+            : '1.0.0',
       },
       fieldGuide: {
         format:
@@ -254,7 +259,7 @@ export function createAfterActionReport(
         ...(s.hidden.scenario.familyId
           ? { variantFamilyId: s.hidden.scenario.familyId }
           : {}),
-        family: integrity ? 'M02' : 'M01',
+        family: s.vendor ? 'M03' : integrity ? 'M02' : 'M01',
         name: report.scenario.name,
         kind: report.scenario.kind,
         mode: s.run.mode,
@@ -271,6 +276,9 @@ export function createAfterActionReport(
           ? null
           : s.hidden.scenario.goals.maxExposedRecords,
         maxFinalBacklog: s.process.maxFinalBacklog,
+        ...(s.vendor
+          ? { requiredVendorBatches: s.hidden.scenario.vendor!.requiredBatches }
+          : {}),
         requireThreatContainment:
           !integrity && s.hidden.scenario.goals.requireThreatContainment,
         ...(integrity
@@ -282,6 +290,13 @@ export function createAfterActionReport(
           : {}),
       }),
       finalOutcome: {
+        ...(report.vendor
+          ? {
+              vendorWorkMet:
+                report.vendor.summary.completedBatches ===
+                report.vendor.summary.requiredBatches,
+            }
+          : {}),
         confidentialityMet: integrity ? null : report.confidentiality.goalMet,
         continuityMet: report.continuity.goalMet,
         containmentMet: integrity
@@ -292,11 +307,13 @@ export function createAfterActionReport(
             integrity.summary.verified &&
             integrity.summary.dataAvailable
           : null,
-        allObjectivesMet: integrity
-          ? integrity.goalMet
-          : report.confidentiality.goalMet &&
-            report.continuity.goalMet &&
-            report.containment.goalMet !== false,
+        allObjectivesMet: report.vendor
+          ? report.vendor.goalMet
+          : integrity
+            ? integrity.goalMet
+            : report.confidentiality.goalMet &&
+              report.continuity.goalMet &&
+              report.containment.goalMet !== false,
       },
       ...trace.finish(),
       groundTruth: {
@@ -345,6 +362,7 @@ export function createAfterActionReport(
         ...(detectionEngineering && integrity
           ? { detectionReview: facts(integrity.detectionReview) }
           : {}),
+        ...(report.vendor ? { vendorAccess: facts(report.vendor) } : {}),
         investmentUse: facts(
           integrity?.investments ?? {
             mfaRefusals: s.telemetry.sourceEvents.filter(

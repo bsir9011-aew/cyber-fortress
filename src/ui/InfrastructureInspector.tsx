@@ -17,6 +17,7 @@ import type { MapSelection } from './infrastructurePresentation';
 import type { IntegrityView } from '../application/selectIntegrityView';
 
 interface Props {
+  vendor?: import('../application/selectVendorView').VendorView | undefined;
   resilience?: ResilienceStatusProps | undefined;
   world: WorldState;
   selection: MapSelection;
@@ -32,6 +33,7 @@ export function InfrastructureInspector({
   onSelect,
   networkRules = [],
   endpoint,
+  vendor,
 }: Props) {
   const asset =
     selection?.kind === 'asset'
@@ -42,6 +44,11 @@ export function InfrastructureInspector({
       ? world.connections.find((item) => item.id === selection.id)
       : undefined;
   const rule = selectConnectionRule(networkRules, connection);
+  const vendorNote =
+    vendor &&
+    (asset?.id === 'carrier-api' ||
+      (connection?.sourceAssetId === 'vpn' &&
+        ['fs-01', 'carrier-api'].includes(connection.targetAssetId)));
 
   return (
     <aside className="inspector" aria-label="Inspektor infrastruktury">
@@ -51,6 +58,22 @@ export function InfrastructureInspector({
           {asset ? 'Zasób' : connection ? 'Relacja' : 'Wybierz element'}
         </span>
       </div>
+      {vendorNote && (
+        <section className="inspector-section">
+          <h3>Obowiązkowy wyjątek CARGO-LINK</h3>
+          <p>
+            {vendor!.accountId} ·{' '}
+            {vendor!.exception
+              ? `${vendor!.exception.scope}, termin ${String(Math.floor(vendor!.exception.expiresAtMinute / 60)).padStart(2, '0')}:${String(vendor!.exception.expiresAtMinute % 60).padStart(2, '0')}, stan ${vendor!.expired ? 'expired' : vendor!.exception.status}`
+              : 'brak zatwierdzenia — odmowa'}
+            .
+          </p>
+          <p>
+            ACL i uprawnienie nie zastępują zatwierdzenia. Wyjątek wygasa także
+            dla istniejących sesji; ogólna reguła allow go nie omija.
+          </p>
+        </section>
+      )}
       {asset ? (
         <>
           <div className="inspector-icon">

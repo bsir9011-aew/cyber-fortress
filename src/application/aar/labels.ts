@@ -1,5 +1,9 @@
 import type { AarDecision } from '../../domain/afterActionReport';
 const actions: Record<AarDecision['action']['type'], string> = {
+  'inspect-vendor-operations': 'Sprawdzenie operacji CARGO-LINK',
+  'revoke-vendor-exception': 'Cofnięcie wyjątku dostawcy',
+  'narrow-vendor-exception': 'Ograniczenie wyjątku do HTTPS',
+  'expand-vendor-exception': 'Rozszerzenie wyjątku o SMB',
   'inspect-documents': 'Porównanie dokumentów z ERP',
   'inspect-backups': 'Inwentaryzacja kopii',
   'verify-backup': 'Weryfikacja kopii',

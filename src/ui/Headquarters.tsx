@@ -1,3 +1,4 @@
+import { VendorPreparation } from './VendorPreparation';
 import { DetectionConfiguration } from './DetectionConfiguration';
 import { AfterActionExport } from './AfterActionExport';
 import { campaignAarMissionId } from '../application/createAfterActionReport';
@@ -238,6 +239,13 @@ export function Headquarters({
           Rozpocznij nieznany przypadek →
         </button>
       </section>
+      {view.history.some((r) => r.integrity) && (
+        <VendorPreparation
+          key={`vendor-${session.attemptId}-${view.preparation.number}`}
+          campaign={session.campaign}
+          onCommand={onCommand}
+        />
+      )}
       <DetectionConfiguration
         key={`${session.attemptId}-${view.preparation.number}`}
         campaign={session.campaign}
@@ -526,6 +534,11 @@ export function Headquarters({
                 session.campaign.detectionChanges?.some(
                   (w) => w.completedHour === null,
                 );
+              const vendorBusy =
+                worker === 'administrator' &&
+                session.campaign.vendorApprovals?.some(
+                  (a) => a.completedHour === null,
+                );
               const busy = activeWork(worker);
               const options = view.projects.filter(
                 (p) =>
@@ -542,11 +555,13 @@ export function Headquarters({
                       : 'Analityk'}
                   </span>
                   <h2>
-                    {detectionBusy
-                      ? 'Konfiguracja EDR — 1 h'
-                      : busy
-                        ? 'W trakcie wdrożenia'
-                        : 'Gotowy do przydziału'}
+                    {vendorBusy
+                      ? 'Wyjątek CARGO-LINK — 1 h'
+                      : detectionBusy
+                        ? 'Konfiguracja EDR — 1 h'
+                        : busy
+                          ? 'W trakcie wdrożenia'
+                          : 'Gotowy do przydziału'}
                   </h2>
                   <p>
                     {busy
@@ -562,7 +577,12 @@ export function Headquarters({
                   <select
                     id={`assign-${worker}`}
                     value={chosen?.id ?? ''}
-                    disabled={detectionBusy || Boolean(busy) || !options.length}
+                    disabled={
+                      vendorBusy ||
+                      detectionBusy ||
+                      Boolean(busy) ||
+                      !options.length
+                    }
                     onChange={(e) =>
                       setAssignment((a) => ({
                         ...a,
@@ -582,6 +602,7 @@ export function Headquarters({
                   <button
                     className="secondary-button"
                     disabled={
+                      vendorBusy ||
                       detectionBusy ||
                       Boolean(busy) ||
                       !chosen ||
@@ -636,11 +657,18 @@ export function Headquarters({
                         d.window === view.preparation.number &&
                         d.startHour === hour,
                     );
+                  const vendorWork =
+                    worker === 'administrator' &&
+                    session.campaign.vendorApprovals?.find(
+                      (a) =>
+                        a.window === view.preparation.number &&
+                        a.startHour === hour,
+                    );
                   return (
                     <div
                       key={hour}
                       className={
-                        w || detection
+                        w || detection || vendorWork
                           ? hour < view.preparation.hour
                             ? 'work-done'
                             : 'work-planned'
@@ -649,11 +677,13 @@ export function Headquarters({
                     >
                       <small>{hour + 1}. godzina okna</small>
                       <span>
-                        {detection
-                          ? 'Konfiguracja EDR'
-                          : w
-                            ? workName(w.projectId)
-                            : 'Wolne'}
+                        {vendorWork
+                          ? 'Wyjątek CARGO-LINK'
+                          : detection
+                            ? 'Konfiguracja EDR'
+                            : w
+                              ? workName(w.projectId)
+                              : 'Wolne'}
                       </span>
                     </div>
                   );

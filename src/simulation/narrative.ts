@@ -28,6 +28,15 @@ export function deriveNarrative(
     const { task } = event;
     const action = task.action;
     let text: string | null = null;
+    if (action.type === 'revoke-vendor-exception')
+      text =
+        'Cofnąłem autoryzację wyjątku CARGO-LINK. Sesje pozostają; sprawdź odmowy usług i wpływ na zlecenie.';
+    if (action.type === 'narrow-vendor-exception')
+      text =
+        'Wyjątek CARGO-LINK obejmuje tylko HTTPS. SMB wymaga osobnego uprawnienia; termin nie został przedłużony.';
+    if (action.type === 'expand-vendor-exception')
+      text =
+        'Rozszerzyłem ważny wyjątek CARGO-LINK o SMB. Termin pozostał bez zmian. Zakres nie przesądza o legalności operacji.';
     if (action.type === 'terminate-session')
       text = `Zakończyłem tunel ${action.sessionId}. To nie zmienia zasad nowych logowań.`;
     if (action.type === 'block-account')

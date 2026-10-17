@@ -1,3 +1,5 @@
+import type { VendorAuthorization } from './vendor';
+
 export interface Identity {
   readonly id: string;
   readonly name: string;
@@ -40,6 +42,7 @@ export interface ResourcePermission {
 }
 
 export interface AccessState {
+  readonly vendorAuthorization?: VendorAuthorization;
   readonly vpnAssetId: string;
   readonly identityAssetId: string;
   readonly sessionLifetimeMinutes: number;

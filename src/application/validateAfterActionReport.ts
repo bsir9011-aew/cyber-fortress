@@ -47,7 +47,7 @@ export function validateAfterActionReport(
     r.finalOutcome.continuityMet !== b.finalBacklog <= goals.maxFinalBacklog
   )
     return bad();
-  if (r.scenario.family === 'M01') {
+  if (r.scenario.family === 'M01' || r.scenario.family === 'M03') {
     if (
       typeof goals.maxExposedRecords !== 'number' ||
       r.finalOutcome.confidentialityMet !==
@@ -77,6 +77,7 @@ export function validateAfterActionReport(
       r.finalOutcome.continuityMet,
       r.finalOutcome.containmentMet,
       r.finalOutcome.integrityMet,
+      r.finalOutcome.vendorWorkMet ?? true,
     ].every((v) => v !== false)
   )
     return bad();

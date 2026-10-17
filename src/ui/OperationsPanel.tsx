@@ -7,6 +7,7 @@ import type {
 } from '../domain/simulation';
 import { taskSpecs } from '../simulation/tasks';
 import { actionLabel } from './simulationPresentation';
+import { VendorOperations } from './VendorPanel';
 import { IntegrityOperations } from './IntegrityPanel';
 
 export function OperationsPanel({
@@ -22,6 +23,12 @@ export function OperationsPanel({
   const rule = view.rules.find((item) => item.id === ruleId) ?? view.rules[0];
   const knownSessions = [
     ...new Map([
+      ...(view.vendor?.observations ?? []).flatMap((o) =>
+        o.records.map(
+          (r) =>
+            [r.sessionId, { id: r.sessionId, accountId: r.accountId }] as const,
+        ),
+      ),
       ...(view.sessionObservation?.sessions ?? []).map(
         (session) =>
           [
@@ -125,11 +132,17 @@ export function OperationsPanel({
           Pobierz audyt FS-01 · 5 min
         </button>
       )}
+      {view.vendor && (
+        <VendorOperations view={view.vendor} onCommand={onCommand} />
+      )}
       {view.integrity && (
         <IntegrityOperations view={view.integrity} onCommand={onCommand} />
       )}
-      <details className="legacy-operations" open={!view.integrity}>
-        <summary hidden={!view.integrity}>
+      <details
+        className="legacy-operations"
+        open={!view.integrity && !view.vendor}
+      >
+        <summary hidden={!view.integrity && !view.vendor}>
           Narzędzia dostępu VPN i reguły sieciowe
         </summary>
         <h3 className="action-group-title">

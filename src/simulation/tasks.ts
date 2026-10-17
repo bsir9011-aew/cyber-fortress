@@ -4,6 +4,7 @@ import type {
   TaskAction,
   WorkerId,
 } from '../domain/simulation';
+import { vendorTaskRejection } from './vendor';
 import { isAssetOnline, isSessionActive } from './access';
 import { currentMinute } from './clock';
 import {
@@ -13,10 +14,13 @@ import {
 } from './integrity';
 
 export function knownAccountIds(
-  state: Pick<SimulationState, 'knowledge' | 'incident'>,
+  state: Pick<SimulationState, 'knowledge' | 'incident' | 'vendor'>,
 ): readonly string[] {
   return [
     ...new Set([
+      ...(state.vendor?.observations ?? []).flatMap((o) =>
+        o.records.map((r) => r.accountId),
+      ),
       ...state.incident.alerts.map((alert) => alert.accountId),
       ...(state.knowledge.fileObservations ?? []).flatMap((o) =>
         o.records.map((r) => r.accountId),
@@ -32,10 +36,13 @@ export function knownAccountIds(
 }
 
 export function knownSessionIds(
-  state: Pick<SimulationState, 'knowledge'>,
+  state: Pick<SimulationState, 'knowledge' | 'vendor'>,
 ): readonly string[] {
   return [
     ...new Set([
+      ...(state.vendor?.observations ?? []).flatMap((o) =>
+        o.records.map((r) => r.sessionId),
+      ),
       ...(state.knowledge.fileObservations ?? []).flatMap((o) =>
         o.records.flatMap((r) => (r.sessionId ? [r.sessionId] : [])),
       ),
@@ -55,6 +62,10 @@ export const taskSpecs: Record<
   TaskAction['type'],
   { readonly workerId: WorkerId; readonly turns: number }
 > = {
+  'inspect-vendor-operations': { workerId: 'analyst', turns: 1 },
+  'revoke-vendor-exception': { workerId: 'administrator', turns: 1 },
+  'narrow-vendor-exception': { workerId: 'administrator', turns: 2 },
+  'expand-vendor-exception': { workerId: 'administrator', turns: 2 },
   'inspect-edr-telemetry': { workerId: 'analyst', turns: 1 },
   'inspect-documents': { workerId: 'analyst', turns: 2 },
   'inspect-backups': { workerId: 'analyst', turns: 1 },
@@ -99,6 +110,11 @@ export function taskRejection(
     return 'outside-time-window';
   if (isIntegrityAction(action)) return integrityTaskRejection(state, action);
   switch (action.type) {
+    case 'inspect-vendor-operations':
+    case 'revoke-vendor-exception':
+    case 'narrow-vendor-exception':
+    case 'expand-vendor-exception':
+      return vendorTaskRejection(state, action);
     case 'inspect-edr-telemetry':
       return state.integrity &&
         state.telemetry.endpoint?.coverage.collectorAvailable

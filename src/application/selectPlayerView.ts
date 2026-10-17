@@ -1,3 +1,4 @@
+import { selectVendorView } from './selectVendorView';
 import type { SimulationState } from '../domain/simulation';
 import type { NetworkRule } from '../domain/access';
 import type { InfrastructureConnection } from '../domain/infrastructure';
@@ -13,6 +14,7 @@ import { selectIntegrityView } from './selectIntegrityView';
 /** Jawna projekcja: nigdy spread SimulationState/access/hidden do komponentów. */
 export function selectPlayerView(state: SimulationState) {
   return {
+    ...(state.vendor ? { vendor: selectVendorView(state) } : {}),
     ...(state.integrity ? { integrity: selectIntegrityView(state) } : {}),
     run: { ...state.run },
     briefing: { ...state.hidden.scenario.briefing },
