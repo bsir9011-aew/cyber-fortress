@@ -136,6 +136,38 @@ export function Headquarters({
           {view.lastDecision.reason}
         </p>
       )}
+      <section
+        className="integrity-mission-card"
+        aria-label="Misja 02: Ostatnia czysta kopia"
+      >
+        <div>
+          <p className="eyebrow">Nowy rozdział / Integralność i odzyskiwanie</p>
+          <h2>02 — Ostatnia czysta kopia</h2>
+          <p>
+            ERP działa, ale dokumenty FS-01 nie zgadzają się z zamówieniami.
+            Ustal źródło, ogranicz je i wybierz sposób odtworzenia. To osobna
+            rodzina incydentu.
+          </p>
+          <p>
+            {!view.history.length
+              ? 'Dostępna po ukończeniu jednego incydentu Misji 01.'
+              : view.preparation.hour !== 4
+                ? 'Przed startem rozlicz cztery godziny przygotowania.'
+                : 'Zachowasz budżet, inwestycje i trwałe zmiany. Dowody będą świeże.'}
+          </p>
+        </div>
+        <button
+          className="primary-button"
+          disabled={
+            !view.history.some(
+              (r) => r.scenarioId !== 'nexus-last-clean-copy',
+            ) || view.preparation.hour !== 4
+          }
+          onClick={() => onCommand({ type: 'start-integrity-incident' })}
+        >
+          Rozpocznij Misję 02 →
+        </button>
+      </section>
       <nav className="hq-tabs" aria-label="Konteksty centrali">
         {tabs.map((tab) => (
           <button
@@ -250,8 +282,10 @@ export function Headquarters({
                     Operacja {r.number} · {r.name}
                   </strong>
                   <p>
-                    {r.exposedRecords} ujawnionych rekordów · {r.processed}{' '}
-                    obsłużonych · {r.backlog} zaległych · wydano{' '}
+                    {r.integrity
+                      ? `${r.integrity.correct}/100 poprawnych dokumentów · ${r.integrity.damaged} uszkodzonych · ${r.integrity.reconcile} do uzgodnienia`
+                      : `${r.exposedRecords} ujawnionych rekordów`}{' '}
+                    · {r.processed} obsłużonych · {r.backlog} zaległych · wydano{' '}
                     {money(r.spent)}.
                   </p>
                   <p>

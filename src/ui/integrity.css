@@ -1,0 +1,220 @@
+.integrity-mission-card {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 26px;
+  margin: 22px 0;
+  border: 1px solid #5c6654;
+  border-left: 4px solid #edc880;
+  border-radius: 8px;
+  background: linear-gradient(120deg, #303125, #142333);
+}
+.integrity-mission-card > div {
+  flex: 1;
+}
+.integrity-mission-card h2 {
+  margin: 10px 0;
+  font-size: 27px;
+}
+.integrity-mission-card p {
+  color: #d0d8d6;
+}
+.integrity-panel,
+.integrity-report {
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d1b2b;
+  min-width: 0;
+}
+.integrity-panel h2 {
+  font-size: clamp(23px, 3vw, 32px);
+  line-height: 1.3;
+  max-width: 24ch;
+}
+.integrity-panel h3,
+.integrity-operations h3 {
+  margin: 28px 0 12px;
+}
+.integrity-panel p,
+.integrity-report p {
+  color: #c2d2df;
+}
+.integrity-panel blockquote {
+  margin: 22px 0;
+  padding: 20px;
+  border-left: 3px solid #e3bf78;
+  background: #253128;
+}
+.integrity-service {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+}
+.integrity-route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 12px;
+  border: 1px solid #365064;
+  border-radius: 6px;
+  color: var(--accent);
+  text-align: center;
+}
+.integrity-route span {
+  color: #eaf2ff;
+  line-height: 1.7;
+}
+.integrity-route small {
+  color: var(--muted);
+}
+.integrity-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.integrity-counts > div {
+  padding: 16px 10px;
+  border: 1px solid #334b5b;
+  border-radius: 5px;
+  background: #132637;
+}
+.integrity-counts dt {
+  font-size: 13px;
+  color: #bdd0db;
+}
+.integrity-counts dd {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 8px 0 0;
+}
+.integrity-panel label {
+  display: block;
+  margin: 22px 0 10px;
+}
+.integrity-panel select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #43596b;
+  background: #102435;
+  color: #eaf2ff;
+  border-radius: 5px;
+  font: inherit;
+}
+.integrity-panel details,
+.integrity-report details {
+  padding: 16px;
+  margin: 14px 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.integrity-panel summary,
+.integrity-report summary {
+  cursor: pointer;
+  line-height: 1.6;
+}
+.integrity-panel li {
+  margin: 12px 0;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.integrity-operations h3 {
+  font-size: 17px;
+  line-height: 1.6;
+}
+.integrity-operations h3 span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+.integrity-operations p {
+  font-size: 14px;
+}
+.backup-card {
+  padding: 16px;
+  margin: 14px 0;
+  border: 1px solid #3f5361;
+  border-radius: 6px;
+  background: #142638;
+}
+.backup-card strong {
+  color: #f0d49d;
+}
+.legacy-operations > summary {
+  padding: 18px 0;
+  cursor: pointer;
+  color: var(--muted);
+}
+.legacy-operations > summary[hidden] {
+  display: none;
+}
+.integrity-report h1 {
+  font-size: clamp(29px, 4vw, 46px);
+  max-width: 25ch;
+}
+.recovery-report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 30px 0;
+}
+.recovery-report-grid > article {
+  padding: 22px;
+  border: 1px solid #385064;
+  border-radius: 6px;
+}
+.integrity-decisions {
+  display: grid;
+  gap: 12px;
+  margin: 22px 0;
+}
+.integrity-decisions article {
+  border-left: 2px solid #5c7f8c;
+  padding: 12px 20px;
+  background: #122333;
+  overflow-wrap: anywhere;
+}
+.integrity-report > button {
+  margin: 26px 0 0;
+}
+@media (max-width: 700px) {
+  .integrity-mission-card {
+    display: block;
+    padding: 20px;
+  }
+  .integrity-mission-card button {
+    width: 100%;
+    margin-top: 10px;
+  }
+  .integrity-panel,
+  .integrity-report {
+    padding: 18px;
+  }
+  .integrity-counts {
+    gap: 6px;
+  }
+  .integrity-counts > div {
+    padding: 12px 6px;
+  }
+  .integrity-counts dt {
+    font-size: 12px;
+  }
+  .integrity-counts dd {
+    font-size: 27px;
+  }
+  .recovery-report-grid {
+    grid-template-columns: 1fr;
+  }
+  .recovery-report-grid > article {
+    padding: 15px;
+  }
+  .integrity-route {
+    font-size: 12px;
+    padding: 18px 6px;
+    gap: 6px;
+  }
+}

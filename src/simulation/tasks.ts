@@ -6,6 +6,11 @@ import type {
 } from '../domain/simulation';
 import { isAssetOnline, isSessionActive } from './access';
 import { currentMinute } from './clock';
+import {
+  isIntegrityAction,
+  integrityTaskRejection,
+  integrityTaskTurns,
+} from './integrity';
 
 export function knownAccountIds(
   state: Pick<SimulationState, 'knowledge' | 'incident'>,
@@ -32,7 +37,7 @@ export function knownSessionIds(
   return [
     ...new Set([
       ...(state.knowledge.fileObservations ?? []).flatMap((o) =>
-        o.records.map((r) => r.sessionId),
+        o.records.flatMap((r) => (r.sessionId ? [r.sessionId] : [])),
       ),
       ...(state.knowledge.sessionObservation?.sessions.map(
         (session) => session.id,
@@ -50,6 +55,15 @@ export const taskSpecs: Record<
   TaskAction['type'],
   { readonly workerId: WorkerId; readonly turns: number }
 > = {
+  'inspect-documents': { workerId: 'analyst', turns: 2 },
+  'inspect-backups': { workerId: 'analyst', turns: 1 },
+  'verify-backup': { workerId: 'analyst', turns: 2 },
+  'restore-documents': { workerId: 'administrator', turns: 2 },
+  'reconcile-documents': { workerId: 'analyst', turns: 2 },
+  'examine-endpoint': { workerId: 'analyst', turns: 2 },
+  'isolate-endpoint': { workerId: 'administrator', turns: 1 },
+  'restrict-endpoint-writes': { workerId: 'administrator', turns: 2 },
+  'reconnect-endpoint': { workerId: 'administrator', turns: 1 },
   'inspect-vpn-sessions': { workerId: 'analyst', turns: 1 },
   'inspect-auth-logs': { workerId: 'analyst', turns: 1 },
   'inspect-file-access': { workerId: 'analyst', turns: 1 },
@@ -77,8 +91,12 @@ export function taskRejection(
     )
   )
     return 'worker-busy';
-  if (state.clock.turn + spec.turns > state.clock.turnLimit)
+  if (
+    state.clock.turn + (integrityTaskTurns(state, action) ?? spec.turns) >
+    state.clock.turnLimit
+  )
     return 'outside-time-window';
+  if (isIntegrityAction(action)) return integrityTaskRejection(state, action);
   switch (action.type) {
     case 'inspect-vpn-sessions':
       return state.telemetry.sessionSensor.enabled &&

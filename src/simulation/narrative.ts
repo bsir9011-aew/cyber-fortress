@@ -9,6 +9,7 @@ type NarrativeFacts = Pick<
   'clock' | 'tasks' | 'knowledge' | 'history' | 'incident' | 'business'
 > & {
   readonly remoteAvailable: boolean;
+  readonly integrityMission?: boolean;
 };
 
 export function deriveNarrative(
@@ -31,6 +32,14 @@ export function deriveNarrative(
       text = `Zakończyłem tunel ${action.sessionId}. To nie zmienia zasad nowych logowań.`;
     if (action.type === 'block-account')
       text = `Nowe logowania konta ${action.accountId} są zablokowane. Istniejące tunele wymagają osobnej decyzji.`;
+    if (action.type === 'isolate-endpoint')
+      text = `Odizolowałem ${action.endpointId}. Sieć tej stacji jest odcięta; stan dokumentów i kompromitacja nie zostały naprawione.`;
+    if (action.type === 'restrict-endpoint-writes')
+      text = `Ograniczyłem zapis stacji ${action.endpointId}. To kontrola uprawnień, nie oczyszczenie hosta.`;
+    if (action.type === 'reconnect-endpoint')
+      text = `Podłączyłem ${action.endpointId} przy zachowanym ograniczeniu zapisu. Legalna praca nadal wymaga usług i poprawnych dokumentów.`;
+    if (action.type === 'restore-documents')
+      text = `Zakończyłem zadanie odtworzenia z ${action.backupId}. Sprawdź wynik porównaniem z ERP; źródło modyfikacji wymaga osobnego ograniczenia.`;
     if (action.type === 'unblock-account')
       text = `Przywróciłem nowe logowania konta ${action.accountId}. Zakończone tunele pozostają zakończone. Hasło i MFA nie zostały zmienione; nadal ważne przejęte poświadczenie może ponownie umożliwić dostęp.`;
     if (action.type === 'reset-credential')
@@ -135,6 +144,7 @@ export function deriveNarrative(
           .find((event) => event.kind === 'business-report')?.id ?? 'business',
     });
   if (
+    !facts.integrityMission &&
     facts.business.lastReport?.remoteAvailable &&
     facts.business.lastReport.contributions?.some((item) => !item.available)
   )
@@ -176,6 +186,7 @@ export function updateNarrative(state: SimulationState): SimulationState {
     incident: state.incident,
     business: state.business,
     remoteAvailable: businessAvailability(state).remoteAvailable,
+    ...(state.integrity ? { integrityMission: true } : {}),
   });
   return { ...state, incident: { ...state.incident, messages } };
 }

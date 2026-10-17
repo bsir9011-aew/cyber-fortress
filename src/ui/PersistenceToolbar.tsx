@@ -1,16 +1,17 @@
 import { useRef, useState } from 'react';
 import {
-  createGameSave,
+  createCurrentGameSave,
   MAX_GAME_BYTES,
-  readGameSave,
-  serializeGameSave,
-} from '../persistence/gameSave';
-import type { FortressSaveV2 } from '../persistence/gameSave';
+  readCurrentGameSave,
+  serializeCurrentGameSave,
+} from '../persistence/gameSaveV3';
+import type { FortressSaveV3 } from '../persistence/gameSaveV3';
 import type { GameSession } from '../application/gameSession';
 
 export function PersistenceToolbar({
   game,
   legacyRaw,
+  previousRaw,
   canExport,
   status,
   error,
@@ -20,19 +21,20 @@ export function PersistenceToolbar({
 }: {
   game: GameSession;
   legacyRaw: string | null;
+  previousRaw: string | null;
   canExport: boolean;
   status: string;
   error: string;
   onRetry: () => void;
-  onImport: (save: FortressSaveV2) => void;
+  onImport: (save: FortressSaveV3) => void;
   onHistory: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   function exportSave() {
-    const result = serializeGameSave(
-      createGameSave(game, new Date().toISOString()),
+    const result = serializeCurrentGameSave(
+      createCurrentGameSave(game, new Date().toISOString()),
     );
     if (!result.ok) {
       setMessage(result.error);
@@ -52,14 +54,13 @@ export function PersistenceToolbar({
       'Eksport przygotowany. Plik zawiera pełny stan, także ukrytą prawdę incydentu.',
     );
   }
-  function exportLegacy() {
-    if (legacyRaw === null) return;
+  function exportLegacy(raw: string, version: string) {
     const url = URL.createObjectURL(
-      new Blob([legacyRaw], { type: 'application/json' }),
+      new Blob([raw], { type: 'application/json' }),
     );
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'fortress-lab-original-v1.json';
+    link.download = `fortress-lab-original-${version}.json`;
     document.body.append(link);
     link.click();
     link.remove();
@@ -74,7 +75,7 @@ export function PersistenceToolbar({
         setMessage('Plik przekracza limit 8 MiB.');
         return;
       }
-      const result = readGameSave(await file.text());
+      const result = readCurrentGameSave(await file.text());
       if (!result.ok) {
         setMessage(result.error);
         return;
@@ -113,7 +114,14 @@ export function PersistenceToolbar({
           onChange={(event) => void importFile(event.target.files?.[0])}
         />
         {legacyRaw !== null && (
-          <button onClick={exportLegacy}>Eksportuj oryginał V1</button>
+          <button onClick={() => exportLegacy(legacyRaw, 'v1')}>
+            Eksportuj oryginał V1
+          </button>
+        )}
+        {previousRaw !== null && (
+          <button onClick={() => exportLegacy(previousRaw, 'v2')}>
+            Eksportuj oryginał V2
+          </button>
         )}
         <button onClick={onHistory}>Historia prób</button>
       </div>

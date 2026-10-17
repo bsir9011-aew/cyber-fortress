@@ -8,10 +8,12 @@ import {
 } from '../simulation/business';
 import { currentMinute, isFinished } from '../simulation/clock';
 import { knownAccountIds } from '../simulation/tasks';
+import { selectIntegrityView } from './selectIntegrityView';
 
 /** Jawna projekcja: nigdy spread SimulationState/access/hidden do komponentów. */
 export function selectPlayerView(state: SimulationState) {
   return {
+    ...(state.integrity ? { integrity: selectIntegrityView(state) } : {}),
     run: { ...state.run },
     briefing: { ...state.hidden.scenario.briefing },
     recordPool: state.hidden.scenario.goals.recordPool,

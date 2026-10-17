@@ -24,6 +24,15 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
       </div>
       <details className="business-dependencies">
         <summary>Od czego zależy wydajność firmy?</summary>
+        {view.integrity && (
+          <p>
+            W tej misji 14 zamówień wydajności zdalnej zależy także od
+            dostępnego FS-01 i udziału poprawnych dokumentów: floor(14 ×
+            poprawne / 100). Izolacja pakowanie-03 odbiera 2 z 8 lokalnych
+            zamówień wydajności. Sprawna całość: 22. Stan danych poznajesz przez
+            badanie; tu widzisz rzeczywistą wydajność procesu.
+          </p>
+        )}
         <ul>
           <li>
             {view.businessDependencies.localCapacity} zamówień / turę: lokalne

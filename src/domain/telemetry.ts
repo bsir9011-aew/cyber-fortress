@@ -75,9 +75,11 @@ export interface FileAccessEvent {
   readonly id: string;
   readonly minute: number;
   readonly accountId: string;
-  readonly sessionId: string;
+  readonly sessionId: string | null;
+  readonly endpointId?: string;
+  readonly documentIds?: readonly string[];
   readonly targetAssetId: string;
-  readonly operation: 'list' | 'open' | 'read';
+  readonly operation: 'list' | 'open' | 'read' | 'modify';
   readonly outcome: 'allowed' | 'denied';
   /** Liczba rekordów zmierzona przez usługę tylko przy skutecznym read. */
   readonly recordsRead: number | null;

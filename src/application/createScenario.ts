@@ -3,6 +3,10 @@ import type { SimulationState } from '../domain/simulation';
 import { createInitialAttacker } from '../simulation/attacker';
 import { issueVpnSession } from '../simulation/access';
 import { recordAuthentication, updateTelemetry } from '../simulation/telemetry';
+import {
+  initializeIntegrity,
+  validateIntegrityDefinition,
+} from '../simulation/integrity';
 
 /** Sprawdzenie treści przed uruchomieniem, bez naprawiania błędnych referencji. */
 export function validateScenario(
@@ -260,7 +264,8 @@ export function validateScenario(
     'Invalid mission goals',
   );
   check(
-    goals.requireThreatContainment === (definition.attacker !== null),
+    goals.requireThreatContainment ===
+      (definition.attacker !== null || definition.integrity !== undefined),
     'Containment goal disagrees with threat presence',
   );
   if (definition.attacker) {
@@ -297,12 +302,25 @@ export function validateScenario(
     }
   }
   check(
-    definition.kind === 'legitimate-session'
-      ? definition.attacker === null &&
+    definition.integrity
+      ? definition.kind === 'local-integrity' &&
+          definition.attacker === null &&
+          validateIntegrityDefinition(definition.integrity) &&
+          Boolean(asset(definition.integrity.endpoint.assetId)) &&
+          Boolean(account(definition.integrity.endpoint.accountId)) &&
+          Boolean(account(definition.integrity.businessReadAccountId)) &&
+          service(definition.integrity.datasetAssetId, 'SMB') &&
+          definition.integrity.endpoint.permissions.every((p) =>
+            service(p.assetId, p.protocol),
+          ) &&
+          definition.integrity.endpoint.businessCapacity <=
+            process.localCapacity
+      : definition.kind === 'legitimate-session'
+        ? definition.attacker === null &&
           Object.values(definition.initialSessionOrigins).every(
             (origin) => origin === 'legitimate',
           )
-      : definition.attacker !== null,
+        : definition.attacker !== null,
     'Scenario truth disagrees with actors',
   );
   return errors;
@@ -403,5 +421,5 @@ export function createScenario(
         },
       };
   }
-  return updateTelemetry(state);
+  return updateTelemetry(initializeIntegrity(state));
 }

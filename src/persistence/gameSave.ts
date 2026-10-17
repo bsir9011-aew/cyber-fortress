@@ -99,7 +99,11 @@ function metadata(
         v.completedAt <= savedAt))
   );
 }
-function validateOperation(v: unknown, savedAt: string): v is OperationSession {
+function validateOperation(
+  v: unknown,
+  savedAt: string,
+  recordedCommand = (c: unknown) => isRecordedCommand(c, true),
+): v is OperationSession {
   if (
     !object(v) ||
     !keys(v, [
@@ -115,7 +119,7 @@ function validateOperation(v: unknown, savedAt: string): v is OperationSession {
     !object(v.simulation.run) ||
     !Array.isArray(v.commands) ||
     v.commands.length > MAX_GAME_COMMANDS ||
-    !v.commands.every((c) => isRecordedCommand(c, true))
+    !v.commands.every(recordedCommand)
   )
     return false;
   const { run } = v.simulation;
@@ -132,6 +136,77 @@ function validateOperation(v: unknown, savedAt: string): v is OperationSession {
     (v.completedAt !== null) ===
       (expected.clock.turn === expected.clock.turnLimit)
   );
+}
+/** Shared replay validation; V2 defaults keep the historical command contract. */
+export function validateGameSession(
+  value: unknown,
+  savedAt: string,
+  campaignCommand = isCampaignCommand,
+  recordedCommand = (c: unknown) => isRecordedCommand(c, true),
+): value is GameSession {
+  if (!object(value)) return false;
+  const s = value;
+  if (s.kind === 'incident') {
+    if (
+      !keys(s, ['kind', 'operation']) ||
+      !validateOperation(s.operation, savedAt, recordedCommand)
+    )
+      fail();
+  } else if (s.kind === 'campaign') {
+    if (
+      !keys(s, [
+        'kind',
+        'attemptId',
+        'createdAt',
+        'initialSeed',
+        'campaign',
+        'commands',
+        'missionMetadata',
+        'uiState',
+        'headquartersTab',
+      ]) ||
+      !identifier(s.attemptId) ||
+      !timestamp(s.createdAt) ||
+      s.createdAt > savedAt ||
+      !integer(s.initialSeed) ||
+      !Array.isArray(s.commands) ||
+      s.commands.length > MAX_GAME_COMMANDS ||
+      !s.commands.every(campaignCommand) ||
+      typeof s.headquartersTab !== 'string' ||
+      !['overview', 'projects', 'schedule', 'posture', 'map'].includes(
+        s.headquartersTab,
+      )
+    )
+      fail();
+    let expected = createCampaign(s.initialSeed);
+    for (const command of s.commands)
+      expected = campaignReducer(expected, command);
+    if (
+      !sameJson(expected, s.campaign) ||
+      !validateUi(
+        s.uiState,
+        expected.incident ?? createScenarioRun('training', 0),
+      )
+    )
+      fail();
+    if (expected.incident) {
+      if (
+        !metadata(s.missionMetadata, savedAt) ||
+        !keys(s.missionMetadata as unknown as Record<string, unknown>, [
+          'attemptId',
+          'createdAt',
+          'completedAt',
+        ]) ||
+        s.missionMetadata.attemptId !==
+          `${s.attemptId}-M${expected.preparation.number}` ||
+        s.missionMetadata.createdAt < s.createdAt ||
+        (s.missionMetadata.completedAt !== null) !==
+          (expected.phase === 'report')
+      )
+        fail();
+    } else if (s.missionMetadata !== null) fail();
+  } else fail();
+  return true;
 }
 export function readGameSave(text: string): Result<FortressSaveV2> {
   try {
@@ -175,67 +250,7 @@ export function readGameSave(text: string): Result<FortressSaveV2> {
       !object(v.session)
     )
       fail();
-    const s = v.session;
-    if (s.kind === 'incident') {
-      if (
-        !keys(s, ['kind', 'operation']) ||
-        !validateOperation(s.operation, v.savedAt)
-      )
-        fail();
-    } else if (s.kind === 'campaign') {
-      if (
-        !keys(s, [
-          'kind',
-          'attemptId',
-          'createdAt',
-          'initialSeed',
-          'campaign',
-          'commands',
-          'missionMetadata',
-          'uiState',
-          'headquartersTab',
-        ]) ||
-        !identifier(s.attemptId) ||
-        !timestamp(s.createdAt) ||
-        s.createdAt > v.savedAt ||
-        !integer(s.initialSeed) ||
-        !Array.isArray(s.commands) ||
-        s.commands.length > MAX_GAME_COMMANDS ||
-        !s.commands.every(isCampaignCommand) ||
-        typeof s.headquartersTab !== 'string' ||
-        !['overview', 'projects', 'schedule', 'posture', 'map'].includes(
-          s.headquartersTab,
-        )
-      )
-        fail();
-      let expected = createCampaign(s.initialSeed);
-      for (const command of s.commands)
-        expected = campaignReducer(expected, command);
-      if (
-        !sameJson(expected, s.campaign) ||
-        !validateUi(
-          s.uiState,
-          expected.incident ?? createScenarioRun('training', 0),
-        )
-      )
-        fail();
-      if (expected.incident) {
-        if (
-          !metadata(s.missionMetadata, v.savedAt) ||
-          !keys(s.missionMetadata as unknown as Record<string, unknown>, [
-            'attemptId',
-            'createdAt',
-            'completedAt',
-          ]) ||
-          s.missionMetadata.attemptId !==
-            `${s.attemptId}-M${expected.preparation.number}` ||
-          s.missionMetadata.createdAt < s.createdAt ||
-          (s.missionMetadata.completedAt !== null) !==
-            (expected.phase === 'report')
-        )
-          fail();
-      } else if (s.missionMetadata !== null) fail();
-    } else fail();
+    if (!validateGameSession(v.session, v.savedAt)) fail();
     return { ok: true, value: v as unknown as FortressSaveV2 };
   } catch (error) {
     return {

@@ -4,7 +4,15 @@
 
 Wybór trybu **Strategia** tworzy nowy rozdział. Trening i Nieznany incydent
 pozostają samodzielnymi misjami, bez obowiązkowych zakupów. Kampania korzysta
-z tych samych trzech definicji oraz tego samego silnika incydentu.
+z trzech stabilnych definicji Misji 01 oraz odrębnej rodziny Misji 02,
+obsługiwanych przez ten sam silnik incydentu.
+
+Po jednym ukończonym incydencie dostępna jest karta **Ostatnia czysta kopia**.
+Po następnym oknie przygotowania można wybrać `start-integrity-incident`,
+zamiast dotychczasowego `start-incident`. Pierwsza komenda ma własną definicję;
+druga zachowuje `seed % 3`. Nie trzeba przechodzić wszystkich wariantów VPN.
+Budżet i projekty są te same. [Integralność i odzyskiwanie](mission-02-integrity.md)
+oraz [aktualny zapis V3](game-save-v3.md).
 
 ```mermaid
 stateDiagram-v2
@@ -138,13 +146,19 @@ Reguły są oceniane ponownie przy każdej operacji, także istniejącym tunelem
 
 ## Granice rozdziału
 
-Nie ma nowych firm/ataków, wynagrodzeń, rynku, automatycznych przychodów,
+Nie ma nowych firm, wynagrodzeń, rynku, automatycznych przychodów,
 rekrutacji, wielu budżetów ani wielowątkowej kampanii. Zakup nie przyznaje
-punktów bezpieczeństwa. Budżet, praca i polityki przechodzą przez zapis V2.
+punktów bezpieczeństwa. Budżet, praca i polityki przechodzą przez zapis V3.
 Historia tej kampanii znajduje się w centrali; wcześniejsza historia 50
 samodzielnych prób pozostaje oddzielna i zachowana.
 
-Obecny katalog premiuje A jako tanią prewencję przed trzema znanymi przypadkami.
+Katalog Misji 01 premiuje A jako tanią prewencję przed trzema znanymi przypadkami.
 C uczy zakresu i kosztu legalnego dostępu, B daje odrębne dowody i zajmuje inny
 układ pracy zespołu. To nie jest potwierdzony pełny balans: zobacz uczciwą
 [analizę grywalności i wyniki](strategic-command-validation.md).
+
+W Misji 02 VPN MFA i segmentacja nie zatrzymują lokalnego źródła. Audyt daje
+nowe dowody modify, lecz nie naprawia plików. Wykonane izolacja i ograniczenie
+zapisu przechodzą przez `SecurityPosture.endpointOverrides`, obok istniejących
+trwałych reguł/kont/usług. Nowy incydent nie przenosi poprzednich dowodów,
+liczników ani zadań odtwarzania. Raporty integralności pozostają w historii.

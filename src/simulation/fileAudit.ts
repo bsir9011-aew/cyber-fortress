@@ -11,6 +11,7 @@ import {
   networkAllows,
 } from './access';
 import { currentMinute } from './clock';
+import { resolveLocalFileOperation } from './integrity';
 
 /** Resolver źródła: serwer widzi jedynie żądania, które faktycznie dotarły. */
 export function attemptFileAccess(
@@ -71,6 +72,17 @@ export function attemptFileAccess(
 export function recordLegalFileActivity(
   state: SimulationState,
 ): SimulationState {
+  if (state.integrity)
+    return resolveLocalFileOperation(
+      state,
+      state.integrity.endpoint.id,
+      'read',
+      state.integrity.documents
+        .filter((d) => d.status === 'correct')
+        .slice(0, 2)
+        .map((d) => d.id),
+      currentMinute(state.clock) + state.clock.turnMinutes,
+    ).state;
   if (!state.telemetry.fileAudit) return state;
   let next = state;
   for (const work of state.process.additionalWork ?? []) {

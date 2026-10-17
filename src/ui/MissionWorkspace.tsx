@@ -30,6 +30,9 @@ import './persistence.css';
 import type { PersistentOperations } from './usePersistentOperations';
 import type { OperationSession } from '../application/operationSession';
 import { StrategicReport } from './StrategicReport';
+import { IntegrityPanel } from './IntegrityPanel';
+import { IntegrityReport } from './IntegrityReport';
+import { FileEvidence } from './FileEvidence';
 type Context = 'cases' | 'operations' | 'architecture';
 const contexts: { id: Context; label: string; number: string }[] = [
   { id: 'cases', label: 'Sprawy', number: '01' },
@@ -67,6 +70,11 @@ export function MissionWorkspace({
     .at(-1);
   const lastEvent = view.history.at(-1);
   const evidenceCount =
+    (view.integrity
+      ? view.integrity.observations.length +
+        view.integrity.endpointObservations.length +
+        (view.integrity.backupInventoryMinute === null ? 0 : 1)
+      : 0) +
     view.authObservations.length +
     view.fileObservations.length +
     view.ownerStatements.length +
@@ -169,12 +177,19 @@ export function MissionWorkspace({
               <h1 ref={headingRef} tabIndex={-1} className="sr-only">
                 Raport po zakończeniu misji
               </h1>
-              <MissionReportPanel
-                report={report}
-                onReplay={() => onCommand({ type: 'reset' })}
-                onNewIncident={newIncident}
-                campaignMode={operations.game.kind === 'campaign'}
-              />
+              {report.integrity ? (
+                <IntegrityReport
+                  report={report.integrity}
+                  onHeadquarters={newIncident}
+                />
+              ) : (
+                <MissionReportPanel
+                  report={report}
+                  onReplay={() => onCommand({ type: 'reset' })}
+                  onNewIncident={newIncident}
+                  campaignMode={operations.game.kind === 'campaign'}
+                />
+              )}
               {operations.game.kind === 'campaign' && (
                 <StrategicReport campaign={operations.game.campaign} />
               )}
@@ -190,9 +205,11 @@ export function MissionWorkspace({
                   <strong>Chroń dane. Dowieź wysyłki.</strong>
                 </div>
                 <div>
-                  <small>Sprawa 01</small>
+                  <small>Sprawa {view.integrity ? '02' : '01'}</small>
                   <button onClick={() => setContext('cases')}>
-                    Nietypowe logowania VPN →
+                    {view.integrity
+                      ? 'Rozbieżności dokumentów →'
+                      : 'Nietypowe logowania VPN →'}
                   </button>
                 </div>
                 <div>
@@ -263,7 +280,9 @@ export function MissionWorkspace({
                 <main id="main" className="main-workspace">
                   <div className="page-heading">
                     <div>
-                      <p className="eyebrow">NEXUS / Misja 01</p>
+                      <p className="eyebrow">
+                        NEXUS / Misja {view.integrity ? '02' : '01'}
+                      </p>
                       <h1 ref={headingRef} tabIndex={-1}>
                         {context === 'cases'
                           ? 'Zrozum sygnał. Podejmij decyzję.'
@@ -302,7 +321,17 @@ export function MissionWorkspace({
                   )}
                   {context === 'cases' && (
                     <>
-                      <InvestigationPanel view={view} onCommand={onCommand} />
+                      {view.integrity ? (
+                        <>
+                          <IntegrityPanel
+                            view={view.integrity}
+                            onCommand={onCommand}
+                          />
+                          <FileEvidence view={view} />
+                        </>
+                      ) : (
+                        <InvestigationPanel view={view} onCommand={onCommand} />
+                      )}
                       <NarrativeFeed view={view} />
                     </>
                   )}
@@ -429,6 +458,7 @@ export function MissionWorkspace({
                       selection={selection}
                       onSelect={select}
                       networkRules={view.rules}
+                      endpoint={view.integrity?.endpoint}
                     />
                   )}
                 </aside>

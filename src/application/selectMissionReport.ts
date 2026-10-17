@@ -2,6 +2,7 @@ import type { SimulationState } from '../domain/simulation';
 import { isFinished } from '../simulation/clock';
 import { isBusinessGoalMet } from '../simulation/business';
 import { assessThreatAccess } from '../simulation/threatAssessment';
+import { selectIntegrityReport } from './selectIntegrityReport';
 
 /** Osobna bramka ujawnienia. Bieżąca projekcja nigdy nie otrzymuje raportu. */
 export function selectMissionReport(state: SimulationState) {
@@ -12,6 +13,7 @@ export function selectMissionReport(state: SimulationState) {
     attacker?.status === 'blocked' &&
     attacker.consecutiveFailures >= attacker.definition.maxConsecutiveFailures;
   return {
+    ...(state.integrity ? { integrity: selectIntegrityReport(state) } : {}),
     scenario: {
       id: state.hidden.scenario.id,
       name: state.hidden.scenario.name,

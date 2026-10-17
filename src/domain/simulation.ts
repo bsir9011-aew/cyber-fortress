@@ -1,5 +1,10 @@
 import type { AccessState, NetworkRule } from './access';
 import type { WorldState } from './world';
+import type {
+  IntegrityState,
+  IntegrityTaskAction,
+  IntegrityThreatState,
+} from './integrity';
 import type { AttackerState } from './attack';
 import type {
   AuthenticationObservation,
@@ -78,6 +83,7 @@ export interface BusinessState {
 
 export type WorkerId = 'analyst' | 'administrator';
 export type TaskAction =
+  | IntegrityTaskAction
   | { readonly type: 'inspect-vpn-sessions' }
   | { readonly type: 'inspect-auth-logs' }
   | { readonly type: 'inspect-file-access' }
@@ -107,6 +113,10 @@ export interface EmployeeTask {
 }
 
 export type SimulationCommand =
+  | {
+      readonly type: 'set-integrity-hypothesis';
+      readonly hypothesis: IntegrityState['hypothesis'];
+    }
   | { readonly type: 'advance-turn' }
   | { readonly type: 'set-hypothesis'; readonly hypothesis: IncidentHypothesis }
   | {
@@ -171,6 +181,7 @@ export type SimulationEventData =
 export type SimulationEvent = EventBase & SimulationEventData;
 
 export interface SimulationState {
+  readonly integrity?: IntegrityState;
   readonly run: RunIdentity;
   readonly world: WorldState;
   readonly clock: SimulationClock;
@@ -184,6 +195,7 @@ export interface SimulationState {
   /** Dziennik potwierdzeń działań i raportów biznesowych, nie log uwierzytelnień. */
   readonly history: readonly SimulationEvent[];
   readonly hidden: {
+    readonly integrityThreat?: IntegrityThreatState;
     readonly attacker: AttackerState | null;
     readonly scenario: ScenarioDefinition;
     readonly legitimateActors: readonly LegitimateActorState[];

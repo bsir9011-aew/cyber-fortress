@@ -18,6 +18,7 @@ import {
 import { currentMinute } from './clock';
 import { recordAuthentication } from './telemetry';
 import { attemptFileAccess } from './fileAudit';
+import { stepIntegrityThreat } from './integrity';
 
 export function createInitialAttacker(
   definition: AttackDefinition,
@@ -223,6 +224,7 @@ export function stepAttacker(
 ): ReferenceSimulationState;
 export function stepAttacker(state: SimulationState): SimulationState;
 export function stepAttacker(state: SimulationState): SimulationState {
+  if (state.integrity) return stepIntegrityThreat(state);
   const attacker = state.hidden.attacker;
   if (!attacker) return state;
   const action = selectAttackerAction(attacker, state.clock.turn);
