@@ -2,12 +2,50 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — Persistent Operations (Sprint 6)
+## FORTRESS LAB — Strategic Command (Sprint 7)
 
 Trzy warianty misji **„Ostatnie okno wysyłkowe”** w NEXUS Logistics.
 Jako Security Engineer otrzymujesz sygnał nietypowych logowań VPN, pozyskujesz
 dowody i decydujesz, jak chronić dane, zachowując obsługę zamówień do 15:30.
 Bez backendu, kluczy API, timerów czasu rzeczywistego i nowych zależności.
+
+### Strategia — Centrala NEXUS
+
+Odpowiadasz za przygotowanie firmy: **120 pracowników, 94 komputery**, modelowane
+usługi VPN/AD, ERP i FS-01. Budżet rozdziału to **80 000 zł**, z czego pilotaż
+MFA pochłonął już **12 000 zł**. Masz **68 000 zł** i czterogodzinne okno pracy
+administratora oraz analityka.
+
+| Inwestycja | Do zapłaty | Praca | Rzeczywisty skutek |
+| --- | ---: | --- | --- |
+| Uporządkowanie dostępu zdalnego | 20 000 zł | Administrator 4 h | Wymóg drugiego składnika i usunięcie SMB bez dokumentowanego zadania. |
+| Widoczność dostępu do plików | 28 000 zł | Analityk 4 h + administrator 2 h | Audyt FS-01 z opóźnieniem, dostępny jako dowód. Nie zatrzymuje odczytu. |
+| Rozdzielenie ruchu VPN | 30 000 zł | Administrator 4 h | Reguły dla konkretnych kont, osobno HTTPS i SMB. Wybrana grupa może wykluczyć legalną pracę. |
+
+Wybierz **Rozpocznij strategię**, poznaj firmę i porównaj projekty. Zaplanuj projekt,
+potwierdź rezerwację i przydziel pracownika w **Planie pracy**. Płatność następuje
+przy pierwszej pracy, a zabezpieczenie aktywuje się dopiero po wykonaniu wszystkich
+godzin. Dwie osoby mogą pracować równolegle. Niewykonana część przechodzi dalej.
+Możesz też nie inwestować i zachować środki.
+
+Rozlicz cztery godziny i rozpocznij incydent. Po 18 turach raport pokaże wpływ
+przygotowania, a **Wróć do centrali** otworzy kolejne okno z zachowanymi inwestycjami,
+budżetem oraz faktycznie zmienionymi regułami, kontami i dostępnością. Sesje,
+alerty, wiedza i liczniki wycieku należą do pojedynczego incydentu. Kampania
+wykorzystuje istniejące warianty; **Trening** i **Nieznany incydent** nadal działają
+samodzielnie, bez przygotowania.
+
+[Dokumentacja kampanii](docs/campaign.md) · [Silnik i źródła dowodów](docs/strategic-engine.md) ·
+[Zapis V2 oraz aktualizacja z V1](docs/game-save-v2.md) ·
+[Wyniki i ograniczenia Sprintu 7](docs/strategic-command-validation.md).
+
+![Centrala NEXUS](docs/screenshots/strategy-01-headquarters.png)
+
+[Projekty](docs/screenshots/strategy-02-projects.png),
+[harmonogram](docs/screenshots/strategy-03-schedule.png),
+[aktywne zabezpieczenia](docs/screenshots/strategy-04-active-controls.png),
+[raport](docs/screenshots/strategy-05-report.png) i
+[dowód FS-01](docs/screenshots/strategy-06-file-evidence.png).
 
 ### Zapis, powrót i porównanie prób
 
@@ -18,9 +56,11 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 
 - **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
   strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
-  Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu.
+  Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu. Nowe zapisy mają
+  format V2; poprzedni oryginał V1 pozostaje zachowany i możliwy do wyeksportowania.
 - **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
-  działalność, ograniczenie dostępu i działania. Powtórka tworzy nową próbę tego
+  działalność, ograniczenie dostępu i działania samodzielnych misji. Wyniki strategii
+  znajdziesz w Centrali w historii bieżącej kampanii. Powtórka tworzy nową próbę tego
   samego wariantu i seedu. Historia ma osobne potwierdzenie czyszczenia.
 - Wskaźnik informuje o powodzeniu zapisu. Przy braku miejsca lub zablokowanej
   pamięci gra działa dalej; wyeksportuj plik, aby zachować postęp.
@@ -40,9 +80,9 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 ### Wersja przeglądarkowa
 
 Docelowy adres: **https://bsir9011-aew.github.io/cyber-fortress/**.
-Publikacja Sprintu 6 czeka na zatwierdzenie PR i włączenie GitHub Pages
-w ustawieniach repozytorium. Nie została jeszcze potwierdzona jako działająca.
-Workflow wdraża wyłącznie `main`, po testach i produkcyjnym buildzie.
+Repozytorium ma już Pages w trybie GitHub Actions i wdrożenie scalonego Sprintu 6.
+Sprint 7 czeka na zatwierdzenie PR; nie został opublikowany w produkcji.
+Workflow nadal wdraża wyłącznie `main`, po testach i produkcyjnym buildzie.
 
 ### Rozpoczęcie misji
 
@@ -193,15 +233,19 @@ npm run build
 src/
   domain/       # typy i kontrakty świata
   simulation/   # czas, dostęp, biznes, zadania, przeciwnik, sensory, narracja i przejścia stanu
-  application/  # inicjalizacja, reducer, publiczna projekcja, raport końcowy i selektory mapy
-  content/      # infrastruktura i trzy konfiguracje NEXUS w scenarios/
+  application/  # inicjalizacja, reducer misji/kampanii, sesje gry, projekcje i raporty
+  content/      # infrastruktura, trzy konfiguracje NEXUS oraz projekty ochrony
   ui/           # React, style i SVG
-  persistence/  # wersjonowany JSON, walidacja, localStorage i historia prób
+  persistence/  # zapis V2, zgodność V1, walidacja, localStorage i historia prób
 docs/           # architektura i GDD
 prototype/      # archiwalny prototyp HTML 0.1
 ```
 
-- [Format zapisu i historia](docs/persistence.md)
+- [Kampania i budżet](docs/campaign.md)
+- [Semantyka silnika Sprintu 7](docs/strategic-engine.md)
+- [Zapis V2 i ochrona V1](docs/game-save-v2.md)
+- [Raport Sprintu 7](docs/strategic-command-validation.md)
+- [Archiwalny format V1](docs/persistence.md)
 - [Walidacja Sprintu 6](docs/persistence-validation.md)
 - [Publikacja przez GitHub Pages](docs/github-pages.md)
 - [Konfiguracja scenariuszy](docs/scenario-configuration.md)
@@ -216,12 +260,19 @@ Licencja: [MIT](LICENSE).
 
 Jedna organizacja, trzy stałe warianty i co najwyżej jeden deterministyczny przeciwnik. Kopiowanie zmienia wyłącznie
 licznik abstrakcyjnych rekordów w TypeScript. Działania symulacji nie wykonują
-operacji w prawdziwej sieci ani na plikach. Nie ma SOC/SIEM, sensorów ruchu, generatywnych dialogów, kampanii,
-ekonomii, kont ani chmurowych zapisów. Odświeżenie strony proponuje wznowienie lokalnej próby.
+operacji w prawdziwej sieci ani na plikach. Nie ma pełnego SOC/SIEM, sensorów ruchu,
+generatywnych dialogów, wielowątkowej kampanii, gospodarki rynkowej, kont ani
+chmurowych zapisów. Audyt obejmuje tylko jawnie modelowaną usługę FS-01. Odświeżenie strony proponuje wznowienie lokalnej próby.
 
 Prosty planer nadal kończy próby po 3 kolejnych porażkach; raport odróżnia ten limit
 od odcięcia technicznych możliwości. Wyłączenie VPN nie zmienia ważności
-przejętego poświadczenia. Pełne przywrócenie zablokowanego konta oraz usuwanie
-uprawnień pozostają poza dostępnymi komendami tego sprintu.
+przejętego poświadczenia. W Operacjach → Konto i poświadczenie administrator
+może przywrócić nowe logowania wskazanego zablokowanego konta zadaniem trwającym
+5 minut. Nie przywraca to zakończonych tuneli, nie zmienia hasła ani MFA.
+Nadal ważne przejęte poświadczenie może znów umożliwić dostęp. Legalna praca
+wymaga poprawnego nowego logowania i dostępnych usług; stan konta przechodzi do
+następnych misji. Dowolne edytowanie nadań pozostaje poza dostępnymi komendami.
+Projekt A porządkuje tylko jawnie określony
+zakres SMB.
 
 Przegląd techniczny pierwszych minut nie zastępuje testów grywalności z ludźmi.

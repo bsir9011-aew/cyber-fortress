@@ -17,10 +17,12 @@ export function MissionReportPanel({
   report,
   onReplay,
   onNewIncident,
+  campaignMode = false,
 }: {
   report: MissionReport;
   onReplay: () => void;
   onNewIncident: () => void;
+  campaignMode?: boolean;
 }) {
   const { confidentiality: data, continuity: business, containment } = report;
   return (
@@ -40,8 +42,11 @@ export function MissionReportPanel({
             <span className="accent">Co naprawdę się wydarzyło?</span>
           </h1>
         </div>
-        <button className="primary-button" onClick={onReplay}>
-          Powtórz ten sam incydent →
+        <button
+          className="primary-button"
+          onClick={campaignMode ? onNewIncident : onReplay}
+        >
+          {campaignMode ? 'Wróć do centrali' : 'Powtórz ten sam incydent'} →
         </button>
       </div>
       <p className="report-disclosure">
@@ -343,11 +348,14 @@ export function MissionReportPanel({
           </p>
         </div>
         <div className="replay-actions">
-          <button className="primary-button" onClick={onReplay}>
-            Powtórz ten sam incydent →
+          <button
+            className="primary-button"
+            onClick={campaignMode ? onNewIncident : onReplay}
+          >
+            {campaignMode ? 'Wróć do centrali' : 'Powtórz ten sam incydent'} →
           </button>
           <button className="secondary-button" onClick={onNewIncident}>
-            Nowy incydent →
+            {campaignMode ? 'Kolejne przygotowanie →' : 'Nowy incydent →'}
           </button>
         </div>
       </div>

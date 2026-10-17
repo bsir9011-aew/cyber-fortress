@@ -17,6 +17,7 @@ import {
 } from './access';
 import { currentMinute } from './clock';
 import { recordAuthentication } from './telemetry';
+import { attemptFileAccess } from './fileAudit';
 
 export function createInitialAttacker(
   definition: AttackDefinition,
@@ -247,15 +248,40 @@ export function stepAttacker(state: SimulationState): SimulationState {
     );
     return recordAttempt(state, failed, action, 'session-lost');
   }
-  // Każda próba, także każda porcja transferu, sprawdza ten sam mechanizm dostępu.
-  const allowed = canUseService(
-    state.world,
-    state.access,
-    session.id,
-    definition.targetAssetId,
-    definition.protocol,
-    currentMinute(state.clock),
-  );
+  // Ten sam resolver zwraca decyzję usługi i ewentualny pomiar sensora.
+  const volume =
+    action.kind === 'transfer'
+      ? Math.min(
+          definition.recordLimit - attacker.transfer.exposedRecords,
+          definition.chunkSizes[attacker.transfer.nextChunkIndex] ?? 0,
+        )
+      : null;
+  const resolved =
+    definition.protocol === 'SMB'
+      ? attemptFileAccess(
+          state,
+          session.id,
+          definition.targetAssetId,
+          action.kind === 'reconnaissance'
+            ? 'list'
+            : action.kind === 'start-transfer'
+              ? 'open'
+              : 'read',
+          volume,
+        )
+      : {
+          state,
+          allowed: canUseService(
+            state.world,
+            state.access,
+            session.id,
+            definition.targetAssetId,
+            definition.protocol,
+            currentMinute(state.clock),
+          ),
+        };
+  state = resolved.state;
+  const allowed = resolved.allowed;
   const observed = {
     ...attacker,
     knowledge: {
@@ -295,11 +321,7 @@ export function stepAttacker(state: SimulationState): SimulationState {
       'transfer-started',
     );
 
-  const remaining = definition.recordLimit - attacker.transfer.exposedRecords;
-  const copiedRecords = Math.min(
-    remaining,
-    definition.chunkSizes[attacker.transfer.nextChunkIndex] ?? 0,
-  );
+  const copiedRecords = volume ?? 0;
   const exposedRecords = attacker.transfer.exposedRecords + copiedRecords;
   const completed = exposedRecords >= definition.recordLimit;
   return recordAttempt(

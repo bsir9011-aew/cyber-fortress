@@ -31,6 +31,8 @@ export function deriveNarrative(
       text = `Zakończyłem tunel ${action.sessionId}. To nie zmienia zasad nowych logowań.`;
     if (action.type === 'block-account')
       text = `Nowe logowania konta ${action.accountId} są zablokowane. Istniejące tunele wymagają osobnej decyzji.`;
+    if (action.type === 'unblock-account')
+      text = `Przywróciłem nowe logowania konta ${action.accountId}. Zakończone tunele pozostają zakończone. Hasło i MFA nie zostały zmienione; nadal ważne przejęte poświadczenie może ponownie umożliwić dostęp.`;
     if (action.type === 'reset-credential')
       text = `Zmieniono poświadczenie konta ${action.accountId}. Wcześniej wydane sesje zachowują ważność.`;
     if (action.type === 'set-vpn')
@@ -82,6 +84,17 @@ export function deriveNarrative(
         id: `msg-${observation.id}`,
         speaker: 'Analityk',
         text: `Pobrałem ${observation.records.length} zdarzeń uwierzytelnienia. To zapis logowań, bez audytu plików. Sprawdź źródło i czas obserwacji.`,
+        source: 'task',
+        referenceId: observation.id,
+      },
+      observation.observedAtMinute,
+    );
+  for (const observation of facts.knowledge.fileObservations ?? [])
+    add(
+      {
+        id: `file-${observation.id}`,
+        speaker: 'Analityk',
+        text: `Pozyskałem ${observation.records.length} zdarzeń z audytu FS-01. Zakres wynika z pokrycia i opóźnienia sensora, bez klasyfikacji sprawcy.`,
         source: 'task',
         referenceId: observation.id,
       },

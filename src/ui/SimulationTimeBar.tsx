@@ -5,9 +5,11 @@ import { formatMinute } from '../simulation/clock';
 export function SimulationTimeBar({
   view,
   onCommand,
+  canReset = true,
 }: {
   view: PlayerView;
   onCommand: (command: SimulationCommand) => void;
+  canReset?: boolean;
 }) {
   return (
     <section className="simulation-timebar" aria-label="Zegar symulacji">
@@ -45,12 +47,14 @@ export function SimulationTimeBar({
         Następne {view.clock.turnMinutes} minut{' '}
         <span aria-hidden="true">→</span>
       </button>
-      <button
-        className="reset-button"
-        onClick={() => onCommand({ type: 'reset' })}
-      >
-        {view.finished ? 'Powtórz ten sam incydent' : 'Powtórz próbę'}
-      </button>
+      {canReset && (
+        <button
+          className="reset-button"
+          onClick={() => onCommand({ type: 'reset' })}
+        >
+          {view.finished ? 'Powtórz ten sam incydent' : 'Powtórz próbę'}
+        </button>
+      )}
     </section>
   );
 }

@@ -1,5 +1,8 @@
 # Sprint 5 — konfiguracja wariantów
 
+> Bazowy katalog Sprintu 5 pozostaje zgodny. Nakładanie trwałych polityk, drugi
+> składnik i audyt z kampanii opisano w [semantyce silnika Sprintu 7](strategic-engine.md).
+
 Trzy definicje danych korzystają ze wspólnego zegara, dostępu, biznesu, zadań,
 telemetrii, detekcji, narracji i raportu. Nie ma osobnych silników wariantów.
 Dokument ujawnia prawdę scenariuszy i jest przeznaczony dla programisty.

@@ -28,6 +28,12 @@ export function OperationsPanel({
             { id: session.id, accountId: session.accountId },
           ] as const,
       ),
+      ...view.fileObservations.flatMap((o) =>
+        o.records.map(
+          (r) =>
+            [r.sessionId, { id: r.sessionId, accountId: r.accountId }] as const,
+        ),
+      ),
       ...view.authObservations.flatMap((observation) =>
         observation.records.flatMap((record) =>
           record.sessionId
@@ -136,6 +142,15 @@ export function OperationsPanel({
           Porozmawiaj z Martą · 5 min
         </button>
       </div>
+      {view.fileSensor && (
+        <button
+          className="file-research-button"
+          disabled={disabled('inspect-file-access') || !view.fileSensor.enabled}
+          onClick={() => schedule({ type: 'inspect-file-access' })}
+        >
+          Pobierz audyt FS-01 · 5 min
+        </button>
+      )}
       <p className="source-note">
         Wynik po zakończeniu zadania. Czytanie dowodów nie zajmuje czasu.
       </p>
@@ -174,6 +189,22 @@ export function OperationsPanel({
               obejmuje także istniejący ruch tego protokołu. Inne przepływy mają
               osobne reguły.
             </p>
+            {rule.accountIds && (
+              <p className="source-note">
+                Zakres kont:{' '}
+                {rule.accountIds.length
+                  ? rule.accountIds.join(', ')
+                  : 'pusta grupa — reguła nie dopasuje żadnego konta'}
+                .
+              </p>
+            )}
+            {view.rules.some((r) => r.accountIds) && (
+              <p className="source-note">
+                Reguły zależą od konta sesji. Zmiana szerokiej reguły R-SMB może
+                nie zmienić pierwszeństwa reguł SEG. Domyślna odmowa działa po
+                dopasowaniu zakresu.
+              </p>
+            )}
             {view.businessDependencies.additionalWork
               .filter((work) =>
                 work.services.some(
@@ -261,7 +292,7 @@ export function OperationsPanel({
               ))}
             </select>
             <p className="source-note">
-              Obie zmiany dotyczą nowych uwierzytelnień. Nie kończą wcześniej
+              Zmiany dotyczą nowych uwierzytelnień. Nie kończą wcześniej
               wydanych sesji.
             </p>
             <div className="operation-actions">
@@ -274,6 +305,17 @@ export function OperationsPanel({
                 Zablokuj nowe logowania · 5 min
               </button>
               <button
+                disabled={
+                  disabled('unblock-account') ||
+                  !view.blockedKnownAccountIds.includes(account)
+                }
+                onClick={() =>
+                  schedule({ type: 'unblock-account', accountId: account })
+                }
+              >
+                Przywróć nowe logowania · 5 min
+              </button>
+              <button
                 disabled={disabled('reset-credential')}
                 onClick={() =>
                   schedule({ type: 'reset-credential', accountId: account })
@@ -282,6 +324,12 @@ export function OperationsPanel({
                 Resetuj poświadczenie · 10 min
               </button>
             </div>
+            <p className="decision-warning">
+              Przywrócenie konta nie odtwarza zakończonych tuneli ani nie
+              zmienia hasła i MFA. Nadal ważne przejęte poświadczenie może
+              ponownie umożliwić dostęp. Legalna praca wymaga nowego poprawnego
+              logowania i dostępu do wymaganych usług.
+            </p>
           </>
         ) : (
           <p className="source-note">

@@ -13,6 +13,9 @@ export function knownAccountIds(
   return [
     ...new Set([
       ...state.incident.alerts.map((alert) => alert.accountId),
+      ...(state.knowledge.fileObservations ?? []).flatMap((o) =>
+        o.records.map((r) => r.accountId),
+      ),
       ...(state.knowledge.sessionObservation?.sessions.map(
         (session) => session.accountId,
       ) ?? []),
@@ -28,6 +31,9 @@ export function knownSessionIds(
 ): readonly string[] {
   return [
     ...new Set([
+      ...(state.knowledge.fileObservations ?? []).flatMap((o) =>
+        o.records.map((r) => r.sessionId),
+      ),
       ...(state.knowledge.sessionObservation?.sessions.map(
         (session) => session.id,
       ) ?? []),
@@ -46,9 +52,11 @@ export const taskSpecs: Record<
 > = {
   'inspect-vpn-sessions': { workerId: 'analyst', turns: 1 },
   'inspect-auth-logs': { workerId: 'analyst', turns: 1 },
+  'inspect-file-access': { workerId: 'analyst', turns: 1 },
   'contact-account-owner': { workerId: 'analyst', turns: 1 },
   'terminate-session': { workerId: 'administrator', turns: 1 },
   'block-account': { workerId: 'administrator', turns: 1 },
+  'unblock-account': { workerId: 'administrator', turns: 1 },
   'reset-credential': { workerId: 'administrator', turns: 2 },
   'set-vpn': { workerId: 'administrator', turns: 1 },
   'set-network-rule': { workerId: 'administrator', turns: 2 },
@@ -79,6 +87,14 @@ export function taskRejection(
         isAssetOnline(state.world, state.telemetry.sessionSensor.sourceAssetId)
         ? null
         : 'source-unavailable';
+    case 'inspect-file-access':
+      return state.telemetry.fileAudit?.sensor.enabled &&
+        isAssetOnline(
+          state.world,
+          state.telemetry.fileAudit.sensor.sourceAssetId,
+        )
+        ? null
+        : 'source-unavailable';
     case 'inspect-auth-logs':
       return state.telemetry.authenticationSensor.enabled &&
         isAssetOnline(
@@ -106,6 +122,7 @@ export function taskRejection(
         ? null
         : 'invalid-state';
     case 'block-account':
+    case 'unblock-account':
     case 'reset-credential': {
       if (!knownAccountIds(state).includes(action.accountId))
         return 'target-not-observed';
@@ -114,6 +131,11 @@ export function taskRejection(
       );
       if (!account) return 'unknown-target';
       if (action.type === 'block-account' && account.loginStatus === 'blocked')
+        return 'invalid-state';
+      if (
+        action.type === 'unblock-account' &&
+        account.loginStatus !== 'blocked'
+      )
         return 'invalid-state';
       return null;
     }

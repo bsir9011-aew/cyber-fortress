@@ -1,10 +1,13 @@
 # Publikacja FORTRESS LAB przez GitHub Pages
 
 Docelowy adres: https://bsir9011-aew.github.io/cyber-fortress/.
-Sprint 6 przygotowuje wdrożenie. Nie wykonujemy merge PR i nie ogłaszamy
-działającej witryny na podstawie lokalnego builda.
+Sprint 7 zachowuje istniejący workflow. Nie wykonujemy merge PR ani wdrożenia
+nowej wersji przed zatwierdzeniem. 17.10.2026 API potwierdziło Pages w trybie
+`workflow` i status `success` deploymentu scalonego Sprintu 6 (`main` 173d135).
+Nowy build Sprintu 7 zweryfikowano lokalnie pod właściwą podścieżką; nie jest
+jeszcze publicznym wdrożeniem.
 
-## Konfiguracja po zatwierdzeniu zmian
+## Konfiguracja publikacji (Pages jest już włączone)
 
 1. W repozytorium otwórz **Settings → Pages → Build and deployment → GitHub Actions**.
 2. Sprawdź środowisko **Settings → Environments → github-pages**. Dopuść deployment
@@ -57,9 +60,11 @@ Nie używamy routingu wymagającego przepisywania adresów na serwerze.
 
 Lokalny produkcyjny preview pod podścieżką: HTML, CSS i JavaScript działają,
 Chromium wykonuje pełne misje, zapis i import, bez błędnych żądań zasobów.
-Publikacja publiczna pozostaje do potwierdzenia po merge oraz konfiguracji.
-Podczas przygotowania repozytorium miało `has_pages: false`, a endpoint Pages
-zwracał 404. To stan konfiguracji, nie błąd lokalnego builda.
+Publikacja Sprintu 7 pozostaje do potwierdzenia po zatwierdzeniu i merge.
+Historycznie podczas przygotowania Sprintu 6 Pages było wyłączone; obecnie API
+potwierdza udany deployment Sprintu 6. Bezpośredni GET publicznej domeny z tego
+środowiska zakończył się odmową HTTP 403, dlatego nie deklarujemy osobistej
+weryfikacji publicznego UI. Preview produkcyjne jest zweryfikowane w Chromium.
 
 Źródła mechanizmu: [Vite — GitHub Pages](https://vite.dev/guide/static-deploy.html#github-pages),
 [oficjalne deploy-pages](https://github.com/actions/deploy-pages),

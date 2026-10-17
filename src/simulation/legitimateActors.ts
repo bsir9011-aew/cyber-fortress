@@ -41,6 +41,9 @@ export function resumeLegitimateWork(state: SimulationState): SimulationState {
         next.access,
         {
           sessionId,
+          ...(behavior.secondFactorVersion === undefined
+            ? {}
+            : { secondFactorVersion: behavior.secondFactorVersion }),
           accountId: account.id,
           credentialVersion:
             behavior.credentialPolicy === 'managed-current'
