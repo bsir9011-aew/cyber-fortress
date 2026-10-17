@@ -39,6 +39,8 @@ export function selectPlayerView(state: SimulationState) {
     history: state.history,
     sessionObservation: state.knowledge.sessionObservation,
     authObservations: state.knowledge.authObservations,
+    fileObservations: state.knowledge.fileObservations ?? [],
+    fileSensor: state.telemetry.fileAudit?.sensor,
     ownerStatements: state.knowledge.ownerStatements,
     alerts: state.incident.alerts,
     hypothesis: state.incident.hypothesis,

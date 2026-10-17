@@ -8,6 +8,8 @@ export function actionLabel(action: TaskAction): string {
   switch (action.type) {
     case 'inspect-vpn-sessions':
       return 'Sprawdzenie aktywnych sesji VPN';
+    case 'inspect-file-access':
+      return 'Pobranie audytu FS-01';
     case 'inspect-auth-logs':
       return 'Pobranie logów uwierzytelnienia';
     case 'contact-account-owner':
@@ -54,6 +56,8 @@ export function eventLabel(event: SimulationEvent): string {
       return `Zamówienia: +${event.report.received}, obsłużono ${event.report.processed}, zaległe ${event.report.backlog}. Wydajność w tym przedziale: ${event.report.capacity}.`;
     case 'sessions-observed':
       return `Analityk odczytał listę aktywnych sesji VPN: ${event.count}.`;
+    case 'file-access-observed':
+      return `Analityk pobrał audyt FS-01: ${event.count} zdarzeń.`;
     case 'auth-logs-observed':
       return `Analityk pobrał logi uwierzytelnienia: ${event.count} zdarzeń.`;
     case 'owner-contacted':

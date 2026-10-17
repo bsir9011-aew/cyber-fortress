@@ -1,132 +1,45 @@
-import { useEffect, useRef, useState } from 'react';
-import { selectPlayerView } from '../application/selectPlayerView';
-import { selectMissionReport } from '../application/selectMissionReport';
-import { nextRun } from '../application/scenarioSelectors';
+import { useState } from 'react';
 import type { ScenarioMode } from '../domain/scenario';
-import type { SimulationCommand } from '../domain/simulation';
-import {
-  getConnectionLayer,
-  selectLayerConnections,
-} from '../application/infrastructureSelectors';
-import type { MapLayer } from '../application/infrastructureSelectors';
-import { nexusLogistics } from '../content/organization';
-import { InfrastructureInspector } from './InfrastructureInspector';
-import { InfrastructureMap } from './InfrastructureMap';
-import { connectionLabels, layers } from './infrastructurePresentation';
-import type { MapSelection } from './infrastructurePresentation';
-import { BusinessPanel } from './BusinessPanel';
-import { OperationsPanel } from './OperationsPanel';
-import { SimulationEventLog } from './SimulationEventLog';
-import { SimulationTimeBar } from './SimulationTimeBar';
-import { InvestigationPanel } from './InvestigationPanel';
-import { MissionBriefing } from './MissionBriefing';
+import { usePersistentOperations } from './usePersistentOperations';
+import { PersistenceToolbar } from './PersistenceToolbar';
+import { AttemptHistory } from './AttemptHistory';
 import { ScenarioSelection } from './ScenarioSelection';
-import { MissionReportPanel } from './MissionReportPanel';
-import { NarrativeFeed } from './NarrativeFeed';
-import { eventLabel } from './simulationPresentation';
+import { MissionWorkspace } from './MissionWorkspace';
+import { Headquarters } from './Headquarters';
 import './simulation.css';
 import './mission.css';
 import './scenario.css';
 import './persistence.css';
-import { usePersistentOperations } from './usePersistentOperations';
-import { PersistenceToolbar } from './PersistenceToolbar';
-import { AttemptHistory } from './AttemptHistory';
-
-type Context = 'cases' | 'operations' | 'architecture';
-const contexts: { id: Context; label: string; number: string }[] = [
-  { id: 'cases', label: 'Sprawy', number: '01' },
-  { id: 'operations', label: 'Operacje', number: '02' },
-  { id: 'architecture', label: 'Architektura', number: '03' },
-];
+import './strategy.css';
 
 export function App() {
   const operations = usePersistentOperations();
-  const { session, updateUi } = operations;
-  const simulation = session.simulation;
-  const { briefing, context, layer, selection } = session.uiState;
-  const view = selectPlayerView(simulation);
-  const report = selectMissionReport(simulation);
-  const { world } = view;
-  const [choosingMode, setChoosingMode] = useState(true);
-  const [attempt, setAttempt] = useState(0);
-  const setBriefing = (briefing: boolean) => updateUi({ briefing });
-  const setContext = (context: Context) => updateUi({ context });
-  const setLayer = (layer: MapLayer) => updateUi({ layer });
-  const setSelection = (selection: MapSelection) => updateUi({ selection });
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const visibleConnections = selectLayerConnections(world, layer);
-  const activeLayer = layers.find((item) => item.id === layer)!;
-  const relationKinds = [
-    ...new Set(visibleConnections.map((connection) => connection.kind)),
-  ];
-  const latestMessage = view.messages
-    .filter((message) => message.source !== 'briefing')
-    .at(-1);
-  const lastEvent = view.history.at(-1);
-  const evidenceCount =
-    view.authObservations.length +
-    view.ownerStatements.length +
-    (view.sessionObservation ? 1 : 0);
-
-  useEffect(() => {
-    if (!briefing && !choosingMode) headingRef.current?.focus();
-  }, [
-    briefing,
-    choosingMode,
-    context,
-    view.finished,
-    operations.historyVisible,
-  ]);
-
-  function select(value: MapSelection) {
-    if (value?.kind === 'connection') {
-      const connection = world.connections.find((item) => item.id === value.id);
-      if (connection) setLayer(getConnectionLayer(connection.kind));
-    }
-    setSelection(value);
-  }
-  function changeLayer(next: MapLayer) {
-    setLayer(next);
-    if (selection?.kind === 'connection') setSelection(null);
-  }
-  function onCommand(command: SimulationCommand) {
-    if (command.type === 'reset') {
-      startRun(view.run.mode, view.run.seed);
-      return;
-    }
-    operations.command(command);
-  }
-  function startRun(mode: ScenarioMode, seed: number) {
-    if (
-      (operations.hasSave || operations.active) &&
-      !window.confirm(
-        'Nowa próba zastąpi bieżącą grę i lokalny zapis. Zakończone wyniki pozostaną w historii. Kontynuować?',
+  const { game, session } = operations;
+  const [menu, setMenu] = useState(true);
+  function confirmReplace() {
+    return (
+      !(operations.active || operations.hasSave) ||
+      window.confirm(
+        'Nowa gra zastąpi bieżącą grę i zapis V2. Oryginał V1 oraz historia prób pozostaną. Kontynuować?',
       )
-    )
-      return;
-    operations.start(mode, seed);
-    setChoosingMode(false);
-    setAttempt((value) => value + 1);
+    );
   }
-  function resume() {
-    operations.resume();
-    setChoosingMode(false);
+  function start(mode: ScenarioMode, seed: number) {
+    if (confirmReplace()) {
+      operations.start(mode, seed);
+      setMenu(false);
+    }
   }
-  function newIncident() {
-    const run = nextRun(view.run);
-    startRun(run.mode, run.seed);
-  }
-
   return (
     <div className="app-shell mission-shell">
       <a className="skip-link" href="#main">
-        Przejdź do misji
+        Przejdź do gry
       </a>
       <header className="topbar">
         <a
           className="brand"
           href="#main"
-          aria-label="FORTRESS LAB — misja NEXUS Logistics"
+          aria-label="FORTRESS LAB — NEXUS Logistics"
         >
           <span className="brand-mark" aria-hidden="true">
             ⬡
@@ -142,15 +55,16 @@ export function App() {
           </span>
           <div>
             <small>Organizacja</small>
-            <strong>{nexusLogistics.name}</strong>
+            <strong>NEXUS Logistics</strong>
           </div>
         </div>
         <span className="version">
-          DEV 0.2 <span>· Persistent Operations</span>
+          DEV 0.2 <span>· Strategic Command</span>
         </span>
       </header>
       <PersistenceToolbar
-        session={session}
+        game={game}
+        legacyRaw={operations.legacyRaw}
         canExport={operations.canResume}
         status={operations.saveStatus}
         error={operations.saveError}
@@ -159,13 +73,12 @@ export function App() {
         onImport={(save) => {
           if (
             !window.confirm(
-              'Import zastąpi bieżącą próbę i lokalny zapis. Historia wyników pozostanie. Kontynuować?',
+              'Import zastąpi bieżącą grę i zapis V2. Oryginał V1 oraz historia pozostaną. Kontynuować?',
             )
           )
             return;
           operations.restore(save);
-          setChoosingMode(false);
-          setAttempt((value) => value + 1);
+          setMenu(false);
         }}
       />
       {operations.historyVisible ? (
@@ -176,334 +89,76 @@ export function App() {
           onClear={() => {
             if (
               window.confirm(
-                'Usunąć historię wyników? Bieżący zapis pozostanie.',
+                'Usunąć historię samodzielnych prób? Bieżąca gra oraz kampania pozostaną.',
               )
             )
               operations.clearHistory();
           }}
           onRetry={operations.retryHistory}
-          onReplay={(entry) => startRun(entry.mode, entry.seed)}
+          onReplay={(entry) => start(entry.mode, entry.seed)}
         />
-      ) : choosingMode ? (
+      ) : menu ? (
         <>
           {operations.canResume && (
             <section className="resume-card" aria-label="Wznowienie rozgrywki">
               <div>
                 <p className="eyebrow">Świat czeka na Twoją decyzję</p>
                 <h1>
-                  {view.finished
-                    ? 'Wróć do zakończonej próby'
-                    : 'Kontynuuj rozgrywkę'}
+                  Kontynuuj{' '}
+                  {game.kind === 'campaign' ? 'kampanię' : 'rozgrywkę'}
                 </h1>
                 <p>
-                  {String(Math.floor(view.minute / 60)).padStart(2, '0')}:
-                  {String(view.minute % 60).padStart(2, '0')} · tura{' '}
-                  {view.clock.turn} / {view.clock.turnLimit}. Czas nie płynął
-                  podczas Twojej nieobecności.
+                  {game.kind === 'campaign' &&
+                  game.campaign.phase === 'preparation'
+                    ? `Centrala · okno ${game.campaign.preparation.number} · rozliczono ${game.campaign.preparation.hour} / 4 h.`
+                    : session
+                      ? `Tura ${session.simulation.clock.turn} / 18 · czas świata stoi podczas nieobecności.`
+                      : ''}
                 </p>
               </div>
-              <button className="advance-button" onClick={resume} autoFocus>
+              <button
+                className="advance-button"
+                autoFocus
+                onClick={() => {
+                  operations.resume();
+                  setMenu(false);
+                }}
+              >
                 Kontynuuj rozgrywkę
               </button>
             </section>
           )}
           <ScenarioSelection
             autoFocus={!operations.canResume}
-            onSelect={(mode) => startRun(mode, mode === 'training' ? 0 : 1)}
+            onSelect={(mode) => start(mode, mode === 'training' ? 0 : 1)}
+            onStrategy={() => {
+              if (confirmReplace()) {
+                operations.startCampaign();
+                setMenu(false);
+              }
+            }}
           />
         </>
-      ) : briefing ? (
-        <MissionBriefing view={view} onStart={() => setBriefing(false)} />
-      ) : (
-        <>
-          <SimulationTimeBar view={view} onCommand={onCommand} />
-          <div className="run-mode-bar">
-            <span>
-              {view.run.mode === 'training' ? 'Trening' : 'Nieznany incydent'} ·
-              próba {String(view.run.seed).padStart(3, '0')}
-            </span>
-            <span>Powtórka zachowuje identyczny stan początkowy.</span>
-            <button onClick={() => setChoosingMode(true)}>Wybór trybu</button>
-          </div>
-          {report ? (
-            <main id="main" className="report-workspace">
-              <h1 ref={headingRef} tabIndex={-1} className="sr-only">
-                Raport po zakończeniu misji
-              </h1>
-              <MissionReportPanel
-                report={report}
-                onReplay={() => onCommand({ type: 'reset' })}
-                onNewIncident={newIncident}
-              />
-            </main>
-          ) : (
-            <>
-              <div
-                className="mission-objective-bar"
-                aria-label="Cele i stan misji"
-              >
-                <div>
-                  <span className="eyebrow">Ostatnie okno wysyłkowe</span>
-                  <strong>Chroń dane. Dowieź wysyłki.</strong>
-                </div>
-                <div>
-                  <small>Sprawa 01</small>
-                  <button onClick={() => setContext('cases')}>
-                    Nietypowe logowania VPN →
-                  </button>
-                </div>
-                <div>
-                  <small>Obsłużone / przyjęte</small>
-                  <strong>
-                    {view.business.totalProcessed} /{' '}
-                    {view.business.totalReceived}
-                  </strong>
-                </div>
-                <div>
-                  <small>Zaległe / limit o 15:30</small>
-                  <strong
-                    className={view.business.backlog > 40 ? 'warning-text' : ''}
-                  >
-                    {view.business.backlog} / 40
-                  </strong>
-                </div>
-                <div>
-                  <small>Zdalny ERP</small>
-                  <strong>
-                    {view.availability.remoteAvailable
-                      ? 'Dostępny'
-                      : 'Niedostępny'}
-                  </strong>
-                </div>
-              </div>
-              <nav className="context-nav" aria-label="Konteksty misji">
-                {contexts.map((item) => (
-                  <button
-                    key={item.id}
-                    aria-pressed={context === item.id}
-                    onClick={() => setContext(item.id)}
-                  >
-                    <span>{item.number}</span>
-                    {item.label}
-                    {item.id === 'cases' && (
-                      <small>{evidenceCount} dowodów</small>
-                    )}
-                  </button>
-                ))}
-              </nav>
-              <div className={`mission-layout context-${context}`}>
-                {context === 'architecture' && (
-                  <aside className="sidebar" aria-label="Warstwy mapy">
-                    <p className="eyebrow muted">Infrastruktura</p>
-                    <nav aria-label="Warstwy infrastruktury">
-                      {layers.map((item, index) => (
-                        <button
-                          key={item.id}
-                          className={`layer-button${layer === item.id ? ' active' : ''}`}
-                          aria-pressed={layer === item.id}
-                          onClick={() => changeLayer(item.id)}
-                        >
-                          <span className="layer-number">0{index + 1}</span>
-                          <span>{item.name}</span>
-                          <span className="layer-count">
-                            {selectLayerConnections(world, item.id).length}
-                          </span>
-                        </button>
-                      ))}
-                    </nav>
-                    <p className="sidebar-note">
-                      Linia opisuje relację. Dostęp wymaga także reguły, sesji i
-                      uprawnienia.
-                    </p>
-                  </aside>
-                )}
-                <main id="main" className="main-workspace">
-                  <div className="page-heading">
-                    <div>
-                      <p className="eyebrow">NEXUS / Misja 01</p>
-                      <h1 ref={headingRef} tabIndex={-1}>
-                        {context === 'cases'
-                          ? 'Zrozum sygnał. Podejmij decyzję.'
-                          : context === 'operations'
-                            ? 'Firma nie może czekać.'
-                            : 'Poznaj drogę do zasobu.'}
-                      </h1>
-                      <p>
-                        {context === 'cases'
-                          ? 'To Ty decydujesz, kiedy masz wystarczająco dużo informacji.'
-                          : context === 'operations'
-                            ? 'Obserwuj wpływ swoich zmian na pracę zespołu.'
-                            : 'Ta sama infrastruktura obsługuje ludzi i ogranicza dostęp.'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mission-feedback" role="status">
-                    <span className="feedback-mark" aria-hidden="true">
-                      {latestMessage ? latestMessage.speaker[0] : 'i'}
-                    </span>
-                    <p>
-                      {latestMessage ? (
-                        <>
-                          <strong>{latestMessage.speaker}:</strong>{' '}
-                          {latestMessage.text}
-                        </>
-                      ) : (
-                        'Zleć pierwsze badanie lub zmianę dostępu. Analityk i administrator mogą pracować równolegle. Potem przejdź o 5 minut dalej.'
-                      )}
-                    </p>
-                  </div>
-                  {lastEvent?.kind === 'command-rejected' && (
-                    <p className="command-feedback" role="alert">
-                      {eventLabel(lastEvent)}
-                    </p>
-                  )}
-                  {context === 'cases' && (
-                    <>
-                      <InvestigationPanel view={view} onCommand={onCommand} />
-                      <NarrativeFeed view={view} />
-                    </>
-                  )}
-                  {context === 'operations' && (
-                    <>
-                      <BusinessPanel view={view} />
-                      <NarrativeFeed view={view} />
-                      <SimulationEventLog view={view} />
-                    </>
-                  )}
-                  {context === 'architecture' && (
-                    <>
-                      {layer === 'telemetry' && (
-                        <section
-                          className="configuration-evidence sensor-coverage"
-                          aria-label="Pokrycie sensorów"
-                        >
-                          <h2>Lokalne sensory VPN</h2>
-                          <p>
-                            <strong>VPN Authentication</strong> · źródło{' '}
-                            {view.sensors.authentication.sourceAssetId} ·{' '}
-                            {view.sensors.authentication.enabled
-                              ? 'włączony'
-                              : 'wyłączony'}{' '}
-                            · retencja{' '}
-                            {view.sensors.authentication.retentionMinutes} min ·
-                            opóźnienie{' '}
-                            {view.sensors.authentication.delayMinutes} min.
-                          </p>
-                          <p>
-                            <strong>VPN Active Sessions</strong> · odczyt
-                            aktywnych tuneli podczas badania · retencja 0 ·
-                            opóźnienie 0. Odczyt obu źródeł wymaga dostępnej
-                            bramy.
-                          </p>
-                          <button
-                            className="reset-button"
-                            onClick={() => setContext('cases')}
-                          >
-                            Przejdź do pozyskanych dowodów →
-                          </button>
-                        </section>
-                      )}
-                      <section
-                        className="map-panel"
-                        aria-labelledby="map-title"
-                      >
-                        <div className="map-panel-heading">
-                          <div>
-                            <span className="eyebrow muted">
-                              Mapa organizacji
-                            </span>
-                            <h2 id="map-title">{activeLayer.name}</h2>
-                          </div>
-                          <span className="map-counter">
-                            {world.assets.length} zasobów <span> / </span>{' '}
-                            {visibleConnections.length} relacji
-                          </span>
-                        </div>
-                        <div className="layer-summary">
-                          <span className={`layer-dot layer-${layer}`} />
-                          <p>{activeLayer.description}</p>
-                          <button
-                            className="clear-selection"
-                            onClick={() => setSelection(null)}
-                            disabled={!selection}
-                          >
-                            Wyczyść wybór <span aria-hidden="true">×</span>
-                          </button>
-                        </div>
-                        {visibleConnections.length === 0 && (
-                          <div className="empty-layer" role="status">
-                            <span aria-hidden="true">◎</span>
-                            <div>
-                              <strong>Brak relacji w tej warstwie</strong>
-                              <p>{activeLayer.emptyMessage}</p>
-                            </div>
-                          </div>
-                        )}
-                        <InfrastructureMap
-                          world={world}
-                          connections={visibleConnections}
-                          selection={selection}
-                          onSelect={select}
-                        />
-                        <div className="map-legend" aria-label="Legenda mapy">
-                          {relationKinds.map((kind) => (
-                            <span key={kind}>
-                              <i className={`legend-line kind-${kind}`} />
-                              {connectionLabels[kind]} →
-                            </span>
-                          ))}
-                          <span>
-                            <i className="legend-node" />
-                            Wybrany zasób
-                          </span>
-                          <span>
-                            <i className="legend-related" />
-                            Powiązany zasób
-                          </span>
-                        </div>
-                      </section>
-                      <div className="map-guidance">
-                        <span aria-hidden="true">⌖</span>
-                        <p>
-                          Wybierz zasób lub relację, aby otworzyć inspektor.
-                          Warstwy rozdzielają rodzaje zależności.
-                        </p>
-                        <span className="keyboard-hint">Tab · Enter</span>
-                      </div>
-                      <BusinessPanel view={view} />
-                    </>
-                  )}
-                </main>
-                <aside className="right-column" aria-label="Decyzje i zasoby">
-                  <OperationsPanel
-                    key={attempt}
-                    view={view}
-                    onCommand={onCommand}
-                  />
-                  {context === 'architecture' && (
-                    <InfrastructureInspector
-                      world={world}
-                      selection={selection}
-                      onSelect={select}
-                      networkRules={view.rules}
-                    />
-                  )}
-                </aside>
-              </div>
-              <nav className="mobile-decision-dock" aria-label="Skróty misji">
-                <a href="#main">Sprawa i dowody ↑</a>
-                <a href="#team-actions">Zleć zadanie ↓</a>
-              </nav>
-            </>
-          )}
-        </>
-      )}
+      ) : game.kind === 'campaign' && game.campaign.phase === 'preparation' ? (
+        <Headquarters
+          session={game}
+          onCommand={operations.campaignCommand}
+          onTab={operations.headquartersTab}
+          onUi={operations.updateUi}
+          onMenu={() => setMenu(true)}
+        />
+      ) : session ? (
+        <MissionWorkspace
+          key={session.attemptId}
+          operations={operations}
+          session={session}
+          onMenu={() => setMenu(true)}
+        />
+      ) : null}
       <footer className="app-footer">
+        <span>FORTRESS LAB / NEXUS Logistics</span>
         <span>
-          FORTRESS LAB <span className="muted">/</span> NEXUS Logistics
-        </span>
-        <span>
-          Persistent Operations <span className="footer-dot" /> Sprint 6
+          Strategic Command <span className="footer-dot" /> Sprint 7
         </span>
       </footer>
     </div>

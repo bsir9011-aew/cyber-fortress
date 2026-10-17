@@ -87,6 +87,17 @@ export function deriveNarrative(
       },
       observation.observedAtMinute,
     );
+  for (const observation of facts.knowledge.fileObservations ?? [])
+    add(
+      {
+        id: `file-${observation.id}`,
+        speaker: 'Analityk',
+        text: `Pozyskałem ${observation.records.length} zdarzeń z audytu FS-01. Zakres wynika z pokrycia i opóźnienia sensora, bez klasyfikacji sprawcy.`,
+        source: 'task',
+        referenceId: observation.id,
+      },
+      observation.observedAtMinute,
+    );
   const session = facts.knowledge.sessionObservation;
   if (session)
     add(

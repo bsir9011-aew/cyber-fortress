@@ -11,6 +11,7 @@ export interface RunIdentity {
 }
 
 export interface LegitimateBehavior {
+  readonly secondFactorVersion?: number;
   readonly id: string;
   readonly accountId: string;
   readonly credentialPolicy: 'managed-current' | 'fixed';

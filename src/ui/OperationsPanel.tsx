@@ -28,6 +28,12 @@ export function OperationsPanel({
             { id: session.id, accountId: session.accountId },
           ] as const,
       ),
+      ...view.fileObservations.flatMap((o) =>
+        o.records.map(
+          (r) =>
+            [r.sessionId, { id: r.sessionId, accountId: r.accountId }] as const,
+        ),
+      ),
       ...view.authObservations.flatMap((observation) =>
         observation.records.flatMap((record) =>
           record.sessionId
@@ -136,6 +142,15 @@ export function OperationsPanel({
           Porozmawiaj z Martą · 5 min
         </button>
       </div>
+      {view.fileSensor && (
+        <button
+          className="file-research-button"
+          disabled={disabled('inspect-file-access') || !view.fileSensor.enabled}
+          onClick={() => schedule({ type: 'inspect-file-access' })}
+        >
+          Pobierz audyt FS-01 · 5 min
+        </button>
+      )}
       <p className="source-note">
         Wynik po zakończeniu zadania. Czytanie dowodów nie zajmuje czasu.
       </p>
@@ -174,6 +189,22 @@ export function OperationsPanel({
               obejmuje także istniejący ruch tego protokołu. Inne przepływy mają
               osobne reguły.
             </p>
+            {rule.accountIds && (
+              <p className="source-note">
+                Zakres kont:{' '}
+                {rule.accountIds.length
+                  ? rule.accountIds.join(', ')
+                  : 'pusta grupa — reguła nie dopasuje żadnego konta'}
+                .
+              </p>
+            )}
+            {view.rules.some((r) => r.accountIds) && (
+              <p className="source-note">
+                Reguły zależą od konta sesji. Zmiana szerokiej reguły R-SMB może
+                nie zmienić pierwszeństwa reguł SEG. Domyślna odmowa działa po
+                dopasowaniu zakresu.
+              </p>
+            )}
             {view.businessDependencies.additionalWork
               .filter((work) =>
                 work.services.some(

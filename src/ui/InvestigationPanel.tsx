@@ -1,6 +1,7 @@
 import type { PlayerView } from '../application/selectPlayerView';
 import type { SimulationCommand } from '../domain/simulation';
 import type { IncidentHypothesis } from '../domain/incident';
+import { FileEvidence } from './FileEvidence';
 import { formatMinute } from '../simulation/clock';
 
 export const hypothesisLabels: Record<IncidentHypothesis, string> = {
@@ -23,6 +24,7 @@ export function InvestigationPanel({
   const sensor = view.sensors.authentication;
   return (
     <div className="investigation-panel">
+      {view.fileSensor && <FileEvidence view={view} />}
       <section className="alert-card" aria-labelledby="alert-title">
         <div className="alert-icon" aria-hidden="true">
           !
@@ -131,6 +133,9 @@ export function InvestigationPanel({
                             }
                           >
                             {event.outcome === 'success' ? 'Sukces' : 'Odmowa'}
+                            {event.reason === 'mfa-required' && (
+                              <small> · wymagany drugi składnik</small>
+                            )}
                           </span>
                         </td>
                         <td>{event.sessionId ?? '—'}</td>

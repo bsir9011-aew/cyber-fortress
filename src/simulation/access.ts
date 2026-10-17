@@ -2,6 +2,7 @@ import type { AccessState, NetworkRule, VpnSession } from '../domain/access';
 import type { WorldState } from '../domain/world';
 
 export interface NetworkFlow {
+  readonly accountId?: string;
   readonly sourceAssetId: string;
   readonly targetAssetId: string;
   readonly protocol: string;
@@ -20,7 +21,10 @@ export function selectNetworkRule(
       (rule) =>
         rule.sourceAssetId === flow.sourceAssetId &&
         rule.targetAssetId === flow.targetAssetId &&
-        rule.protocol === flow.protocol,
+        rule.protocol === flow.protocol &&
+        (rule.accountIds === undefined ||
+          (flow.accountId !== undefined &&
+            rule.accountIds.includes(flow.accountId))),
     );
 }
 
@@ -85,6 +89,7 @@ export function canUseService(
   if (
     !networkAllows(world, access, {
       sourceAssetId: session.gatewayAssetId,
+      accountId: session.accountId,
       targetAssetId,
       protocol,
     })
@@ -99,6 +104,7 @@ export function canUseService(
 }
 
 export interface SessionRequest {
+  readonly secondFactorVersion?: number;
   readonly sessionId: string;
   readonly accountId: string;
   readonly credentialVersion: number;
@@ -153,7 +159,13 @@ export function issueVpnSession(
     return { ok: false, reason: 'account-blocked' };
   if (account.credentialVersion !== request.credentialVersion)
     return { ok: false, reason: 'invalid-credential' };
-  if (account.mfaPolicy !== 'not-required')
+  if (
+    account.mfaPolicy === 'required' &&
+    (account.secondFactorVersion === undefined ||
+      !Number.isSafeInteger(account.secondFactorVersion) ||
+      account.secondFactorVersion < 1 ||
+      request.secondFactorVersion !== account.secondFactorVersion)
+  )
     return { ok: false, reason: 'mfa-required' };
   const session: VpnSession = {
     id: request.sessionId,

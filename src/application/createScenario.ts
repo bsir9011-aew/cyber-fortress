@@ -105,7 +105,9 @@ export function validateScenario(
   for (const item of access.accounts)
     check(
       access.identities.some((identity) => identity.id === item.identityId) &&
-        integer(item.credentialVersion, 1),
+        integer(item.credentialVersion, 1) &&
+        (item.secondFactorVersion === undefined ||
+          integer(item.secondFactorVersion, 1)),
       `Invalid account: ${item.id}`,
     );
   for (const item of access.sessions) {
@@ -135,7 +137,10 @@ export function validateScenario(
       Boolean(asset(item.sourceAssetId)) &&
         service(item.targetAssetId, item.protocol) &&
         Number.isSafeInteger(item.priority) &&
-        ['allow', 'deny'].includes(item.action),
+        ['allow', 'deny'].includes(item.action) &&
+        (item.accountIds === undefined ||
+          (new Set(item.accountIds).size === item.accountIds.length &&
+            item.accountIds.every((id) => Boolean(account(id))))),
       `Invalid network rule: ${item.id}`,
     );
   for (const item of access.permissions)
@@ -371,6 +376,9 @@ export function createScenario(
       state.access,
       {
         sessionId: attempt.requestedSessionId,
+        ...(actor.secondFactorVersion === undefined
+          ? {}
+          : { secondFactorVersion: actor.secondFactorVersion }),
         accountId: actor.accountId,
         credentialVersion: attempt.credentialVersion,
       },

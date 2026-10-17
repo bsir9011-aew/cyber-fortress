@@ -1,4 +1,4 @@
-# Architektura FORTRESS LAB — Sprint 6
+# Architektura FORTRESS LAB — Sprint 7
 
 Jedna aplikacja React + TypeScript + Vite z natywną mapą SVG. Silnik to czyste
 funkcje TypeScript: bez Reacta, DOM, zegara systemowego, I/O i losowości.
@@ -9,12 +9,12 @@ Nie ma dodatkowych zależności projektu ani backendu.
 
 | Katalog              | Odpowiedzialność                                                     |
 | -------------------- | -------------------------------------------------------------------- |
-| `src/domain`         | Kontrakty infrastruktury, tożsamości, dostępu i symulacji.           |
-| `src/content`        | Infrastruktura i trzy definicje wariantów NEXUS.               |
+| `src/domain`         | Kontrakty infrastruktury, dostępu, symulacji i kampanii.           |
+| `src/content`        | Infrastruktura, trzy warianty NEXUS i katalog trzech projektów.               |
 | `src/simulation`     | Zegar, biznes, dostęp, walidacja zadań i przejścia stanu.            |
 | `src/application`    | Inicjalizacja, reset/reducer, projekcja dla gracza i selektory mapy. |
 | `src/ui`             | Mapa, inspektor, panele, formularze komend i polskie opisy zdarzeń.  |
-| `src/persistence`    | Wersjonowane migawki, walidacja, localStorage i historia prób.                      |
+| `src/persistence`    | Zapis V2, zgodność V1, walidacja, localStorage i historia prób.                      |
 | `docs` / `prototype` | Dokumentacja, screenshoty i niezmieniony prototyp 0.1.               |
 
 `SimulationState` zawiera jeden `world: WorldState` oraz zegar, proces i bilans
@@ -62,10 +62,10 @@ Start 14:00, 18 tur po 5 minut, termin 15:30. Godzina jest wyliczana z numeru tu
 bez `Date.now`, interwałów i upływu czasu rzeczywistego. Czytanie i przyjmowanie
 komend nie przesuwa zegara. Na granicy tury:
 
-1. Rozliczamy napływ i obsługę zamówień za zakończony przedział według starej konfiguracji.
+1. Rozliczamy napływ i obsługę zamówień za zakończony przedział według starej konfiguracji. Wdrożony audyt rejestruje także modelowaną legalną pracę plikową.
 2. Kończymy należne zadania, sortując po terminie, priorytecie i stabilnym ID. Zmiany administratora poprzedzają odczyt analityka.
 3. Wygaszamy sesje, rozstrzygamy zaplanowane logowania legalnych klientów i najwyżej jedną akcję przeciwnika, jeśli występuje, przy aktualnej konfiguracji.
-4. Rejestrujemy w sensorach wytworzone zdarzenia uwierzytelnienia i wykonujemy detekcję.
+4. Rejestrujemy w sensorach wytworzone zdarzenia uwierzytelnienia i opcjonalnego audytu FS-01; wykonujemy detekcję VPN oraz stosujemy opóźnienia.
 5. Ukończone badania pozyskują dozwolone obserwacje logów i sesji; rozmowa tworzy relację człowieka.
 6. Oceniamy koniec misji i wyprowadzamy wiadomości z jawnych faktów. Po turze 18 blokujemy dalsze komendy; osobny selektor udostępnia raport. Reset pozostaje dostępny.
 
@@ -138,11 +138,12 @@ są potwierdzane po zakończeniu zadania. Każde użycie istniejącego połącze
 ponownie oceniane po zmianie polityki, zgodnie z GDD §6.4. Blokada SMB nie dotyka
 HTTPS. Inspektor rozróżnia topologię i aktualną regułę.
 
-Konto ma odrębną tożsamość, stan nowych logowań, wersję poświadczenia i rezerwę
-wymagania MFA. Nowa sesja wymaga działającej bramy, usługi tożsamości i relacji
+Konto ma odrębną tożsamość, stan nowych logowań, wersję poświadczenia, politykę
+MFA i opcjonalną zarejestrowaną wersję drugiego składnika. Nowa sesja wymaga działającej bramy, usługi tożsamości i relacji
 uwierzytelniania, aktywnego konta, aktualnej wersji poświadczenia i spełnionego
-wymagania logowania. Pełne wyzwanie MFA nie jest implementowane; wymaganie MFA
-powoduje odmowę wydania sesji w tym silniku.
+wymagania logowania. Nie ma prawdziwego wyzwania kryptograficznego: od Sprintu 7
+modelowane MFA porównuje przedstawiony składnik z zarejestrowanym. Brak lub
+niezgodność powoduje odmowę; poprawny składnik pozwala legalnie wydać sesję.
 
 - Blokada logowania konta nie usuwa istniejącego tunelu.
 - Reset poświadczenia zmienia wersję dla nowych logowań, pozostawiając istniejące tunele.
@@ -306,8 +307,8 @@ uniwersalny system dialogów. Nieznani właściciele nie otrzymują wymyślonych
 
 `selectPlayerView` jawnie wybiera konfigurację, biznes, zadania, potwierdzenia,
 alerty i pozyskane dowody; nigdy nie rozprowadza całego stanu. Prywatna historia
-przeciwnika nie trafia do `state.history`. Nie modelujemy sensora ruchu ani audytu
-plików. Brak takich dowodów nie pozwala ocenić poufności podczas rozgrywki.
+przeciwnika nie trafia do `state.history`. W samodzielnych misjach pozostaje to dotychczasowy zakres. Kampania może wdrożyć audyt
+FS-01 opisany niżej; nadal nie ma sensora ruchu. Brak takich dowodów nie pozwala ocenić poufności podczas rozgrywki.
 Oznaczenie hipotezy jest bezpłatną komendą notatki, bez wpływu na świat lub oceny
 poprawności.
 
@@ -384,7 +385,7 @@ zawiera liczbowe porównanie i Chromium. Historyczne wyniki zachowują
 
 Trzy stałe definicje obejmują co najwyżej jednego przeciwnika, jeden trop, jeden protokół i trzy porcje danych.
 Nie ma adaptacyjnego szukania innych hostów, pełnego skanowania, zmieniania
-znanego hasła, pełnego SIEM/SOAR, sensorów ruchu, audytu plików, ekonomii, rozbudowanej kampanii,
+znanego hasła, pełnego SIEM/SOAR, sensorów ruchu, ekonomii rynkowej, rozbudowanej kampanii,
 FastAPI ani chmurowych zapisów. Zatrzymany planer nie zaczyna od nowa po wyczerpaniu
 prób; aktywny plan może zostać ucięty końcem okna 18 tur. GDD v1.0 i oryginalny
 HTML pozostają niezmienione. Żadna akcja symulacji nie wykonuje prawdziwej
@@ -427,3 +428,45 @@ gałęzi nie ma ścieżki do wdrożenia produkcyjnego.
 
 Szczegóły: [format, limity i błędy](persistence.md),
 [raport regresyjny](persistence-validation.md), [publikacja](github-pages.md).
+
+
+## Centrala i wspólny silnik — Sprint 7
+
+`domain/campaign.ts` definiuje budżet z rejestrem, stan projektów, polityki trwałe,
+okno przygotowania i historię. `application/campaignReducer.ts` jest czystym
+reducerem, bez Reacta, I/O i czasu systemowego. Rezerwuje środki, rozlicza
+płatność, pracę obu wykonawców i aktywację po ukończeniu. Katalog kosztów i zakresu
+jest w `content/securityProjects.ts`.
+
+`GameSession` rozróżnia samodzielny `OperationSession` i kampanię. Kampania
+przechowuje najwyżej jeden aktywny `SimulationState`. `currentOperation` tworzy
+wyłącznie projekcję metadanych/journalu i wskazuje ten sam obiekt świata.
+Centrala nie ma drugiej autorytatywnej infrastruktury: pokazuje dokumentację
+referencyjną i znane trwałe zmiany. `selectStrategyView` nie zwraca przyszłego
+wariantu ani bieżących ukrytych aktorów. Zakończone raporty można ujawnić.
+
+`prepareCampaignDefinition` nakłada trwałe polityki na wybraną przed misją
+definicję i rozstrzyga logowania istniejącym `issueVpnSession` przed fabryką.
+To zapobiega odtworzeniu fikcyjnego S-19 po rzeczywistej odmowie. Typ wariantu
+pozostaje ten sam. Brak zmian strategicznych zachowuje dokładnie bazowy stan.
+Ręcznie wykonane reguły, stan logowania/wersje kont i dostępność przechodzą do
+następnego okna; sesje, alerty, wiedza i liczniki są odtwarzane na świeżo.
+
+MFA sprawdza modelowaną wersję drugiego składnika, a reguły sieciowe opcjonalną
+listę kont. Brak zakresu zachowuje stare zachowanie. Serwerowy sensor FS-01 jest
+opcjonalnym rozszerzeniem istniejącej telemetrii. Nie kopiuje ukrytej historii;
+obserwuje rozstrzygnięte żądania, własny zakres, retencję i opóźnienie.
+`inspect-file-access` używa tego samego analityka i kolejki zadań.
+
+Nowy zapis `FortressSaveV2` zawiera całą sesję i journal. Walidacja powtarza
+komendy istniejącym reducerem i porównuje cały stan. V1 jest sprawdzany
+historycznym kontraktem oraz fixture'ami ze scalonego Sprintu 6. Nowy adapter
+pisze wyłącznie do nowego klucza V2 i udostępnia eksport oryginalnego V1.
+Daty i ID pozostają metadanymi spoza autorytatywnego stanu kampanii/symulacji.
+
+`Headquarters` renderuje budżet, projekty, plan, polityki, mapę i historię;
+`MissionWorkspace` zachowuje wcześniejszy pulpit misji. `StrategicReport`
+korzysta z faktycznych wyników logowania, obserwacji i raportów biznesowych.
+
+Specyfikacje: [kampania](campaign.md), [silnik](strategic-engine.md),
+[zapis V2](game-save-v2.md), [walidacja i ograniczenia](strategic-command-validation.md).

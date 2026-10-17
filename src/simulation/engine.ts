@@ -13,6 +13,7 @@ import { readAuthenticationLogs, updateTelemetry } from './telemetry';
 import { updateNarrative } from './narrative';
 import { completeDecision, rememberDecision } from './threatAssessment';
 import { resumeLegitimateWork } from './legitimateActors';
+import { readFileAccess, recordLegalFileActivity } from './fileAudit';
 
 function record(
   state: SimulationState,
@@ -108,6 +109,7 @@ function applyTaskEffect(
         },
       };
     case 'inspect-vpn-sessions':
+    case 'inspect-file-access':
     case 'inspect-auth-logs':
     case 'contact-account-owner':
       return state;
@@ -152,6 +154,23 @@ function observeCompletedResearch(
 ): SimulationState {
   if (task.action.type === 'inspect-vpn-sessions')
     return observeVpnSessions(state);
+  if (task.action.type === 'inspect-file-access') {
+    const observation = readFileAccess(state, task.id);
+    if (!observation) return record(state, { kind: 'research-unavailable' });
+    return record(
+      {
+        ...state,
+        knowledge: {
+          ...state.knowledge,
+          fileObservations: [
+            ...(state.knowledge.fileObservations ?? []),
+            observation,
+          ],
+        },
+      },
+      { kind: 'file-access-observed', count: observation.records.length },
+    );
+  }
   if (task.action.type === 'inspect-auth-logs') {
     const observation = readAuthenticationLogs(state, task.id);
     if (!observation) return record(state, { kind: 'research-unavailable' });
@@ -195,6 +214,7 @@ function observeCompletedResearch(
 function advanceTurn(state: SimulationState): SimulationState {
   // 1. Rozliczenie zakończonego przedziału na STAREJ konfiguracji.
   const business = settleBusiness(state);
+  state = recordLegalFileActivity(state);
   let next = record(
     {
       ...state,

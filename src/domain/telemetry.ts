@@ -1,5 +1,11 @@
 /** Zdarzenie wytworzone przez usługę. Nie zawiera pochodzenia sesji ani sekretów. */
 export interface AuthenticationEvent {
+  readonly reason?:
+    | 'invalid-request'
+    | 'service-unavailable'
+    | 'account-blocked'
+    | 'invalid-credential'
+    | 'mfa-required';
   readonly id: string;
   readonly minute: number;
   readonly sourceAssetId: string;
@@ -24,6 +30,8 @@ export interface AuthenticationSensor {
 }
 
 export interface TelemetryState {
+  readonly authenticationReasons?: true;
+  readonly fileAudit?: FileAuditState;
   readonly authenticationSensor: AuthenticationSensor;
   /** Sensor migawkowy: bez historii, bez opóźnienia, tylko aktywne tunele bramy. */
   readonly sessionSensor: {
@@ -61,4 +69,43 @@ export interface VpnAlert {
   readonly windowEndMinute: number;
   readonly failureCount: number;
   readonly assessment: 'requires-investigation';
+}
+
+export interface FileAccessEvent {
+  readonly id: string;
+  readonly minute: number;
+  readonly accountId: string;
+  readonly sessionId: string;
+  readonly targetAssetId: string;
+  readonly operation: 'list' | 'open' | 'read';
+  readonly outcome: 'allowed' | 'denied';
+  /** Liczba rekordów zmierzona przez usługę tylko przy skutecznym read. */
+  readonly recordsRead: number | null;
+}
+export interface FileAccessRecord extends FileAccessEvent {
+  readonly sensorId: string;
+  readonly capturedAtMinute: number;
+  readonly availableAtMinute: number;
+}
+export interface FileAuditState {
+  readonly sensor: {
+    readonly id: string;
+    readonly sourceAssetId: string;
+    readonly enabled: boolean;
+    readonly coverageFromMinute: number;
+    readonly retentionMinutes: number;
+    readonly delayMinutes: number;
+  };
+  readonly sourceEvents: readonly FileAccessEvent[];
+  readonly records: readonly FileAccessRecord[];
+  readonly processedSourceCount: number;
+}
+export interface FileAccessObservation {
+  readonly id: string;
+  readonly observedAtMinute: number;
+  readonly sensorId: string;
+  readonly sourceAssetId: string;
+  readonly windowStartMinute: number;
+  readonly windowEndMinute: number;
+  readonly records: readonly FileAccessRecord[];
 }

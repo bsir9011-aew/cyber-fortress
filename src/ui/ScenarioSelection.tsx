@@ -3,9 +3,11 @@ import type { ScenarioMode } from '../domain/scenario';
 export function ScenarioSelection({
   onSelect,
   autoFocus = true,
+  onStrategy,
 }: {
   onSelect: (mode: ScenarioMode) => void;
   autoFocus?: boolean;
+  onStrategy?: () => void;
 }) {
   return (
     <main id="main" className="scenario-selection">
@@ -22,6 +24,22 @@ export function ScenarioSelection({
           dane i utrzymaj wysyłki.
         </p>
       </div>
+      {onStrategy && (
+        <article className="strategy-entry">
+          <span className="eyebrow">03 / Odpowiadasz za firmę</span>
+          <div>
+            <h2>Strategia — Centrala NEXUS</h2>
+            <p>
+              68 000 zł rezerwy. Dwie osoby. Cztery godziny na przygotowanie.
+              Wybierz inwestycje, sprawdź zależności i zachowaj skutki na
+              kolejne incydenty.
+            </p>
+          </div>
+          <button className="primary-button" onClick={onStrategy}>
+            Rozpocznij strategię →
+          </button>
+        </article>
+      )}
       <div className="mode-cards">
         <article>
           <span className="mode-number">01 / Poznaj mechanizmy</span>

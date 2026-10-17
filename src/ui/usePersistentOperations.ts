@@ -1,43 +1,46 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  applyOperationCommand,
-  createOperationSession,
-} from '../application/operationSession';
+import { applyOperationCommand } from '../application/operationSession';
 import type {
-  OperationSession,
   RecordedCommand,
   SavedUiState,
 } from '../application/operationSession';
+import {
+  applyCampaignSession,
+  createStandalone,
+  createStrategicSession,
+  currentOperation,
+} from '../application/gameSession';
+import type { GameSession, HeadquartersTab } from '../application/gameSession';
 import type { ScenarioMode } from '../domain/scenario';
-import { createSave, toOperationSession } from '../persistence/saveFormat';
-import type { FortressSaveV1 } from '../persistence/saveFormat';
+import type { CampaignCommand } from '../domain/campaign';
+import type { FortressSaveV2 } from '../persistence/gameSave';
+import { loadGameState, storeGameState } from '../persistence/gameStorage';
 import { appendAttempt, summarizeAttempt } from '../persistence/attemptHistory';
 import {
   browserStorage,
   clearAttemptHistory,
   loadAttemptHistory,
-  loadLocalSave,
   storeAttemptHistory,
-  storeLocalSave,
 } from '../persistence/localStorage';
-
 const storage = browserStorage();
 const now = () => new Date().toISOString();
 const fresh = (mode: ScenarioMode, seed: number) =>
-  createOperationSession(mode, seed, crypto.randomUUID(), now());
+  createStandalone(mode, seed, crypto.randomUUID(), now());
 
-/** Hydratacja jest leniwa. Zapis pozostaje wyłączony do świadomego startu/wznowienia. */
 export function usePersistentOperations() {
   const [boot] = useState(() => ({
-    save: loadLocalSave(storage),
+    game: loadGameState(storage),
     history: loadAttemptHistory(storage),
   }));
-  const saved = boot.save.ok ? boot.save.value : null;
-  const [session, setSession] = useState<OperationSession>(() =>
-    saved ? toOperationSession(saved) : fresh('training', 0),
+  const loaded = boot.game.result.ok ? boot.game.result.value : null;
+  const [game, setGame] = useState<GameSession>(
+    () => loaded ?? fresh('training', 0),
   );
+  const session = currentOperation(game);
   const [active, setActive] = useState(false);
-  const [hasSave, setHasSave] = useState(Boolean(saved) || !boot.save.ok);
+  const [hasSave, setHasSave] = useState(
+    Boolean(loaded) || !boot.game.result.ok,
+  );
   const [history, setHistory] = useState(() =>
     boot.history.ok ? (boot.history.value?.attempts ?? []) : [],
   );
@@ -51,36 +54,33 @@ export function usePersistentOperations() {
     boot.history.ok ? '' : boot.history.error,
   );
   const [saveStatus, setSaveStatus] = useState(
-    saved
+    loaded
       ? 'Zapisano.'
-      : boot.save.ok
+      : boot.game.result.ok
         ? 'Brak zapisu.'
         : 'Zapis nie powiódł się.',
   );
   const [saveError, setSaveError] = useState(
-    boot.save.ok ? '' : boot.save.error,
+    boot.game.result.ok ? '' : boot.game.result.error,
   );
   const [historyVisible, setHistoryVisible] = useState(false);
-  const lastWritten = useRef<OperationSession | null>(null);
-
+  const lastWritten = useRef<GameSession | null>(null);
   useEffect(() => {
-    if (!active || session === lastWritten.current) return;
-    const result = storeLocalSave(storage, createSave(session, now()));
+    if (!active || game === lastWritten.current) return;
+    const result = storeGameState(storage, game, now());
     setSaveStatus(result.ok ? 'Zapisano.' : 'Zapis nie powiódł się.');
     setSaveError(result.ok ? '' : result.error);
     if (result.ok) {
-      lastWritten.current = session;
+      lastWritten.current = game;
       setHasSave(true);
     }
-  }, [session, active]);
-
+  }, [game, active]);
   useEffect(() => {
-    if (!active || historyCorrupt.current) return;
-    const entry = summarizeAttempt(session);
+    if (!active || game.kind !== 'incident' || historyCorrupt.current) return;
+    const entry = summarizeAttempt(game.operation);
     if (!entry || (clearedAt && entry.completedAt <= clearedAt)) return;
     const next = appendAttempt(history, entry);
     if (next === history) return;
-    // Zachowujemy wynik w pamięci również przy braku miejsca na dysku.
     setHistory(next);
     const result = storeAttemptHistory(storage, {
       schemaVersion: 1,
@@ -88,26 +88,51 @@ export function usePersistentOperations() {
       clearedAt,
     });
     setHistoryError(result.ok ? '' : result.error);
-  }, [session, active, history, clearedAt]);
-
+  }, [game, active, history, clearedAt]);
   function start(mode: ScenarioMode, seed: number) {
-    setSession(fresh(mode, seed));
+    setGame(fresh(mode, seed));
+    setActive(true);
+    setHistoryVisible(false);
+  }
+  function startCampaign() {
+    setGame(createStrategicSession(crypto.randomUUID(), now()));
     setActive(true);
     setHistoryVisible(false);
   }
   function updateUi(patch: Partial<SavedUiState>) {
-    setSession((current) => ({
-      ...current,
-      uiState: { ...current.uiState, ...patch },
-    }));
+    setGame((g) =>
+      g.kind === 'incident'
+        ? {
+            ...g,
+            operation: {
+              ...g.operation,
+              uiState: { ...g.operation.uiState, ...patch },
+            },
+          }
+        : { ...g, uiState: { ...g.uiState, ...patch } },
+    );
   }
   function command(command: RecordedCommand) {
     const date = now();
-    setSession((current) => applyOperationCommand(current, command, date));
+    setGame((g) =>
+      g.kind === 'incident'
+        ? { ...g, operation: applyOperationCommand(g.operation, command, date) }
+        : applyCampaignSession(g, { type: 'incident-command', command }, date),
+    );
   }
-  function restore(save: FortressSaveV1) {
-    // Nie kopiujemy pól formatu do sesji, aby kolejne eksporty miały jeden schemat.
-    setSession(toOperationSession(save));
+  function campaignCommand(command: CampaignCommand) {
+    const date = now();
+    setGame((g) =>
+      g.kind === 'campaign' ? applyCampaignSession(g, command, date) : g,
+    );
+  }
+  function headquartersTab(tab: HeadquartersTab) {
+    setGame((g) =>
+      g.kind === 'campaign' ? { ...g, headquartersTab: tab } : g,
+    );
+  }
+  function restore(save: FortressSaveV2) {
+    setGame(save.session);
     setActive(true);
     setHistoryVisible(false);
   }
@@ -125,22 +150,24 @@ export function usePersistentOperations() {
   }
   function retrySave() {
     lastWritten.current = null;
-    setSession((current) => ({ ...current }));
+    setGame((g) => ({ ...g }));
   }
   function retryHistory() {
     if (historyCorrupt.current) return;
-    const result = storeAttemptHistory(storage, {
+    const r = storeAttemptHistory(storage, {
       schemaVersion: 1,
       attempts: history,
       clearedAt,
     });
-    setHistoryError(result.ok ? '' : result.error);
+    setHistoryError(r.ok ? '' : r.error);
   }
   return {
+    game,
     session,
     active,
     hasSave,
-    canResume: active || Boolean(saved),
+    legacyRaw: boot.game.legacyRaw,
+    canResume: active || Boolean(loaded),
     saveStatus,
     saveError,
     history,
@@ -148,8 +175,11 @@ export function usePersistentOperations() {
     historyVisible,
     setHistoryVisible,
     start,
+    startCampaign,
     updateUi,
     command,
+    campaignCommand,
+    headquartersTab,
     restore,
     clearHistory,
     retrySave,
@@ -160,3 +190,4 @@ export function usePersistentOperations() {
     },
   };
 }
+export type PersistentOperations = ReturnType<typeof usePersistentOperations>;

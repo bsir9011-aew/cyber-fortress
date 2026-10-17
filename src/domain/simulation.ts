@@ -1,7 +1,11 @@
 import type { AccessState, NetworkRule } from './access';
 import type { WorldState } from './world';
 import type { AttackerState } from './attack';
-import type { AuthenticationObservation, TelemetryState } from './telemetry';
+import type {
+  AuthenticationObservation,
+  FileAccessObservation,
+  TelemetryState,
+} from './telemetry';
 import type {
   LegitimateActorState,
   RunIdentity,
@@ -76,6 +80,7 @@ export type WorkerId = 'analyst' | 'administrator';
 export type TaskAction =
   | { readonly type: 'inspect-vpn-sessions' }
   | { readonly type: 'inspect-auth-logs' }
+  | { readonly type: 'inspect-file-access' }
   | { readonly type: 'contact-account-owner'; readonly accountId: string }
   | { readonly type: 'terminate-session'; readonly sessionId: string }
   | { readonly type: 'block-account'; readonly accountId: string }
@@ -124,6 +129,7 @@ export interface SessionObservation {
 }
 
 export interface PlayerKnowledge {
+  readonly fileObservations?: readonly FileAccessObservation[];
   readonly sessionObservation: SessionObservation | null;
   readonly authObservations: readonly AuthenticationObservation[];
   readonly ownerStatements: readonly OwnerStatement[];
@@ -156,6 +162,7 @@ export type SimulationEventData =
   | { readonly kind: 'business-report'; readonly report: BusinessReport }
   | { readonly kind: 'sessions-observed'; readonly count: number }
   | { readonly kind: 'auth-logs-observed'; readonly count: number }
+  | { readonly kind: 'file-access-observed'; readonly count: number }
   | { readonly kind: 'owner-contacted'; readonly accountId: string }
   | { readonly kind: 'research-unavailable' }
   | { readonly kind: 'simulation-finished'; readonly success: boolean };

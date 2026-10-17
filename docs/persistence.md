@@ -1,4 +1,8 @@
-# Zapis operacji — FortressSaveV1
+# Zapis operacji — FortressSaveV1 (Sprint 6)
+
+> Aktualny format gry opisuje [FortressSaveV2](game-save-v2.md). Poniżej zachowano
+> kontrakt V1 do walidacji starych plików. Sprint 7 odczytuje zgodne V1 i kopiuje
+> zweryfikowany stan do V2 po świadomym wznowieniu; nie nadpisuje oryginału V1.
 
 Sprint 6 używa localStorage, zgodnie z jego zakresem. GDD przewiduje IndexedDB
 dla większego MVP; nie zmieniamy teraz GDD ani nie dodajemy bazy lub biblioteki.

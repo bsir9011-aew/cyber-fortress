@@ -58,13 +58,16 @@ export function identifier(value: unknown): value is string {
     typeof value === 'string' && /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,95}$/.test(value)
   );
 }
-function keys(value: Record<string, unknown>, fields: string[]) {
+export function keys(value: Record<string, unknown>, fields: string[]) {
   return (
     Object.keys(value).length === fields.length &&
     fields.every((key) => Object.hasOwn(value, key))
   );
 }
-function command(value: unknown): value is RecordedCommand {
+export function isRecordedCommand(
+  value: unknown,
+  allowFileAudit = false,
+): value is RecordedCommand {
   if (!object(value)) return false;
   if (value.type === 'advance-turn') return keys(value, ['type']);
   if (value.type === 'set-hypothesis')
@@ -87,6 +90,8 @@ function command(value: unknown): value is RecordedCommand {
     return false;
   const a = value.action;
   switch (a.type) {
+    case 'inspect-file-access':
+      return allowFileAudit && keys(a, ['type']);
     case 'inspect-auth-logs':
     case 'inspect-vpn-sessions':
       return keys(a, ['type']);
@@ -144,7 +149,7 @@ export function boundedJson(value: unknown) {
     }
   }
 }
-function validateUi(
+export function validateUi(
   value: unknown,
   session: OperationSession['simulation'],
 ): value is SavedUiState {
@@ -247,7 +252,7 @@ export function readSave(text: string): Result<FortressSaveV1> {
       value.scenarioId !== selectScenario(run.mode, run.seed).id ||
       !Array.isArray(value.commands) ||
       value.commands.length > MAX_COMMANDS ||
-      !value.commands.every(command)
+      !value.commands.every((entry) => isRecordedCommand(entry))
     )
       invalid();
     let expected = createScenarioRun(run.mode, run.seed);

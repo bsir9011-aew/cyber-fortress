@@ -8,8 +8,9 @@ export interface Account {
   readonly identityId: string;
   readonly loginStatus: 'enabled' | 'blocked';
   readonly credentialVersion: number;
-  /** Rezerwa kontraktu: brak implementacji wyzwania MFA w tym sprincie. */
+  /** Abstrakcja zarejestrowanego drugiego składnika; bez prawdziwych sekretów. */
   readonly mfaPolicy: 'not-required' | 'required';
+  readonly secondFactorVersion?: number;
 }
 
 export interface VpnSession {
@@ -28,6 +29,8 @@ export interface NetworkRule {
   readonly protocol: string;
   readonly priority: number;
   readonly action: 'allow' | 'deny';
+  /** Brak pola zachowuje stare reguły dla wszystkich podmiotów. */
+  readonly accountIds?: readonly string[];
 }
 
 export interface ResourcePermission {

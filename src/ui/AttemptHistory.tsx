@@ -43,6 +43,10 @@ export function AttemptHistory({
         zakończonych prób na tym urządzeniu. Powtórka rozpoczyna ten sam wariant
         od 14:00.
       </p>
+      <p>
+        To historia samodzielnych treningów i incydentów. Wyniki strategii są w
+        Centrali, w historii bieżącej kampanii.
+      </p>
       <div className="history-controls">
         <button onClick={onBack}>Wróć do rozgrywki</button>
         <button disabled={!entries.length && !error} onClick={onClear}>

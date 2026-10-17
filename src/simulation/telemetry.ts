@@ -11,6 +11,7 @@ import type {
 import { isAssetOnline } from './access';
 import type { SessionIssueResult } from './access';
 import { currentMinute } from './clock';
+import { collectFileTelemetry } from './fileAudit';
 
 /** Wywoływane przy rzeczywistej próbie w usłudze, nie na podstawie etykiety aktora. */
 export function recordAuthentication(
@@ -38,6 +39,9 @@ export function recordAuthentication(
           sourceAssetId: state.access.vpnAssetId,
           accountId,
           outcome: result.ok ? 'success' : 'failure',
+          ...(state.telemetry.authenticationReasons && !result.ok
+            ? { reason: result.reason }
+            : {}),
           sessionId: result.ok ? result.session.id : null,
         },
       ],
@@ -149,7 +153,10 @@ export function updateTelemetry(
 ): ReferenceSimulationState;
 export function updateTelemetry(state: SimulationState): SimulationState;
 export function updateTelemetry(state: SimulationState): SimulationState {
-  const telemetry = collectAuthenticationTelemetry(state);
+  const telemetry = collectFileTelemetry({
+    ...state,
+    telemetry: collectAuthenticationTelemetry(state),
+  });
   const minute = currentMinute(state.clock);
   return {
     ...state,

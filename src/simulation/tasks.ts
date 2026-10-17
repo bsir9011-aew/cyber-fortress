@@ -13,6 +13,9 @@ export function knownAccountIds(
   return [
     ...new Set([
       ...state.incident.alerts.map((alert) => alert.accountId),
+      ...(state.knowledge.fileObservations ?? []).flatMap((o) =>
+        o.records.map((r) => r.accountId),
+      ),
       ...(state.knowledge.sessionObservation?.sessions.map(
         (session) => session.accountId,
       ) ?? []),
@@ -28,6 +31,9 @@ export function knownSessionIds(
 ): readonly string[] {
   return [
     ...new Set([
+      ...(state.knowledge.fileObservations ?? []).flatMap((o) =>
+        o.records.map((r) => r.sessionId),
+      ),
       ...(state.knowledge.sessionObservation?.sessions.map(
         (session) => session.id,
       ) ?? []),
@@ -46,6 +52,7 @@ export const taskSpecs: Record<
 > = {
   'inspect-vpn-sessions': { workerId: 'analyst', turns: 1 },
   'inspect-auth-logs': { workerId: 'analyst', turns: 1 },
+  'inspect-file-access': { workerId: 'analyst', turns: 1 },
   'contact-account-owner': { workerId: 'analyst', turns: 1 },
   'terminate-session': { workerId: 'administrator', turns: 1 },
   'block-account': { workerId: 'administrator', turns: 1 },
@@ -77,6 +84,14 @@ export function taskRejection(
         state.telemetry.sessionSensor.sourceAssetId ===
           state.access.vpnAssetId &&
         isAssetOnline(state.world, state.telemetry.sessionSensor.sourceAssetId)
+        ? null
+        : 'source-unavailable';
+    case 'inspect-file-access':
+      return state.telemetry.fileAudit?.sensor.enabled &&
+        isAssetOnline(
+          state.world,
+          state.telemetry.fileAudit.sensor.sourceAssetId,
+        )
         ? null
         : 'source-unavailable';
     case 'inspect-auth-logs':
