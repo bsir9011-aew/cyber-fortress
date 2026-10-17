@@ -1,4 +1,4 @@
-# Architektura FORTRESS LAB — Sprint 8
+# Architektura FORTRESS LAB — Sprint 9
 
 Jedna aplikacja React + TypeScript + Vite z natywną mapą SVG. Silnik to czyste
 funkcje TypeScript: bez Reacta, DOM, zegara systemowego, I/O i losowości.
@@ -486,7 +486,7 @@ prywatne dokumenty, plan i kompromitacja trafiają tylko do gated
 `selectIntegrityReport` po 18 turach. React renderuje tę projekcję i komendy,
 nie przechowuje alternatywnej logiki odzyskiwania.
 
-UI zapisuje teraz `FortressSaveV3` przez `currentGameStorage`. Wspólny
+Sprint 8 wprowadził `FortressSaveV3` i `currentGameStorage`. Wspólny
 `validateGameSession` ma osobne walidatory komend V2/V3. Stare formaty zachowują
 pełną kontrolę przez replay; zgodna sesja przechodzi do koperty V3 bez zmiany
 świata. Oryginały V1/V2 nie są zapisywane ani usuwane przez aktualny UI.
@@ -498,3 +498,42 @@ Walidacja celu i wykonawcy jest w `simulation/tasks.ts`, efekt zmienia tylko
 `loginStatus` w silniku. UI dostaje wyłącznie identyfikatory zablokowanych kont
 już znanych graczowi. Nowe sesje nadal wydaje ten sam `issueVpnSession`, a
 kampania zachowuje wynik w istniejącym `SecurityPosture.accountOverrides`.
+
+
+## Inwestycje odporności, obserwowalność endpointu i V4
+
+`domain/resilience.ts` określa rejestr finansowania, pokrycie, gotowość kopii
+oraz wspólny format zdarzenia/rekordu/obserwacji EDR. Nie zależy od Reacta.
+`campaignReducer` przyjmuje transzę tylko przez jawną komendę po raporcie M02;
+dopiero wtedy dodaje dwa projekty z osobnego katalogu `resilienceProjects`.
+Nie zmienia historycznego początku kampanii. Istniejący harmonogram rozlicza
+pracę i płatność, a nowe efekty aktywują się po obu kanałach pracy.
+
+Po zakończeniu EDR zapisywany jest `EndpointCoverage`. Po zakończeniu programu
+backup `testBackupProcedure` wykonuje modelowany test aktualnego snapshotu
+przy dostępnej infrastrukturze i zapisuje `BackupReadiness`. Przygotowanie
+kolejnej M02 nakłada oba obiekty na definicję scenariusza, przed jego startem.
+M01 ich nie stosuje. Dotychczasowe konta, reguły i zakres VPN zachowują znaczenie.
+
+`resolveLocalFileOperation` wysyła rzeczywisty wynik operacji do opcjonalnego
+agenta. `endpointTelemetry.ts` rozdziela fizyczne przechwycenie, lokalny bufor,
+dostarczenie do kolektora i dostępność dla odbiorcy. Kanał zarządzający jest
+jawną abstrakcją blokowaną przez izolację. `updateTelemetry` wywołuje kolekcję
+i detektor po efektach zadań i operacjach świata. Detektor przyjmuje tylko
+rekordy i definicję reguły; nie widzi planu zagrożenia. Analityczne zadanie
+czyta kolektor po rozstrzygnięciu tury. Fizyczny dziennik pozostaje osobną
+10-minutową drogą. UI korzysta wyłącznie z allowlisty `selectIntegrityView`.
+
+`matchingBackupTest` sprawdza tożsamość snapshotu i pełny zakres. Tylko zgodny
+zaliczony test zmienia gotowość czystej FS-1350 i czas restore. Istniejące
+predykaty infrastruktury, uprawnienia, rekonstrukcja późniejszych dokumentów,
+weryfikacja wyniku oraz kolejność tury pozostają wspólne.
+
+`gameSaveV4.ts` dodaje allowlistę nowych komend i kopertę 9.0.0 /
+`nexus-resilience-1`. Historyczne moduły V1/V2/V3 zachowują swoje kontrakty.
+`resilienceGameStorage.ts` czyta cztery niezależne klucze i zapisuje wyłącznie
+V4; oryginały są eksportowalne bajt w bajt. Wspólny replay porównuje pełny
+stan również podczas wdrożenia, badania EDR i restore.
+
+[Kontrakty i diagram](resilience-investments.md) · [V4](game-save-v4.md) ·
+[Pełne przebiegi i Chromium](resilience-validation.md).

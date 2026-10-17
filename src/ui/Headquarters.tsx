@@ -1,3 +1,4 @@
+import { ResilienceStatus } from './ResilienceStatus';
 import { useEffect, useRef, useState } from 'react';
 import type {
   StrategicSession,
@@ -103,6 +104,44 @@ export function Headquarters({
           </strong>
         </div>
       </section>
+      {view.eligibleForFunding && (
+        <section
+          className="resilience-funding"
+          aria-label="Przegląd odporności — Etap II"
+        >
+          <p className="eyebrow">PRZEGLĄD ODPORNOŚCI — ETAP II</p>
+          <h2>
+            {view.funding
+              ? 'Transza przyjęta · 25 000 zł'
+              : 'Decyzja zarządu · 25 000 zł'}
+          </h2>
+          <p>
+            Po incydencie integralności zarząd zwiększa środki na ograniczenie
+            ryzyka. To finansowanie przeglądu, niezależne od wyniku misji.
+            Historyczna alokacja Etapu I: 80 000 zł.
+          </p>
+          {view.funding ? (
+            <p>
+              Jednorazowa alokacja board-resilience-ii · przegląd raportu{' '}
+              {view.funding.allocations[0]?.reportNumber}. Łączna pula: 105 000
+              zł. Wydatki i rezerwacje pozostają w osobnym rejestrze.
+            </p>
+          ) : (
+            <button
+              className="primary-button"
+              onClick={() => onCommand({ type: 'accept-resilience-funding' })}
+            >
+              Przyjmij finansowanie Etapu II — 25 000 zł
+            </button>
+          )}
+          <p>
+            EDR pomaga wcześniej zebrać dowody. Backup skraca odtworzenie
+            sprawdzonej kopii. Zachowanie rezerwy pozostawia dotychczasowe
+            możliwości. Oba projekty: 52 000 zł, 5 h administratora i 4 h
+            analityka — potrzebne kolejne okno.
+          </p>
+        </section>
+      )}
       <div className="hq-window">
         <div>
           <span className="eyebrow">Przygotowanie poza incydentem</span>
@@ -316,6 +355,11 @@ export function Headquarters({
                 key={p.id}
                 aria-label={p.name}
               >
+                {(p.id === 'endpoint-edr' || p.id === 'backup-resilience') && (
+                  <p className="eyebrow">
+                    Etap II · Projekt {p.id === 'endpoint-edr' ? 'D' : 'E'}
+                  </p>
+                )}
                 <span className="project-status">{statuses[p.status]}</span>
                 <h2>{p.name}</h2>
                 <div className="project-price">
@@ -562,6 +606,7 @@ export function Headquarters({
       {session.headquartersTab === 'posture' && (
         <section className="posture-panel">
           <h2>Trwałe zabezpieczenia organizacji</h2>
+          <ResilienceStatus {...view.resilience} />
           <article>
             <strong>
               MFA ·{' '}
@@ -653,9 +698,11 @@ export function Headquarters({
               </button>
             ))}
           </nav>
+          <ResilienceStatus {...view.resilience} />
           <div className="hq-map-layout">
             <InfrastructureMap
               world={view.world}
+              resilience={view.resilience}
               connections={selectLayerConnections(
                 view.world,
                 session.uiState.layer,
@@ -665,6 +712,7 @@ export function Headquarters({
             />
             <InfrastructureInspector
               world={view.world}
+              resilience={view.resilience}
               selection={session.uiState.selection}
               onSelect={(selection) => onUi({ selection })}
             />

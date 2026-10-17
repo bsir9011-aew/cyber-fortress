@@ -11,6 +11,7 @@ import type {
 import { isAssetOnline } from './access';
 import type { SessionIssueResult } from './access';
 import { currentMinute } from './clock';
+import { collectEndpointTelemetry } from './endpointTelemetry';
 import { collectFileTelemetry } from './fileAudit';
 
 /** Wywoływane przy rzeczywistej próbie w usłudze, nie na podstawie etykiety aktora. */
@@ -153,9 +154,13 @@ export function updateTelemetry(
 ): ReferenceSimulationState;
 export function updateTelemetry(state: SimulationState): SimulationState;
 export function updateTelemetry(state: SimulationState): SimulationState {
-  const telemetry = collectFileTelemetry({
+  const collected = collectFileTelemetry({
     ...state,
     telemetry: collectAuthenticationTelemetry(state),
+  });
+  const telemetry = collectEndpointTelemetry({
+    ...state,
+    telemetry: collected,
   });
   const minute = currentMinute(state.clock);
   return {

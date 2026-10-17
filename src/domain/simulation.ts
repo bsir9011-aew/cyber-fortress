@@ -83,6 +83,7 @@ export interface BusinessState {
 
 export type WorkerId = 'analyst' | 'administrator';
 export type TaskAction =
+  | { readonly type: 'inspect-edr-telemetry' }
   | IntegrityTaskAction
   | { readonly type: 'inspect-vpn-sessions' }
   | { readonly type: 'inspect-auth-logs' }

@@ -162,3 +162,17 @@ nowe dowody modify, lecz nie naprawia plików. Wykonane izolacja i ograniczenie
 zapisu przechodzą przez `SecurityPosture.endpointOverrides`, obok istniejących
 trwałych reguł/kont/usług. Nowy incydent nie przenosi poprzednich dowodów,
 liczników ani zadań odtwarzania. Raporty integralności pozostają w historii.
+
+
+## Etap II — po pierwszej Misji 02
+
+Sprint 9 dodaje jawną, jednorazową transzę 25 000 zł i dopiero po jej przyjęciu
+projekty EDR (24 000 zł, 2 h admina / 2 h analityka) i Backup Resilience
+(28 000 zł, 3 h / 2 h). Początkowy stan kampanii pozostaje historyczny.
+Rejestr alokacji jest oddzielony od wydatków. Nowe projekty używają tego samego
+planowania, rezerwacji, płatności i przenoszenia pracy. Bez inwestycji można
+powtarzać M02 na dotychczasowych zasadach. Trwałe ograniczenie zapisu hosta
+nie znika między misjami.
+
+[Specyfikacja finansowania i obu projektów](resilience-investments.md),
+[zapis V4](game-save-v4.md), [wyniki porównania](resilience-validation.md).

@@ -2,12 +2,22 @@ import type { Account } from './access';
 import type { IntegrityMissionSummary } from './integrity';
 import type { AssetStatus } from './infrastructure';
 import type {
+  BackupReadiness,
+  CampaignFunding,
+  EndpointCoverage,
+} from './resilience';
+import type {
   SimulationState,
   WorkerId,
   SimulationCommand,
 } from './simulation';
 
-export type ProjectId = 'remote-access' | 'file-visibility' | 'segmentation';
+export type ProjectId =
+  | 'remote-access'
+  | 'file-visibility'
+  | 'segmentation'
+  | 'endpoint-edr'
+  | 'backup-resilience';
 export type SegmentationScope = 'file-team' | 'document-users';
 export interface SecurityProject {
   readonly id: ProjectId;
@@ -33,6 +43,8 @@ export interface SecurityBudget {
   readonly ledger: readonly BudgetOperation[];
 }
 export interface SecurityPosture {
+  readonly endpointCoverage?: EndpointCoverage;
+  readonly backupReadiness?: BackupReadiness;
   readonly endpointOverrides?: Readonly<
     Record<
       string,
@@ -77,6 +89,7 @@ export interface CampaignMissionReport {
   readonly fullCapacity: number;
 }
 export interface CampaignState {
+  readonly funding?: CampaignFunding;
   readonly phase: 'preparation' | 'incident' | 'report';
   readonly budget: SecurityBudget;
   readonly projects: readonly SecurityProject[];
@@ -100,6 +113,7 @@ export interface CampaignState {
   }[];
 }
 export type CampaignCommand =
+  | { readonly type: 'accept-resilience-funding' }
   | { readonly type: 'plan-project'; readonly projectId: ProjectId }
   | { readonly type: 'reserve-project'; readonly projectId: ProjectId }
   | { readonly type: 'cancel-project'; readonly projectId: ProjectId }

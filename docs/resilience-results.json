@@ -1,0 +1,349 @@
+[
+  {
+    "strategy": "A",
+    "name": "Bez inwestycji i reakcji",
+    "seed": 2,
+    "firstEvidenceMinute": null,
+    "firstIsolationMinute": null,
+    "serviceOnline": true,
+    "dataAvailable": false,
+    "total": 100,
+    "correct": 0,
+    "damaged": 100,
+    "reconcile": 0,
+    "recovered": 0,
+    "everDamaged": 100,
+    "sourceHasWrite": true,
+    "endpointIsolated": false,
+    "writesRestricted": false,
+    "backupId": null,
+    "rpoMinutes": null,
+    "rtoMinutes": null,
+    "missingChanges": 0,
+    "reconstructed": 0,
+    "verified": false,
+    "limitedDataMinutes": 90,
+    "peakBacklog": 154,
+    "processed": 206,
+    "backlog": 154,
+    "restoreMinutes": null,
+    "funding": {
+      "initialAllocation": 80000,
+      "allocations": [
+        {
+          "id": "board-resilience-ii",
+          "source": "integrity-risk-review",
+          "amount": 25000,
+          "window": 3,
+          "reportNumber": 2
+        }
+      ]
+    },
+    "budget": {
+      "total": 105000,
+      "spent": 12000,
+      "reserved": 0,
+      "available": 93000
+    },
+    "projects": []
+  },
+  {
+    "strategy": "B",
+    "name": "Ręczna reakcja, FS-1320 i uzgodnienie",
+    "seed": 2,
+    "firstEvidenceMinute": 850,
+    "firstIsolationMinute": 845,
+    "serviceOnline": true,
+    "dataAvailable": true,
+    "total": 100,
+    "correct": 100,
+    "damaged": 0,
+    "reconcile": 0,
+    "recovered": 12,
+    "everDamaged": 12,
+    "sourceHasWrite": false,
+    "endpointIsolated": false,
+    "writesRestricted": true,
+    "backupId": "FS-1320",
+    "rpoMinutes": 40,
+    "rtoMinutes": 45,
+    "missingChanges": 20,
+    "reconstructed": 20,
+    "verified": true,
+    "limitedDataMinutes": 35,
+    "peakBacklog": 14,
+    "processed": 360,
+    "backlog": 0,
+    "restoreMinutes": 10,
+    "funding": {
+      "initialAllocation": 80000,
+      "allocations": [
+        {
+          "id": "board-resilience-ii",
+          "source": "integrity-risk-review",
+          "amount": 25000,
+          "window": 3,
+          "reportNumber": 2
+        }
+      ]
+    },
+    "budget": {
+      "total": 105000,
+      "spent": 12000,
+      "reserved": 0,
+      "available": 93000
+    },
+    "projects": []
+  },
+  {
+    "strategy": "C",
+    "name": "EDR wykorzystany, FS-1320 i uzgodnienie",
+    "seed": 2,
+    "firstEvidenceMinute": 845,
+    "firstIsolationMinute": 850,
+    "serviceOnline": true,
+    "dataAvailable": true,
+    "total": 100,
+    "correct": 100,
+    "damaged": 0,
+    "reconcile": 0,
+    "recovered": 12,
+    "everDamaged": 12,
+    "sourceHasWrite": false,
+    "endpointIsolated": false,
+    "writesRestricted": true,
+    "backupId": "FS-1320",
+    "rpoMinutes": 40,
+    "rtoMinutes": 40,
+    "missingChanges": 20,
+    "reconstructed": 20,
+    "verified": true,
+    "limitedDataMinutes": 30,
+    "peakBacklog": 10,
+    "processed": 360,
+    "backlog": 0,
+    "restoreMinutes": 10,
+    "funding": {
+      "initialAllocation": 80000,
+      "allocations": [
+        {
+          "id": "board-resilience-ii",
+          "source": "integrity-risk-review",
+          "amount": 25000,
+          "window": 3,
+          "reportNumber": 2
+        }
+      ]
+    },
+    "budget": {
+      "total": 105000,
+      "spent": 36000,
+      "reserved": 0,
+      "available": 69000
+    },
+    "projects": [
+      "endpoint-edr"
+    ]
+  },
+  {
+    "strategy": "D",
+    "name": "Backup wykorzystany, ręczne dochodzenie",
+    "seed": 2,
+    "firstEvidenceMinute": 850,
+    "firstIsolationMinute": 845,
+    "serviceOnline": true,
+    "dataAvailable": true,
+    "total": 100,
+    "correct": 100,
+    "damaged": 0,
+    "reconcile": 0,
+    "recovered": 12,
+    "everDamaged": 12,
+    "sourceHasWrite": false,
+    "endpointIsolated": false,
+    "writesRestricted": true,
+    "backupId": "FS-1350",
+    "rpoMinutes": 10,
+    "rtoMinutes": 35,
+    "missingChanges": 0,
+    "reconstructed": 0,
+    "verified": true,
+    "limitedDataMinutes": 25,
+    "peakBacklog": 8,
+    "processed": 360,
+    "backlog": 0,
+    "restoreMinutes": 10,
+    "funding": {
+      "initialAllocation": 80000,
+      "allocations": [
+        {
+          "id": "board-resilience-ii",
+          "source": "integrity-risk-review",
+          "amount": 25000,
+          "window": 3,
+          "reportNumber": 2
+        }
+      ]
+    },
+    "budget": {
+      "total": 105000,
+      "spent": 40000,
+      "reserved": 0,
+      "available": 65000
+    },
+    "projects": [
+      "backup-resilience"
+    ]
+  },
+  {
+    "strategy": "E",
+    "name": "EDR i Backup wykorzystane",
+    "seed": 3,
+    "firstEvidenceMinute": 845,
+    "firstIsolationMinute": 850,
+    "serviceOnline": true,
+    "dataAvailable": true,
+    "total": 100,
+    "correct": 100,
+    "damaged": 0,
+    "reconcile": 0,
+    "recovered": 12,
+    "everDamaged": 12,
+    "sourceHasWrite": false,
+    "endpointIsolated": false,
+    "writesRestricted": true,
+    "backupId": "FS-1350",
+    "rpoMinutes": 10,
+    "rtoMinutes": 30,
+    "missingChanges": 0,
+    "reconstructed": 0,
+    "verified": true,
+    "limitedDataMinutes": 20,
+    "peakBacklog": 4,
+    "processed": 360,
+    "backlog": 0,
+    "restoreMinutes": 10,
+    "funding": {
+      "initialAllocation": 80000,
+      "allocations": [
+        {
+          "id": "board-resilience-ii",
+          "source": "integrity-risk-review",
+          "amount": 25000,
+          "window": 3,
+          "reportNumber": 2
+        }
+      ]
+    },
+    "budget": {
+      "total": 105000,
+      "spent": 64000,
+      "reserved": 0,
+      "available": 41000
+    },
+    "projects": [
+      "endpoint-edr",
+      "backup-resilience"
+    ]
+  },
+  {
+    "strategy": "F",
+    "name": "EDR, alert zignorowany",
+    "seed": 2,
+    "firstEvidenceMinute": null,
+    "firstIsolationMinute": null,
+    "serviceOnline": true,
+    "dataAvailable": false,
+    "total": 100,
+    "correct": 0,
+    "damaged": 100,
+    "reconcile": 0,
+    "recovered": 0,
+    "everDamaged": 100,
+    "sourceHasWrite": true,
+    "endpointIsolated": false,
+    "writesRestricted": false,
+    "backupId": null,
+    "rpoMinutes": null,
+    "rtoMinutes": null,
+    "missingChanges": 0,
+    "reconstructed": 0,
+    "verified": false,
+    "limitedDataMinutes": 90,
+    "peakBacklog": 154,
+    "processed": 206,
+    "backlog": 154,
+    "restoreMinutes": null,
+    "funding": {
+      "initialAllocation": 80000,
+      "allocations": [
+        {
+          "id": "board-resilience-ii",
+          "source": "integrity-risk-review",
+          "amount": 25000,
+          "window": 3,
+          "reportNumber": 2
+        }
+      ]
+    },
+    "budget": {
+      "total": 105000,
+      "spent": 36000,
+      "reserved": 0,
+      "available": 69000
+    },
+    "projects": [
+      "endpoint-edr"
+    ]
+  },
+  {
+    "strategy": "G",
+    "name": "Backup bez ograniczenia źródła",
+    "seed": 2,
+    "firstEvidenceMinute": null,
+    "firstIsolationMinute": null,
+    "serviceOnline": true,
+    "dataAvailable": false,
+    "total": 100,
+    "correct": 0,
+    "damaged": 100,
+    "reconcile": 0,
+    "recovered": 32,
+    "everDamaged": 100,
+    "sourceHasWrite": true,
+    "endpointIsolated": false,
+    "writesRestricted": false,
+    "backupId": "FS-1350",
+    "rpoMinutes": 10,
+    "rtoMinutes": null,
+    "missingChanges": 0,
+    "reconstructed": 0,
+    "verified": false,
+    "limitedDataMinutes": 85,
+    "peakBacklog": 117,
+    "processed": 243,
+    "backlog": 117,
+    "restoreMinutes": 10,
+    "funding": {
+      "initialAllocation": 80000,
+      "allocations": [
+        {
+          "id": "board-resilience-ii",
+          "source": "integrity-risk-review",
+          "amount": 25000,
+          "window": 3,
+          "reportNumber": 2
+        }
+      ]
+    },
+    "budget": {
+      "total": 105000,
+      "spent": 40000,
+      "reserved": 0,
+      "available": 65000
+    },
+    "projects": [
+      "backup-resilience"
+    ]
+  }
+]

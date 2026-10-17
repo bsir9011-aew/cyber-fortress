@@ -16,6 +16,8 @@ export function actionLabel(action: TaskAction): string {
       return `Odtworzenie dokumentów z ${action.backupId}`;
     case 'reconcile-documents':
       return 'Uzgodnienie brakujących dokumentów z ERP';
+    case 'inspect-edr-telemetry':
+      return 'Pobierz telemetrię EDR';
     case 'examine-endpoint':
       return `Badanie stacji ${action.endpointId}`;
     case 'isolate-endpoint':
@@ -90,3 +92,9 @@ export function eventLabel(event: SimulationEvent): string {
         : '15:30 — przekroczono dopuszczalną kolejkę zamówień.';
   }
 }
+
+export const backupTestLabels = {
+  clean: 'sprawdzona zgodność',
+  damaged: 'wykryto uszkodzenia',
+  unavailable: 'źródło niedostępne',
+};

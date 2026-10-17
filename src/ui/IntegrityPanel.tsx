@@ -1,7 +1,7 @@
 import type { IntegrityView } from '../application/selectIntegrityView';
 import type { SimulationCommand } from '../domain/simulation';
 import { formatMinute } from '../simulation/clock';
-import { actionLabel } from './simulationPresentation';
+import { actionLabel, backupTestLabels } from './simulationPresentation';
 
 export function IntegrityPanel({
   view,
@@ -112,6 +112,71 @@ export function IntegrityPanel({
           Modyfikacje z lokalnej stacji
         </option>
       </select>
+      {view.edr && (
+        <section className="edr-evidence" aria-label="Telemetria EDR">
+          <h3>EDR · pilotaż pakowanie-03</h3>
+          <p>
+            1 z 94 stacji · fortress-endpoint-agent · agent{' '}
+            {view.edr.agentOnline ? 'dostępny' : 'niedostępny'} · kolektor{' '}
+            {view.edr.coverage.collectorAvailable ? 'dostępny' : 'niedostępny'}.
+            Droga dostarczenia:{' '}
+            {view.edr.deliveryAvailable ? 'dostępna' : 'niedostępna'}. Pokrycie:{' '}
+            {view.edr.coverage.operations.join(', ')}. Opóźnienie{' '}
+            {view.edr.coverage.delayMinutes} min, retencja{' '}
+            {view.edr.coverage.retentionMinutes} min.
+          </p>
+          <p>
+            Reguła {view.edr.coverage.detection.id}: ≥
+            {view.edr.coverage.detection.threshold} modyfikacji /{' '}
+            {view.edr.coverage.detection.windowMinutes} min z jednej stacji.
+          </p>
+          {view.edr.alerts.map((a) => (
+            <blockquote key={a.id}>
+              <strong>
+                {formatMinute(a.minute)} · {a.name}
+              </strong>
+              <p>
+                {a.modificationCount} zaobserwowanych modyfikacji ·{' '}
+                {a.endpointId}. Wymaga dochodzenia; nie potwierdza ataku.
+              </p>
+            </blockquote>
+          ))}
+          {!view.edr.alerts.length && (
+            <p>Brak dostępnego alertu. Nie dowodzi braku aktywności.</p>
+          )}
+          <p>
+            Zleć pobranie telemetrii (5 min). Czyta wyłącznie zdalny kolektor.
+            Izolacja odcina nowe dostarczenia; lokalny bufor agenta pozostaje
+            poza tym odczytem. Badanie lokalnego dziennika trwa osobno 10 min.
+          </p>
+          {view.edr.observations.map((o) => (
+            <details key={o.id} open>
+              <summary>
+                Dowód EDR {o.id} · pobrano {formatMinute(o.observedAtMinute)}
+              </summary>
+              <p>
+                Źródło: {o.source} / {o.collectorId} / {o.sensorId}. Okno{' '}
+                {formatMinute(o.windowStartMinute)}–
+                {formatMinute(o.windowEndMinute)}. {o.records.length} rekordów.
+              </p>
+              <ul>
+                {o.records.map((r) => (
+                  <li key={r.id}>
+                    {r.id} · zdarzenie {formatMinute(r.minute)} · przechwycono{' '}
+                    {formatMinute(r.capturedAtMinute)} · dostarczono{' '}
+                    {formatMinute(r.deliveredAtMinute)} · dostępne{' '}
+                    {formatMinute(r.availableAtMinute)} · {r.source} ·{' '}
+                    {r.endpointId} / {r.accountId} → {r.targetAssetId}/
+                    {r.protocol} · {r.operation} · {r.outcome} ·{' '}
+                    {r.documentIds.length} dokumentów ({r.documentIds[0]}…
+                    {r.documentIds.at(-1)})
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ))}
+        </section>
+      )}
       <h3>Dowód ze stacji</h3>
       {!view.endpointObservations.length ? (
         <p>
@@ -187,6 +252,7 @@ export function IntegrityOperations({
         {view.actions
           .filter((e) =>
             [
+              'inspect-edr-telemetry',
               'inspect-documents',
               'inspect-backups',
               'examine-endpoint',
@@ -220,10 +286,23 @@ export function IntegrityOperations({
       <p className="source-note">
         Izolacja odcina tylko tę stację i kosztuje 2 zamówienia wydajności na
         turę. Nie naprawia plików ani nie usuwa kompromitacji. Aby podłączyć
-        stację: odizoluj ją, zbadaj dziennik i ogranicz zapis. Legalny odczyt
-        będzie mógł wrócić.
+        stację: odizoluj ją, pozyskaj dowód z dziennika lub EDR i ogranicz
+        zapis. Legalny odczyt będzie mógł wrócić.
       </p>
       <h3>Wybierz punkt odtworzenia</h3>
+      {view.backupReadiness && (
+        <p className="backup-readiness">
+          Program Backup Resilience: {view.backupReadiness.backupId} ·{' '}
+          {backupTestLabels[view.backupReadiness.integrity]} · test{' '}
+          {view.backupReadiness.restoreTestPassed
+            ? 'zaliczony'
+            : 'niezaliczony'}{' '}
+          · okno {view.backupReadiness.testedAt.window}, h{' '}
+          {view.backupReadiness.testedAt.hour} ·{' '}
+          {view.backupReadiness.checkedDocumentIds.length} sprawdzonych
+          dokumentów. Parametry poniżej dotyczą aktualnej kopii.
+        </p>
+      )}
       {view.backupInventoryMinute === null ? (
         <p>Nie sprawdzono kopii. Zleć sprawdzenie punktów odtworzenia.</p>
       ) : (

@@ -1,3 +1,5 @@
+import { ResilienceStatus } from './ResilienceStatus';
+import type { ResilienceStatusProps } from './ResilienceStatus';
 import {
   selectAssetConnections,
   selectRelatedAssets,
@@ -15,6 +17,7 @@ import type { MapSelection } from './infrastructurePresentation';
 import type { IntegrityView } from '../application/selectIntegrityView';
 
 interface Props {
+  resilience?: ResilienceStatusProps | undefined;
   world: WorldState;
   selection: MapSelection;
   onSelect: (selection: MapSelection) => void;
@@ -24,6 +27,7 @@ interface Props {
 
 export function InfrastructureInspector({
   world,
+  resilience,
   selection,
   onSelect,
   networkRules = [],
@@ -72,6 +76,9 @@ export function InfrastructureInspector({
                 dowodzi kompromitacji. Działania dostępne w panelu zespołu.
               </p>
             </section>
+          )}
+          {resilience && ['workstations', 'fs-01'].includes(asset.id) && (
+            <ResilienceStatus {...resilience} />
           )}
           <span className={`status-badge status-${asset.status}`}>
             ● {statusLabels[asset.status]} operacyjnie
