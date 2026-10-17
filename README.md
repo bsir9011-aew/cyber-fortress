@@ -2,7 +2,28 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — Defense Investment Program (Sprint 9)
+## FORTRESS LAB — After Action Review (Sprint 10)
+
+Po zakończeniu każdej misji pobierzesz **raport JSON do analizy AI** oraz
+**czytelny raport Markdown**. Pokazują wiedzę dostępną przed decyzją,
+rzeczywisty stan i późniejsze skutki. Dotyczy to także porażki, częściowej
+reakcji i legalnego incydentu. Gra nie ocenia automatycznie gracza.
+
+Wybierz **Kopiuj instrukcję analizy**, a następnie dołącz JSON w wybranej
+rozmowie z ChatGPT. Pliki powstają lokalnie, również offline; gra niczego
+nie wysyła i nie wymaga klucza API. Raporty AAR są odrębne od pełnego zapisu
+gry. Prywatna prawda AAR jest dostępna dopiero po 18. turze.
+
+W Centrali można odtworzyć raport wcześniejszej misji z pełnego dziennika
+kampanii. Samodzielna historia udostępnia raport dla próby z zachowanym
+pełnym dziennikiem; przy samym podsumowaniu uczciwie informuje o braku
+chronologii. Nie zmieniono mechanik ani zapisu V4.
+
+[Kontrakt i rekonstrukcja wiedzy](docs/after-action-review.md) ·
+[Trzy prawdziwe raporty do analizy](docs/aar-examples/README.md) ·
+[Walidacja, scenariusze A–H i screenshoty](docs/after-action-review-validation.md).
+
+### Defense Investment Program (Sprint 9)
 
 Po ukończeniu Misji 02 i powrocie do Centrali pojawia się **Przegląd odporności
 — Etap II**. Jawnie przyjmij jednorazowe **25 000 zł**: łączna pula rośnie do
@@ -125,8 +146,8 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 ### Wersja przeglądarkowa
 
 Docelowy adres: **https://bsir9011-aew.github.io/cyber-fortress/**.
-Repozytorium ma Pages w trybie GitHub Actions. Sprint 8 jest scalony na main.
-Sprint 9 wymaga review PR i nie jest publikowany z gałęzi funkcjonalnej.
+Repozytorium ma Pages w trybie GitHub Actions. Sprint 9 jest scalony na main.
+Sprint 10 wymaga review PR i nie jest publikowany z gałęzi funkcjonalnej.
 Workflow nadal wdraża wyłącznie `main`, po testach i produkcyjnym buildzie.
 
 ### Rozpoczęcie misji
@@ -288,6 +309,9 @@ prototype/      # archiwalny prototyp HTML 0.1
 
 - [Kampania i budżet](docs/campaign.md)
 - [Misja 02: lokalny dostęp, integralność i recovery](docs/mission-02-integrity.md)
+- [After Action Review i eksport AI](docs/after-action-review.md)
+- [Prawdziwe raporty JSON/Markdown](docs/aar-examples/README.md)
+- [Walidacja AAR](docs/after-action-review-validation.md)
 - [Inwestycje Etapu II i diagram](docs/resilience-investments.md)
 - [Walidacja strategii A–G](docs/resilience-validation.md)
 - [Zapis V4 i zgodność V1–V4](docs/game-save-v4.md)

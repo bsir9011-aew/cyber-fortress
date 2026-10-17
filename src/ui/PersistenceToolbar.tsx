@@ -98,6 +98,11 @@ export function PersistenceToolbar({
         <strong className={error ? 'warning-text' : ''}>{status}</strong>
         <span>Tylko na tym urządzeniu i w tej przeglądarce.</span>
       </div>
+      <p className="save-format-note">
+        Eksport zapisu zawiera pełny stan, także prywatną prawdę incydentu;
+        służy do wznowienia gry. Raport AAR pobierzesz osobno po zakończeniu
+        misji.
+      </p>
       <div className="persistence-actions">
         {error && canExport && <button onClick={onRetry}>Ponów zapis</button>}
         <button disabled={!canExport} onClick={exportSave}>

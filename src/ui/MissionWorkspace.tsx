@@ -1,3 +1,4 @@
+import { AfterActionExport } from './AfterActionExport';
 import { useEffect, useRef } from 'react';
 import { selectPlayerView } from '../application/selectPlayerView';
 import { selectMissionReport } from '../application/selectMissionReport';
@@ -191,6 +192,7 @@ export function MissionWorkspace({
                   campaignMode={operations.game.kind === 'campaign'}
                 />
               )}
+              <AfterActionExport game={operations.game} />
               {operations.game.kind === 'campaign' && (
                 <StrategicReport campaign={operations.game.campaign} />
               )}

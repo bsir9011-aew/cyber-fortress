@@ -1,0 +1,6909 @@
+{
+  "format": "FORTRESS_AAR",
+  "schemaVersion": 1,
+  "reportId": "AAR-aar-C",
+  "missionId": "aar-C",
+  "generatedAt": "2026-10-17T12:56:41.194Z",
+  "gameVersion": {
+    "application": "0.2.0",
+    "engine": "9.0.0",
+    "reportGenerator": "1.0.0"
+  },
+  "fieldGuide": {
+    "format": "Raport analityczny, nie zapis gry. Brak importu do symulatora.",
+    "time": "minute: liczba minut od północy fikcyjnego dnia, np. 840 = 14:00. turn: granica tury 0–18, null dla zdarzeń poza granicą lub przed oknem. generatedAt: rzeczywisty UTC ISO 8601.",
+    "units": "Zamówienia i dokumenty to liczby sztuk. exposedRecords to rekordy danych, nie dokumenty. Budżet w PLN. Praca przygotowawcza w godzinach; RPO/RTO i czasy misji w minutach.",
+    "knownAtDecision": "Informacje dostępne w UI przed komendą, nie potwierdzenie, że człowiek je przeczytał. evidenceIds wskazują wyłącznie już pozyskane wpisy knownEvidence. Konfiguracja nie zawiera prywatnych wersji poświadczeń ani pochodzenia sesji.",
+    "sessions": "knownSessionIds to ID dostępne w narzędziach z pozyskanych logów, audytu i migawki bramy. sessions to wyłącznie ostatnia migawka bramy (null = nie pobrano). Żadne historyczne ID nie gwarantuje aktualności tunelu.",
+    "actualStateAtDecision": "Prawda symulacji przed komendą, ujawniona dopiero w tym raporcie po zakończeniu misji.",
+    "capabilities": "threatAccess i serviceAccess to czysta ocena istniejących predykatów w danej chwili, nie nowe próby logowania lub transferu. availability to bieżąca możliwa wydajność; perTurn rozlicza poprzedni przedział. Końcowe zdarzenie silnika businessGoalMet dotyczy tylko celu biznesowego.",
+    "actualEffect": "immediateAccessImpact pochodzi z istniejącego śladu before/after efektu zadania. boundaryState obejmuje CAŁĄ granicę zakończenia, również inne zadania i działania aktorów. Nie przypisuj całej zmiany jednej decyzji.",
+    "subsequentConsequences": "Zakres osi czasu po wydaniu decyzji, obejmujący także inne przyczyny. To sekwencja zdarzeń, nie eksperyment kontrfaktyczny ani automatyczne przypisanie przyczynowości.",
+    "intent": "expectedEffect=null i intentRecorded=false: gra nie rejestrowała uzasadnienia. Hipotezy są deklaracjami gracza. Nie da się ustalić zamierzonych i niezamierzonych skutków z samego wyniku.",
+    "telemetry": "sensor-record-eligible to zarejestrowany czas gotowości rekordu, nie wiedza gracza. evidence-obtained oznacza ukończone badanie lub informację udostępnioną w UI. Obowiązuje dostępność źródła.",
+    "objectives": "Cele mają osobne wyniki. allObjectivesMet nie jest oceną jakości rozumowania ani człowieka."
+  },
+  "organization": {
+    "name": "NEXUS Logistics",
+    "employees": 120,
+    "computers": 94
+  },
+  "scenario": {
+    "id": "nexus-reference",
+    "family": "M01",
+    "name": "Przejęty tunel",
+    "kind": "unauthorized-session",
+    "mode": "unknown",
+    "seed": 0,
+    "startMinute": 840,
+    "endMinute": 930,
+    "turnMinutes": 5,
+    "turnLimit": 18
+  },
+  "campaignContext": null,
+  "missionObjectives": {
+    "maxExposedRecords": 0,
+    "maxFinalBacklog": 40,
+    "requireThreatContainment": true
+  },
+  "finalOutcome": {
+    "confidentialityMet": true,
+    "continuityMet": true,
+    "containmentMet": true,
+    "integrityMet": null,
+    "allObjectivesMet": true
+  },
+  "timeline": [
+    {
+      "id": "TL-00001",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "initial",
+      "kind": "mission-start",
+      "source": "scenario",
+      "status": "started",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": null
+    },
+    {
+      "id": "TL-00002",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "actor-resolution",
+      "kind": "authentication",
+      "source": "authentication-service",
+      "status": "success",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0054",
+        "minute": 840,
+        "sourceAssetId": "vpn",
+        "accountId": "dispatch-team",
+        "outcome": "success",
+        "sessionId": "B-01"
+      }
+    },
+    {
+      "id": "TL-00003",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0001",
+        "minute": 820,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00004",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0001",
+        "operationMinute": 820,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00005",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0002",
+        "minute": 820,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00006",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0002",
+        "operationMinute": 820,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00007",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0003",
+        "minute": 820,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00008",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0003",
+        "operationMinute": 820,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00009",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0004",
+        "minute": 821,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00010",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0004",
+        "operationMinute": 821,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00011",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0005",
+        "minute": 821,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00012",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0005",
+        "operationMinute": 821,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00013",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0006",
+        "minute": 821,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00014",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0006",
+        "operationMinute": 821,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00015",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0007",
+        "minute": 822,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00016",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0007",
+        "operationMinute": 822,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00017",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0008",
+        "minute": 822,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00018",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0008",
+        "operationMinute": 822,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00019",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0009",
+        "minute": 822,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00020",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0009",
+        "operationMinute": 822,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00021",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0010",
+        "minute": 823,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00022",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0010",
+        "operationMinute": 823,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00023",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0011",
+        "minute": 823,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00024",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0011",
+        "operationMinute": 823,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00025",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0012",
+        "minute": 823,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00026",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0012",
+        "operationMinute": 823,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00027",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0013",
+        "minute": 824,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00028",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0013",
+        "operationMinute": 824,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00029",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0014",
+        "minute": 824,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00030",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0014",
+        "operationMinute": 824,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00031",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0015",
+        "minute": 824,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00032",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0015",
+        "operationMinute": 824,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00033",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0016",
+        "minute": 825,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00034",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0016",
+        "operationMinute": 825,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00035",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0017",
+        "minute": 825,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00036",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0017",
+        "operationMinute": 825,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00037",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0018",
+        "minute": 825,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00038",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0018",
+        "operationMinute": 825,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00039",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0019",
+        "minute": 826,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00040",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0019",
+        "operationMinute": 826,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00041",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0020",
+        "minute": 826,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00042",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0020",
+        "operationMinute": 826,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00043",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0021",
+        "minute": 826,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00044",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0021",
+        "operationMinute": 826,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00045",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0022",
+        "minute": 827,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00046",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0022",
+        "operationMinute": 827,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00047",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0023",
+        "minute": 827,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00048",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0023",
+        "operationMinute": 827,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00049",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0024",
+        "minute": 827,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00050",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0024",
+        "operationMinute": 827,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00051",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0025",
+        "minute": 828,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00052",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0025",
+        "operationMinute": 828,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00053",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0026",
+        "minute": 828,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00054",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0026",
+        "operationMinute": 828,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00055",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0027",
+        "minute": 828,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00056",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0027",
+        "operationMinute": 828,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00057",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0028",
+        "minute": 829,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00058",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0028",
+        "operationMinute": 829,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00059",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0029",
+        "minute": 829,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00060",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0029",
+        "operationMinute": 829,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00061",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0030",
+        "minute": 829,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00062",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0030",
+        "operationMinute": 829,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00063",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0031",
+        "minute": 830,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00064",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0031",
+        "operationMinute": 830,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00065",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0032",
+        "minute": 830,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00066",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0032",
+        "operationMinute": 830,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00067",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0033",
+        "minute": 830,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00068",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0033",
+        "operationMinute": 830,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00069",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0034",
+        "minute": 831,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00070",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0034",
+        "operationMinute": 831,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00071",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0035",
+        "minute": 831,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00072",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0035",
+        "operationMinute": 831,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00073",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0036",
+        "minute": 831,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00074",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0036",
+        "operationMinute": 831,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00075",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0037",
+        "minute": 832,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00076",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0037",
+        "operationMinute": 832,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00077",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0038",
+        "minute": 832,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00078",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0038",
+        "operationMinute": 832,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00079",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0039",
+        "minute": 832,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00080",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0039",
+        "operationMinute": 832,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00081",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0040",
+        "minute": 833,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00082",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0040",
+        "operationMinute": 833,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00083",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0041",
+        "minute": 833,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00084",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0041",
+        "operationMinute": 833,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00085",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0042",
+        "minute": 833,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00086",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0042",
+        "operationMinute": 833,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00087",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0043",
+        "minute": 834,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00088",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0043",
+        "operationMinute": 834,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00089",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0044",
+        "minute": 834,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00090",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0044",
+        "operationMinute": 834,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00091",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0045",
+        "minute": 834,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00092",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0045",
+        "operationMinute": 834,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00093",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0046",
+        "minute": 835,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00094",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0046",
+        "operationMinute": 835,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00095",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0047",
+        "minute": 835,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00096",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0047",
+        "operationMinute": 835,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00097",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0048",
+        "minute": 835,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00098",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0048",
+        "operationMinute": 835,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00099",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0049",
+        "minute": 836,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00100",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0049",
+        "operationMinute": 836,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00101",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0050",
+        "minute": 836,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00102",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0050",
+        "operationMinute": 836,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00103",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0051",
+        "minute": 836,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00104",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0051",
+        "operationMinute": 836,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00105",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0052",
+        "minute": 837,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null,
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00106",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0052",
+        "operationMinute": 837,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00107",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0053",
+        "minute": 838,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "success",
+        "sessionId": "S-19",
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00108",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0053",
+        "operationMinute": 838,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00109",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0054",
+        "minute": 840,
+        "sourceAssetId": "vpn",
+        "accountId": "dispatch-team",
+        "outcome": "success",
+        "sessionId": "B-01",
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00110",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0054",
+        "operationMinute": 840,
+        "availableAtMinute": 840
+      }
+    },
+    {
+      "id": "TL-00111",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "observation",
+      "kind": "evidence-obtained",
+      "source": "vpn-detector",
+      "status": "available-to-player",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": "K-AL-VPN-AL-vpn-auth-magazyn-07",
+      "details": {
+        "kind": "vpn-alert",
+        "assertion": "signal"
+      }
+    },
+    {
+      "id": "TL-00112",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "observation",
+      "kind": "evidence-obtained",
+      "source": "Ewa",
+      "status": "available-to-player",
+      "commandOrdinal": null,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": "K-MSG-ewa-briefing",
+      "details": {
+        "kind": "narrative-message",
+        "assertion": "message"
+      }
+    },
+    {
+      "id": "TL-00113",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "command",
+      "kind": "decision-issued",
+      "source": "command-journal",
+      "status": "ordered",
+      "commandOrdinal": 1,
+      "decisionId": "D-00001",
+      "taskId": "T-0001",
+      "evidenceId": null,
+      "details": {
+        "type": "schedule-task",
+        "workerId": "administrator",
+        "action": {
+          "type": "set-vpn",
+          "assetId": "vpn",
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "TL-00114",
+      "at": {
+        "minute": 840,
+        "turn": 0
+      },
+      "phase": "command",
+      "kind": "task-started",
+      "source": "engine.history",
+      "status": "running",
+      "commandOrdinal": 1,
+      "decisionId": "D-00001",
+      "taskId": "T-0001",
+      "evidenceId": null,
+      "details": {
+        "kind": "task-started",
+        "task": {
+          "id": "T-0001",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-vpn",
+            "assetId": "vpn",
+            "enabled": false
+          },
+          "startTurn": 0,
+          "dueTurn": 1,
+          "status": "running"
+        },
+        "id": "E-0001",
+        "minute": 840
+      }
+    },
+    {
+      "id": "TL-00115",
+      "at": {
+        "minute": 845,
+        "turn": 1
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 2,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0002",
+        "minute": 845
+      }
+    },
+    {
+      "id": "TL-00116",
+      "at": {
+        "minute": 845,
+        "turn": 1
+      },
+      "phase": "task-completion",
+      "kind": "task-completed",
+      "source": "engine.history",
+      "status": "completed",
+      "commandOrdinal": 2,
+      "decisionId": "D-00001",
+      "taskId": "T-0001",
+      "evidenceId": null,
+      "details": {
+        "kind": "task-completed",
+        "task": {
+          "id": "T-0001",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-vpn",
+            "assetId": "vpn",
+            "enabled": false
+          },
+          "startTurn": 0,
+          "dueTurn": 1,
+          "status": "completed"
+        },
+        "id": "E-0003",
+        "minute": 845
+      }
+    },
+    {
+      "id": "TL-00117",
+      "at": {
+        "minute": 845,
+        "turn": 1
+      },
+      "phase": "task-completion",
+      "kind": "configuration-effective",
+      "source": "engine.history",
+      "status": "applied",
+      "commandOrdinal": 2,
+      "decisionId": "D-00001",
+      "taskId": "T-0001",
+      "evidenceId": null,
+      "details": {
+        "kind": "configuration-changed",
+        "task": {
+          "id": "T-0001",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-vpn",
+            "assetId": "vpn",
+            "enabled": false
+          },
+          "startTurn": 0,
+          "dueTurn": 1,
+          "status": "completed"
+        },
+        "id": "E-0004",
+        "minute": 845
+      }
+    },
+    {
+      "id": "TL-00118",
+      "at": {
+        "minute": 845,
+        "turn": 1
+      },
+      "phase": "observation",
+      "kind": "evidence-obtained",
+      "source": "Bartek",
+      "status": "available-to-player",
+      "commandOrdinal": 2,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": "K-MSG-msg-T-0001",
+      "details": {
+        "kind": "narrative-message",
+        "assertion": "message"
+      }
+    },
+    {
+      "id": "TL-00119",
+      "at": {
+        "minute": 845,
+        "turn": 1
+      },
+      "phase": "command",
+      "kind": "decision-issued",
+      "source": "command-journal",
+      "status": "ordered",
+      "commandOrdinal": 3,
+      "decisionId": "D-00003",
+      "taskId": "T-0002",
+      "evidenceId": null,
+      "details": {
+        "type": "schedule-task",
+        "workerId": "administrator",
+        "action": {
+          "type": "set-network-rule",
+          "ruleId": "R-SMB",
+          "action": "deny"
+        }
+      }
+    },
+    {
+      "id": "TL-00120",
+      "at": {
+        "minute": 845,
+        "turn": 1
+      },
+      "phase": "command",
+      "kind": "task-started",
+      "source": "engine.history",
+      "status": "running",
+      "commandOrdinal": 3,
+      "decisionId": "D-00003",
+      "taskId": "T-0002",
+      "evidenceId": null,
+      "details": {
+        "kind": "task-started",
+        "task": {
+          "id": "T-0002",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-network-rule",
+            "ruleId": "R-SMB",
+            "action": "deny"
+          },
+          "startTurn": 1,
+          "dueTurn": 3,
+          "status": "running"
+        },
+        "id": "E-0005",
+        "minute": 845
+      }
+    },
+    {
+      "id": "TL-00121",
+      "at": {
+        "minute": 850,
+        "turn": 2
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 4,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 2,
+          "received": 20,
+          "processed": 8,
+          "backlog": 12,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded"
+        },
+        "id": "E-0006",
+        "minute": 850
+      }
+    },
+    {
+      "id": "TL-00122",
+      "at": {
+        "minute": 850,
+        "turn": 2
+      },
+      "phase": "actor-resolution",
+      "kind": "vpn-actor-action",
+      "source": "private-attack-history",
+      "status": "session-lost",
+      "commandOrdinal": 4,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "A-0001",
+        "turn": 2,
+        "minute": 850,
+        "action": "reconnaissance",
+        "outcome": "session-lost",
+        "sessionId": "S-19",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      }
+    },
+    {
+      "id": "TL-00123",
+      "at": {
+        "minute": 850,
+        "turn": 2
+      },
+      "phase": "observation",
+      "kind": "evidence-obtained",
+      "source": "Ewa",
+      "status": "available-to-player",
+      "commandOrdinal": 4,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": "K-MSG-ewa-queue",
+      "details": {
+        "kind": "narrative-message",
+        "assertion": "message"
+      }
+    },
+    {
+      "id": "TL-00124",
+      "at": {
+        "minute": 855,
+        "turn": 3
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 5,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 3,
+          "received": 20,
+          "processed": 8,
+          "backlog": 24,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded"
+        },
+        "id": "E-0007",
+        "minute": 855
+      }
+    },
+    {
+      "id": "TL-00125",
+      "at": {
+        "minute": 855,
+        "turn": 3
+      },
+      "phase": "task-completion",
+      "kind": "task-completed",
+      "source": "engine.history",
+      "status": "completed",
+      "commandOrdinal": 5,
+      "decisionId": "D-00003",
+      "taskId": "T-0002",
+      "evidenceId": null,
+      "details": {
+        "kind": "task-completed",
+        "task": {
+          "id": "T-0002",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-network-rule",
+            "ruleId": "R-SMB",
+            "action": "deny"
+          },
+          "startTurn": 1,
+          "dueTurn": 3,
+          "status": "completed"
+        },
+        "id": "E-0008",
+        "minute": 855
+      }
+    },
+    {
+      "id": "TL-00126",
+      "at": {
+        "minute": 855,
+        "turn": 3
+      },
+      "phase": "task-completion",
+      "kind": "configuration-effective",
+      "source": "engine.history",
+      "status": "applied",
+      "commandOrdinal": 5,
+      "decisionId": "D-00003",
+      "taskId": "T-0002",
+      "evidenceId": null,
+      "details": {
+        "kind": "configuration-changed",
+        "task": {
+          "id": "T-0002",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-network-rule",
+            "ruleId": "R-SMB",
+            "action": "deny"
+          },
+          "startTurn": 1,
+          "dueTurn": 3,
+          "status": "completed"
+        },
+        "id": "E-0009",
+        "minute": 855
+      }
+    },
+    {
+      "id": "TL-00127",
+      "at": {
+        "minute": 855,
+        "turn": 3
+      },
+      "phase": "observation",
+      "kind": "evidence-obtained",
+      "source": "Bartek",
+      "status": "available-to-player",
+      "commandOrdinal": 5,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": "K-MSG-msg-T-0002",
+      "details": {
+        "kind": "narrative-message",
+        "assertion": "message"
+      }
+    },
+    {
+      "id": "TL-00128",
+      "at": {
+        "minute": 855,
+        "turn": 3
+      },
+      "phase": "command",
+      "kind": "decision-issued",
+      "source": "command-journal",
+      "status": "ordered",
+      "commandOrdinal": 6,
+      "decisionId": "D-00006",
+      "taskId": "T-0003",
+      "evidenceId": null,
+      "details": {
+        "type": "schedule-task",
+        "workerId": "administrator",
+        "action": {
+          "type": "set-vpn",
+          "assetId": "vpn",
+          "enabled": true
+        }
+      }
+    },
+    {
+      "id": "TL-00129",
+      "at": {
+        "minute": 855,
+        "turn": 3
+      },
+      "phase": "command",
+      "kind": "task-started",
+      "source": "engine.history",
+      "status": "running",
+      "commandOrdinal": 6,
+      "decisionId": "D-00006",
+      "taskId": "T-0003",
+      "evidenceId": null,
+      "details": {
+        "kind": "task-started",
+        "task": {
+          "id": "T-0003",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-vpn",
+            "assetId": "vpn",
+            "enabled": true
+          },
+          "startTurn": 3,
+          "dueTurn": 4,
+          "status": "running"
+        },
+        "id": "E-0010",
+        "minute": 855
+      }
+    },
+    {
+      "id": "TL-00130",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 4,
+          "received": 20,
+          "processed": 8,
+          "backlog": 36,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded"
+        },
+        "id": "E-0011",
+        "minute": 860
+      }
+    },
+    {
+      "id": "TL-00131",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "task-completion",
+      "kind": "task-completed",
+      "source": "engine.history",
+      "status": "completed",
+      "commandOrdinal": 7,
+      "decisionId": "D-00006",
+      "taskId": "T-0003",
+      "evidenceId": null,
+      "details": {
+        "kind": "task-completed",
+        "task": {
+          "id": "T-0003",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-vpn",
+            "assetId": "vpn",
+            "enabled": true
+          },
+          "startTurn": 3,
+          "dueTurn": 4,
+          "status": "completed"
+        },
+        "id": "E-0012",
+        "minute": 860
+      }
+    },
+    {
+      "id": "TL-00132",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "task-completion",
+      "kind": "configuration-effective",
+      "source": "engine.history",
+      "status": "applied",
+      "commandOrdinal": 7,
+      "decisionId": "D-00006",
+      "taskId": "T-0003",
+      "evidenceId": null,
+      "details": {
+        "kind": "configuration-changed",
+        "task": {
+          "id": "T-0003",
+          "workerId": "administrator",
+          "action": {
+            "type": "set-vpn",
+            "assetId": "vpn",
+            "enabled": true
+          },
+          "startTurn": 3,
+          "dueTurn": 4,
+          "status": "completed"
+        },
+        "id": "E-0013",
+        "minute": 860
+      }
+    },
+    {
+      "id": "TL-00133",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "actor-resolution",
+      "kind": "authentication",
+      "source": "authentication-service",
+      "status": "success",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0055",
+        "minute": 860,
+        "sourceAssetId": "vpn",
+        "accountId": "dispatch-team",
+        "outcome": "success",
+        "sessionId": "B-reconnect-04"
+      }
+    },
+    {
+      "id": "TL-00134",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "actor-resolution",
+      "kind": "authentication",
+      "source": "authentication-service",
+      "status": "success",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0056",
+        "minute": 860,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "success",
+        "sessionId": "S-20"
+      }
+    },
+    {
+      "id": "TL-00135",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "actor-resolution",
+      "kind": "vpn-actor-action",
+      "source": "private-attack-history",
+      "status": "authentication-accepted",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "A-0002",
+        "turn": 4,
+        "minute": 860,
+        "action": "authenticate",
+        "outcome": "authentication-accepted",
+        "sessionId": "S-20",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      }
+    },
+    {
+      "id": "TL-00136",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0055",
+        "minute": 860,
+        "sourceAssetId": "vpn",
+        "accountId": "dispatch-team",
+        "outcome": "success",
+        "sessionId": "B-reconnect-04",
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 860,
+        "availableAtMinute": 860
+      }
+    },
+    {
+      "id": "TL-00137",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0055",
+        "operationMinute": 860,
+        "availableAtMinute": 860
+      }
+    },
+    {
+      "id": "TL-00138",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "telemetry",
+      "kind": "sensor-captured",
+      "source": "authentication-sensor",
+      "status": "captured",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "AUTH-0056",
+        "minute": 860,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "success",
+        "sessionId": "S-20",
+        "sensorId": "vpn-auth",
+        "capturedAtMinute": 860,
+        "availableAtMinute": 860
+      }
+    },
+    {
+      "id": "TL-00139",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "telemetry",
+      "kind": "sensor-record-eligible",
+      "source": "authentication-sensor",
+      "status": "eligible-not-player-observation",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "recordId": "AUTH:AUTH-0056",
+        "operationMinute": 860,
+        "availableAtMinute": 860
+      }
+    },
+    {
+      "id": "TL-00140",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "observation",
+      "kind": "evidence-obtained",
+      "source": "Bartek",
+      "status": "available-to-player",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": "K-MSG-msg-T-0003",
+      "details": {
+        "kind": "narrative-message",
+        "assertion": "message"
+      }
+    },
+    {
+      "id": "TL-00141",
+      "at": {
+        "minute": 860,
+        "turn": 4
+      },
+      "phase": "observation",
+      "kind": "evidence-obtained",
+      "source": "Ewa",
+      "status": "available-to-player",
+      "commandOrdinal": 7,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": "K-MSG-ewa-restored",
+      "details": {
+        "kind": "narrative-message",
+        "assertion": "message"
+      }
+    },
+    {
+      "id": "TL-00142",
+      "at": {
+        "minute": 865,
+        "turn": 5
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 8,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 5,
+          "received": 20,
+          "processed": 22,
+          "backlog": 34,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0014",
+        "minute": 865
+      }
+    },
+    {
+      "id": "TL-00143",
+      "at": {
+        "minute": 865,
+        "turn": 5
+      },
+      "phase": "actor-resolution",
+      "kind": "vpn-actor-action",
+      "source": "private-attack-history",
+      "status": "access-denied",
+      "commandOrdinal": 8,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "A-0003",
+        "turn": 5,
+        "minute": 865,
+        "action": "reconnaissance",
+        "outcome": "access-denied",
+        "sessionId": "S-20",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      }
+    },
+    {
+      "id": "TL-00144",
+      "at": {
+        "minute": 870,
+        "turn": 6
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 9,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 6,
+          "received": 20,
+          "processed": 22,
+          "backlog": 32,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0015",
+        "minute": 870
+      }
+    },
+    {
+      "id": "TL-00145",
+      "at": {
+        "minute": 875,
+        "turn": 7
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 10,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 7,
+          "received": 20,
+          "processed": 22,
+          "backlog": 30,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0016",
+        "minute": 875
+      }
+    },
+    {
+      "id": "TL-00146",
+      "at": {
+        "minute": 875,
+        "turn": 7
+      },
+      "phase": "actor-resolution",
+      "kind": "vpn-actor-action",
+      "source": "private-attack-history",
+      "status": "access-denied",
+      "commandOrdinal": 10,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "A-0004",
+        "turn": 7,
+        "minute": 875,
+        "action": "reconnaissance",
+        "outcome": "access-denied",
+        "sessionId": "S-20",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      }
+    },
+    {
+      "id": "TL-00147",
+      "at": {
+        "minute": 880,
+        "turn": 8
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 11,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 8,
+          "received": 20,
+          "processed": 22,
+          "backlog": 28,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0017",
+        "minute": 880
+      }
+    },
+    {
+      "id": "TL-00148",
+      "at": {
+        "minute": 885,
+        "turn": 9
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 12,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 9,
+          "received": 20,
+          "processed": 22,
+          "backlog": 26,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0018",
+        "minute": 885
+      }
+    },
+    {
+      "id": "TL-00149",
+      "at": {
+        "minute": 885,
+        "turn": 9
+      },
+      "phase": "actor-resolution",
+      "kind": "vpn-actor-action",
+      "source": "private-attack-history",
+      "status": "access-denied",
+      "commandOrdinal": 12,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "id": "A-0005",
+        "turn": 9,
+        "minute": 885,
+        "action": "reconnaissance",
+        "outcome": "access-denied",
+        "sessionId": "S-20",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      }
+    },
+    {
+      "id": "TL-00150",
+      "at": {
+        "minute": 890,
+        "turn": 10
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 13,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 10,
+          "received": 20,
+          "processed": 22,
+          "backlog": 24,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0019",
+        "minute": 890
+      }
+    },
+    {
+      "id": "TL-00151",
+      "at": {
+        "minute": 895,
+        "turn": 11
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 14,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 11,
+          "received": 20,
+          "processed": 22,
+          "backlog": 22,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0020",
+        "minute": 895
+      }
+    },
+    {
+      "id": "TL-00152",
+      "at": {
+        "minute": 900,
+        "turn": 12
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 15,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 12,
+          "received": 20,
+          "processed": 22,
+          "backlog": 20,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0021",
+        "minute": 900
+      }
+    },
+    {
+      "id": "TL-00153",
+      "at": {
+        "minute": 905,
+        "turn": 13
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 16,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 13,
+          "received": 20,
+          "processed": 22,
+          "backlog": 18,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0022",
+        "minute": 905
+      }
+    },
+    {
+      "id": "TL-00154",
+      "at": {
+        "minute": 910,
+        "turn": 14
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 17,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 14,
+          "received": 20,
+          "processed": 22,
+          "backlog": 16,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0023",
+        "minute": 910
+      }
+    },
+    {
+      "id": "TL-00155",
+      "at": {
+        "minute": 915,
+        "turn": 15
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 18,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 15,
+          "received": 20,
+          "processed": 22,
+          "backlog": 14,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0024",
+        "minute": 915
+      }
+    },
+    {
+      "id": "TL-00156",
+      "at": {
+        "minute": 920,
+        "turn": 16
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 19,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 16,
+          "received": 20,
+          "processed": 22,
+          "backlog": 12,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0025",
+        "minute": 920
+      }
+    },
+    {
+      "id": "TL-00157",
+      "at": {
+        "minute": 925,
+        "turn": 17
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 20,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 17,
+          "received": 20,
+          "processed": 22,
+          "backlog": 10,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0026",
+        "minute": 925
+      }
+    },
+    {
+      "id": "TL-00158",
+      "at": {
+        "minute": 930,
+        "turn": 18
+      },
+      "phase": "interval-settlement",
+      "kind": "business-report",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 21,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "kind": "business-report",
+        "report": {
+          "turn": 18,
+          "received": 20,
+          "processed": 22,
+          "backlog": 8,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        "id": "E-0027",
+        "minute": 930
+      }
+    },
+    {
+      "id": "TL-00159",
+      "at": {
+        "minute": 930,
+        "turn": 18
+      },
+      "phase": "finish",
+      "kind": "simulation-finished",
+      "source": "engine.history",
+      "status": "recorded",
+      "commandOrdinal": 21,
+      "decisionId": null,
+      "taskId": null,
+      "evidenceId": null,
+      "details": {
+        "sourceEventId": "E-0028",
+        "businessGoalMet": true
+      }
+    }
+  ],
+  "knownEvidence": [
+    {
+      "id": "K-AL-VPN-AL-vpn-auth-magazyn-07",
+      "kind": "vpn-alert",
+      "source": "vpn-detector",
+      "obtainedAt": {
+        "minute": 840,
+        "turn": 0
+      },
+      "obtainedByCommand": 0,
+      "taskId": null,
+      "assertion": "signal",
+      "details": {
+        "id": "AL-vpn-auth-magazyn-07",
+        "minute": 840,
+        "ruleId": "vpn-auth-failures",
+        "sensorId": "vpn-auth",
+        "accountId": "magazyn-07",
+        "windowStartMinute": 820,
+        "windowEndMinute": 840,
+        "failureCount": 52,
+        "assessment": "requires-investigation"
+      }
+    },
+    {
+      "id": "K-MSG-ewa-briefing",
+      "kind": "narrative-message",
+      "source": "Ewa",
+      "obtainedAt": {
+        "minute": 840,
+        "turn": 0
+      },
+      "obtainedByCommand": 0,
+      "taskId": null,
+      "assertion": "message",
+      "details": {
+        "id": "ewa-briefing",
+        "minute": 840,
+        "speaker": "Ewa",
+        "text": "Do 15:30 musimy zamknąć wysyłki. Zdalni dyspozytorzy potrzebują ERP. Mamy sygnał nietypowych logowań VPN. Ustal, co się dzieje, i zabezpiecz dane. Jeśli odetniesz ludzi, potrzebuję planu przywrócenia pracy.",
+        "source": "briefing",
+        "referenceId": "mission-briefing"
+      }
+    },
+    {
+      "id": "K-MSG-msg-T-0001",
+      "kind": "narrative-message",
+      "source": "Bartek",
+      "obtainedAt": {
+        "minute": 845,
+        "turn": 1
+      },
+      "obtainedByCommand": 2,
+      "taskId": null,
+      "assertion": "message",
+      "details": {
+        "id": "msg-T-0001",
+        "speaker": "Bartek",
+        "text": "Wyłączyłem VPN i zakończyłem aktywne tunele. Zdalni dyspozytorzy utracili dostęp.",
+        "source": "configuration",
+        "referenceId": "T-0001",
+        "minute": 845
+      }
+    },
+    {
+      "id": "K-MSG-ewa-queue",
+      "kind": "narrative-message",
+      "source": "Ewa",
+      "obtainedAt": {
+        "minute": 850,
+        "turn": 2
+      },
+      "obtainedByCommand": 4,
+      "taskId": null,
+      "assertion": "message",
+      "details": {
+        "id": "ewa-queue",
+        "speaker": "Ewa",
+        "text": "Zdalni dyspozytorzy nie mogą pracować w ERP. Kolejka rośnie. Potrzebujemy planu przywrócenia dostępu.",
+        "source": "business",
+        "referenceId": "E-0006",
+        "minute": 850
+      }
+    },
+    {
+      "id": "K-MSG-msg-T-0002",
+      "kind": "narrative-message",
+      "source": "Bartek",
+      "obtainedAt": {
+        "minute": 855,
+        "turn": 3
+      },
+      "obtainedByCommand": 5,
+      "taskId": null,
+      "assertion": "message",
+      "details": {
+        "id": "msg-T-0002",
+        "speaker": "Bartek",
+        "text": "Reguła R-SMB ma teraz decyzję DENY. Potwierdzam zmianę konfiguracji, nie wynik incydentu.",
+        "source": "configuration",
+        "referenceId": "T-0002",
+        "minute": 855
+      }
+    },
+    {
+      "id": "K-MSG-msg-T-0003",
+      "kind": "narrative-message",
+      "source": "Bartek",
+      "obtainedAt": {
+        "minute": 860,
+        "turn": 4
+      },
+      "obtainedByCommand": 7,
+      "taskId": null,
+      "assertion": "message",
+      "details": {
+        "id": "msg-T-0003",
+        "speaker": "Bartek",
+        "text": "Brama VPN jest ponownie dostępna. Zakończone tunele nie zostały przywrócone.",
+        "source": "configuration",
+        "referenceId": "T-0003",
+        "minute": 860
+      }
+    },
+    {
+      "id": "K-MSG-ewa-restored",
+      "kind": "narrative-message",
+      "source": "Ewa",
+      "obtainedAt": {
+        "minute": 860,
+        "turn": 4
+      },
+      "obtainedByCommand": 7,
+      "taskId": null,
+      "assertion": "message",
+      "details": {
+        "id": "ewa-restored",
+        "speaker": "Ewa",
+        "text": "Zdalna obsługa ERP wróciła. Zespół może stopniowo nadrabiać kolejkę.",
+        "source": "business",
+        "referenceId": "remote-restored",
+        "minute": 860
+      }
+    }
+  ],
+  "playerDecisions": [
+    {
+      "id": "D-00001",
+      "commandOrdinal": 1,
+      "issuedAt": {
+        "minute": 840,
+        "turn": 0
+      },
+      "completedAt": {
+        "minute": 845,
+        "turn": 1
+      },
+      "workerId": "administrator",
+      "action": {
+        "type": "set-vpn",
+        "assetId": "vpn",
+        "enabled": false
+      },
+      "target": {
+        "kind": "asset",
+        "id": "vpn",
+        "resourceIds": [
+          "vpn"
+        ],
+        "flow": null
+      },
+      "taskId": "T-0001",
+      "status": "completed",
+      "rejection": null,
+      "knownAtDecision": {
+        "asOfCommand": 1,
+        "at": {
+          "minute": 840,
+          "turn": 0
+        },
+        "evidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing"
+        ],
+        "alertIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07"
+        ],
+        "knownSessionIds": [],
+        "sessions": null,
+        "hypotheses": {
+          "vpn": "insufficient-evidence",
+          "integrity": null
+        },
+        "configuration": {
+          "assets": [
+            {
+              "id": "internet",
+              "name": "Internet",
+              "status": "online"
+            },
+            {
+              "id": "firewall",
+              "name": "Firewall",
+              "status": "online"
+            },
+            {
+              "id": "vpn",
+              "name": "VPN Gateway",
+              "status": "online"
+            },
+            {
+              "id": "ad",
+              "name": "Active Directory",
+              "status": "online"
+            },
+            {
+              "id": "web",
+              "name": "Portal WWW",
+              "status": "online"
+            },
+            {
+              "id": "erp",
+              "name": "ERP Server",
+              "status": "online"
+            },
+            {
+              "id": "workstations",
+              "name": "Workstations",
+              "status": "online"
+            },
+            {
+              "id": "m365",
+              "name": "Microsoft 365",
+              "status": "online"
+            },
+            {
+              "id": "fs-01",
+              "name": "File Server FS-01",
+              "status": "online"
+            }
+          ],
+          "networkRules": [
+            {
+              "id": "R-ERP",
+              "sourceAssetId": "vpn",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "priority": 10,
+              "action": "allow"
+            },
+            {
+              "id": "R-SMB",
+              "sourceAssetId": "vpn",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "priority": 20,
+              "action": "allow"
+            },
+            {
+              "id": "R-LOCAL",
+              "sourceAssetId": "workstations",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "priority": 30,
+              "action": "allow"
+            }
+          ],
+          "knownAccounts": [
+            {
+              "id": "magazyn-07",
+              "blocked": false
+            }
+          ],
+          "sensors": {
+            "authentication": {
+              "id": "vpn-auth",
+              "sourceAssetId": "vpn",
+              "enabled": true,
+              "coverageFromMinute": 810,
+              "retentionMinutes": 120,
+              "delayMinutes": 0
+            },
+            "sessions": {
+              "id": "vpn-active-sessions",
+              "sourceAssetId": "vpn",
+              "enabled": true,
+              "retentionMinutes": 0,
+              "delayMinutes": 0
+            },
+            "file": null,
+            "endpoint": null
+          },
+          "endpoint": null,
+          "backupReadiness": null
+        },
+        "business": {
+          "totalReceived": 0,
+          "totalProcessed": 0,
+          "backlog": 0,
+          "lastReport": null
+        },
+        "pendingTasks": [],
+        "sourceLimitations": [
+          "Alert jest sygnałem do zbadania, nie identyfikacją sprawcy.",
+          "Brak rekordu nie oznacza braku zdarzenia: obowiązują pokrycie, dostępność, opóźnienie i retencja źródła.",
+          "Obserwacja jest migawką z czasu pobrania; nie aktualizuje się po kolejnych zmianach."
+        ],
+        "unknowns": [
+          "Nie pobrano migawki sesji VPN.",
+          "Nie pozyskano logów uwierzytelnienia.",
+          "Tożsamość człowieka za kontem oraz prywatny plan zagrożenia nie są wiedzą gracza."
+        ]
+      },
+      "actualStateAtDecision": {
+        "threatAccess": {
+          "applicable": true,
+          "activeSessionIds": [
+            "S-19"
+          ],
+          "usableSessionIds": [
+            "S-19"
+          ],
+          "stolenCredentialStillCurrent": true,
+          "newAuthenticationAllowed": true,
+          "accessAfterNewAuthentication": true,
+          "targetAccessCutOff": false,
+          "accountContained": false
+        },
+        "accounts": [
+          {
+            "id": "magazyn-07",
+            "identityId": "marta",
+            "loginStatus": "enabled",
+            "credentialVersion": 1,
+            "mfaPolicy": "not-required"
+          },
+          {
+            "id": "dispatch-team",
+            "identityId": "dispatchers",
+            "loginStatus": "enabled",
+            "credentialVersion": 1,
+            "mfaPolicy": "not-required"
+          }
+        ],
+        "sessions": [
+          {
+            "id": "S-19",
+            "accountId": "magazyn-07",
+            "gatewayAssetId": "vpn",
+            "status": "active",
+            "startedAtMinute": 838,
+            "expiresAtMinute": 960,
+            "origin": "unauthorized"
+          },
+          {
+            "id": "B-01",
+            "accountId": "dispatch-team",
+            "gatewayAssetId": "vpn",
+            "status": "active",
+            "startedAtMinute": 840,
+            "expiresAtMinute": 960,
+            "origin": "legitimate"
+          }
+        ],
+        "serviceAccess": [
+          {
+            "sessionId": "S-19",
+            "targetAssetId": "erp",
+            "protocol": "HTTPS",
+            "allowed": false
+          },
+          {
+            "sessionId": "S-19",
+            "targetAssetId": "fs-01",
+            "protocol": "SMB",
+            "allowed": true
+          },
+          {
+            "sessionId": "B-01",
+            "targetAssetId": "erp",
+            "protocol": "HTTPS",
+            "allowed": true
+          },
+          {
+            "sessionId": "B-01",
+            "targetAssetId": "fs-01",
+            "protocol": "SMB",
+            "allowed": false
+          }
+        ],
+        "exposedRecords": 0,
+        "endpoint": null,
+        "documents": null,
+        "availability": {
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        }
+      },
+      "expectedEffect": null,
+      "intentRecorded": false,
+      "actualEffect": {
+        "scope": "completion-boundary-including-concurrent-events",
+        "boundaryState": {
+          "threatAccess": {
+            "applicable": true,
+            "activeSessionIds": [],
+            "usableSessionIds": [],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": false,
+            "accessAfterNewAuthentication": false,
+            "targetAccessCutOff": true,
+            "accountContained": false
+          },
+          "accounts": [
+            {
+              "id": "magazyn-07",
+              "identityId": "marta",
+              "loginStatus": "enabled",
+              "credentialVersion": 1,
+              "mfaPolicy": "not-required"
+            },
+            {
+              "id": "dispatch-team",
+              "identityId": "dispatchers",
+              "loginStatus": "enabled",
+              "credentialVersion": 1,
+              "mfaPolicy": "not-required"
+            }
+          ],
+          "sessions": [
+            {
+              "id": "S-19",
+              "accountId": "magazyn-07",
+              "gatewayAssetId": "vpn",
+              "status": "terminated",
+              "startedAtMinute": 838,
+              "expiresAtMinute": 960,
+              "origin": "unauthorized"
+            },
+            {
+              "id": "B-01",
+              "accountId": "dispatch-team",
+              "gatewayAssetId": "vpn",
+              "status": "terminated",
+              "startedAtMinute": 840,
+              "expiresAtMinute": 960,
+              "origin": "legitimate"
+            }
+          ],
+          "serviceAccess": [
+            {
+              "sessionId": "S-19",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "allowed": false
+            },
+            {
+              "sessionId": "S-19",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "allowed": false
+            },
+            {
+              "sessionId": "B-01",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "allowed": false
+            },
+            {
+              "sessionId": "B-01",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "allowed": false
+            }
+          ],
+          "exposedRecords": 0,
+          "endpoint": null,
+          "documents": null,
+          "availability": {
+            "localAvailable": true,
+            "remoteAvailable": false,
+            "capacity": 8,
+            "status": "degraded"
+          }
+        },
+        "immediateAccessImpact": {
+          "threatAccessBefore": {
+            "applicable": true,
+            "activeSessionIds": [
+              "S-19"
+            ],
+            "usableSessionIds": [
+              "S-19"
+            ],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": true,
+            "accessAfterNewAuthentication": true,
+            "targetAccessCutOff": false,
+            "accountContained": false
+          },
+          "threatAccessAfter": {
+            "applicable": true,
+            "activeSessionIds": [],
+            "usableSessionIds": [],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": false,
+            "accessAfterNewAuthentication": false,
+            "targetAccessCutOff": true,
+            "accountContained": false
+          },
+          "totalCapacityBefore": 22,
+          "totalCapacityAfter": 8,
+          "exposedRecordsAtCompletion": 0,
+          "changedCapabilities": true
+        },
+        "eventIds": [
+          "TL-00115",
+          "TL-00116",
+          "TL-00117",
+          "TL-00118"
+        ]
+      },
+      "subsequentConsequences": {
+        "afterEventId": "TL-00113",
+        "throughEventId": "TL-00159",
+        "includesOtherCauses": true,
+        "finalSecurityRef": "securityConsequences",
+        "finalBusinessRef": "businessConsequences"
+      }
+    },
+    {
+      "id": "D-00003",
+      "commandOrdinal": 3,
+      "issuedAt": {
+        "minute": 845,
+        "turn": 1
+      },
+      "completedAt": {
+        "minute": 855,
+        "turn": 3
+      },
+      "workerId": "administrator",
+      "action": {
+        "type": "set-network-rule",
+        "ruleId": "R-SMB",
+        "action": "deny"
+      },
+      "target": {
+        "kind": "network-rule",
+        "id": "R-SMB",
+        "resourceIds": [
+          "vpn",
+          "fs-01"
+        ],
+        "flow": {
+          "id": "R-SMB",
+          "sourceAssetId": "vpn",
+          "targetAssetId": "fs-01",
+          "protocol": "SMB",
+          "priority": 20,
+          "action": "allow"
+        }
+      },
+      "taskId": "T-0002",
+      "status": "completed",
+      "rejection": null,
+      "knownAtDecision": {
+        "asOfCommand": 3,
+        "at": {
+          "minute": 845,
+          "turn": 1
+        },
+        "evidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing",
+          "K-MSG-msg-T-0001"
+        ],
+        "alertIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07"
+        ],
+        "knownSessionIds": [],
+        "sessions": null,
+        "hypotheses": {
+          "vpn": "insufficient-evidence",
+          "integrity": null
+        },
+        "configuration": {
+          "assets": [
+            {
+              "id": "internet",
+              "name": "Internet",
+              "status": "online"
+            },
+            {
+              "id": "firewall",
+              "name": "Firewall",
+              "status": "online"
+            },
+            {
+              "id": "vpn",
+              "name": "VPN Gateway",
+              "status": "offline"
+            },
+            {
+              "id": "ad",
+              "name": "Active Directory",
+              "status": "online"
+            },
+            {
+              "id": "web",
+              "name": "Portal WWW",
+              "status": "online"
+            },
+            {
+              "id": "erp",
+              "name": "ERP Server",
+              "status": "online"
+            },
+            {
+              "id": "workstations",
+              "name": "Workstations",
+              "status": "online"
+            },
+            {
+              "id": "m365",
+              "name": "Microsoft 365",
+              "status": "online"
+            },
+            {
+              "id": "fs-01",
+              "name": "File Server FS-01",
+              "status": "online"
+            }
+          ],
+          "networkRules": [
+            {
+              "id": "R-ERP",
+              "sourceAssetId": "vpn",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "priority": 10,
+              "action": "allow"
+            },
+            {
+              "id": "R-SMB",
+              "sourceAssetId": "vpn",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "priority": 20,
+              "action": "allow"
+            },
+            {
+              "id": "R-LOCAL",
+              "sourceAssetId": "workstations",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "priority": 30,
+              "action": "allow"
+            }
+          ],
+          "knownAccounts": [
+            {
+              "id": "magazyn-07",
+              "blocked": false
+            }
+          ],
+          "sensors": {
+            "authentication": {
+              "id": "vpn-auth",
+              "sourceAssetId": "vpn",
+              "enabled": true,
+              "coverageFromMinute": 810,
+              "retentionMinutes": 120,
+              "delayMinutes": 0
+            },
+            "sessions": {
+              "id": "vpn-active-sessions",
+              "sourceAssetId": "vpn",
+              "enabled": true,
+              "retentionMinutes": 0,
+              "delayMinutes": 0
+            },
+            "file": null,
+            "endpoint": null
+          },
+          "endpoint": null,
+          "backupReadiness": null
+        },
+        "business": {
+          "totalReceived": 20,
+          "totalProcessed": 20,
+          "backlog": 0,
+          "lastReport": {
+            "turn": 1,
+            "received": 20,
+            "processed": 20,
+            "backlog": 0,
+            "localAvailable": true,
+            "remoteAvailable": true,
+            "capacity": 22,
+            "status": "available"
+          }
+        },
+        "pendingTasks": [],
+        "sourceLimitations": [
+          "Alert jest sygnałem do zbadania, nie identyfikacją sprawcy.",
+          "Brak rekordu nie oznacza braku zdarzenia: obowiązują pokrycie, dostępność, opóźnienie i retencja źródła.",
+          "Obserwacja jest migawką z czasu pobrania; nie aktualizuje się po kolejnych zmianach."
+        ],
+        "unknowns": [
+          "Nie pobrano migawki sesji VPN.",
+          "Nie pozyskano logów uwierzytelnienia.",
+          "Tożsamość człowieka za kontem oraz prywatny plan zagrożenia nie są wiedzą gracza."
+        ]
+      },
+      "actualStateAtDecision": {
+        "threatAccess": {
+          "applicable": true,
+          "activeSessionIds": [],
+          "usableSessionIds": [],
+          "stolenCredentialStillCurrent": true,
+          "newAuthenticationAllowed": false,
+          "accessAfterNewAuthentication": false,
+          "targetAccessCutOff": true,
+          "accountContained": false
+        },
+        "accounts": [
+          {
+            "id": "magazyn-07",
+            "identityId": "marta",
+            "loginStatus": "enabled",
+            "credentialVersion": 1,
+            "mfaPolicy": "not-required"
+          },
+          {
+            "id": "dispatch-team",
+            "identityId": "dispatchers",
+            "loginStatus": "enabled",
+            "credentialVersion": 1,
+            "mfaPolicy": "not-required"
+          }
+        ],
+        "sessions": [
+          {
+            "id": "S-19",
+            "accountId": "magazyn-07",
+            "gatewayAssetId": "vpn",
+            "status": "terminated",
+            "startedAtMinute": 838,
+            "expiresAtMinute": 960,
+            "origin": "unauthorized"
+          },
+          {
+            "id": "B-01",
+            "accountId": "dispatch-team",
+            "gatewayAssetId": "vpn",
+            "status": "terminated",
+            "startedAtMinute": 840,
+            "expiresAtMinute": 960,
+            "origin": "legitimate"
+          }
+        ],
+        "serviceAccess": [
+          {
+            "sessionId": "S-19",
+            "targetAssetId": "erp",
+            "protocol": "HTTPS",
+            "allowed": false
+          },
+          {
+            "sessionId": "S-19",
+            "targetAssetId": "fs-01",
+            "protocol": "SMB",
+            "allowed": false
+          },
+          {
+            "sessionId": "B-01",
+            "targetAssetId": "erp",
+            "protocol": "HTTPS",
+            "allowed": false
+          },
+          {
+            "sessionId": "B-01",
+            "targetAssetId": "fs-01",
+            "protocol": "SMB",
+            "allowed": false
+          }
+        ],
+        "exposedRecords": 0,
+        "endpoint": null,
+        "documents": null,
+        "availability": {
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded"
+        }
+      },
+      "expectedEffect": null,
+      "intentRecorded": false,
+      "actualEffect": {
+        "scope": "completion-boundary-including-concurrent-events",
+        "boundaryState": {
+          "threatAccess": {
+            "applicable": true,
+            "activeSessionIds": [],
+            "usableSessionIds": [],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": false,
+            "accessAfterNewAuthentication": false,
+            "targetAccessCutOff": true,
+            "accountContained": false
+          },
+          "accounts": [
+            {
+              "id": "magazyn-07",
+              "identityId": "marta",
+              "loginStatus": "enabled",
+              "credentialVersion": 1,
+              "mfaPolicy": "not-required"
+            },
+            {
+              "id": "dispatch-team",
+              "identityId": "dispatchers",
+              "loginStatus": "enabled",
+              "credentialVersion": 1,
+              "mfaPolicy": "not-required"
+            }
+          ],
+          "sessions": [
+            {
+              "id": "S-19",
+              "accountId": "magazyn-07",
+              "gatewayAssetId": "vpn",
+              "status": "terminated",
+              "startedAtMinute": 838,
+              "expiresAtMinute": 960,
+              "origin": "unauthorized"
+            },
+            {
+              "id": "B-01",
+              "accountId": "dispatch-team",
+              "gatewayAssetId": "vpn",
+              "status": "terminated",
+              "startedAtMinute": 840,
+              "expiresAtMinute": 960,
+              "origin": "legitimate"
+            }
+          ],
+          "serviceAccess": [
+            {
+              "sessionId": "S-19",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "allowed": false
+            },
+            {
+              "sessionId": "S-19",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "allowed": false
+            },
+            {
+              "sessionId": "B-01",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "allowed": false
+            },
+            {
+              "sessionId": "B-01",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "allowed": false
+            }
+          ],
+          "exposedRecords": 0,
+          "endpoint": null,
+          "documents": null,
+          "availability": {
+            "localAvailable": true,
+            "remoteAvailable": false,
+            "capacity": 8,
+            "status": "degraded"
+          }
+        },
+        "immediateAccessImpact": {
+          "threatAccessBefore": {
+            "applicable": true,
+            "activeSessionIds": [],
+            "usableSessionIds": [],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": false,
+            "accessAfterNewAuthentication": false,
+            "targetAccessCutOff": true,
+            "accountContained": false
+          },
+          "threatAccessAfter": {
+            "applicable": true,
+            "activeSessionIds": [],
+            "usableSessionIds": [],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": false,
+            "accessAfterNewAuthentication": false,
+            "targetAccessCutOff": true,
+            "accountContained": false
+          },
+          "totalCapacityBefore": 8,
+          "totalCapacityAfter": 8,
+          "exposedRecordsAtCompletion": 0,
+          "changedCapabilities": false
+        },
+        "eventIds": [
+          "TL-00124",
+          "TL-00125",
+          "TL-00126",
+          "TL-00127"
+        ]
+      },
+      "subsequentConsequences": {
+        "afterEventId": "TL-00119",
+        "throughEventId": "TL-00159",
+        "includesOtherCauses": true,
+        "finalSecurityRef": "securityConsequences",
+        "finalBusinessRef": "businessConsequences"
+      }
+    },
+    {
+      "id": "D-00006",
+      "commandOrdinal": 6,
+      "issuedAt": {
+        "minute": 855,
+        "turn": 3
+      },
+      "completedAt": {
+        "minute": 860,
+        "turn": 4
+      },
+      "workerId": "administrator",
+      "action": {
+        "type": "set-vpn",
+        "assetId": "vpn",
+        "enabled": true
+      },
+      "target": {
+        "kind": "asset",
+        "id": "vpn",
+        "resourceIds": [
+          "vpn"
+        ],
+        "flow": null
+      },
+      "taskId": "T-0003",
+      "status": "completed",
+      "rejection": null,
+      "knownAtDecision": {
+        "asOfCommand": 6,
+        "at": {
+          "minute": 855,
+          "turn": 3
+        },
+        "evidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing",
+          "K-MSG-msg-T-0001",
+          "K-MSG-ewa-queue",
+          "K-MSG-msg-T-0002"
+        ],
+        "alertIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07"
+        ],
+        "knownSessionIds": [],
+        "sessions": null,
+        "hypotheses": {
+          "vpn": "insufficient-evidence",
+          "integrity": null
+        },
+        "configuration": {
+          "assets": [
+            {
+              "id": "internet",
+              "name": "Internet",
+              "status": "online"
+            },
+            {
+              "id": "firewall",
+              "name": "Firewall",
+              "status": "online"
+            },
+            {
+              "id": "vpn",
+              "name": "VPN Gateway",
+              "status": "offline"
+            },
+            {
+              "id": "ad",
+              "name": "Active Directory",
+              "status": "online"
+            },
+            {
+              "id": "web",
+              "name": "Portal WWW",
+              "status": "online"
+            },
+            {
+              "id": "erp",
+              "name": "ERP Server",
+              "status": "online"
+            },
+            {
+              "id": "workstations",
+              "name": "Workstations",
+              "status": "online"
+            },
+            {
+              "id": "m365",
+              "name": "Microsoft 365",
+              "status": "online"
+            },
+            {
+              "id": "fs-01",
+              "name": "File Server FS-01",
+              "status": "online"
+            }
+          ],
+          "networkRules": [
+            {
+              "id": "R-ERP",
+              "sourceAssetId": "vpn",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "priority": 10,
+              "action": "allow"
+            },
+            {
+              "id": "R-SMB",
+              "sourceAssetId": "vpn",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "priority": 20,
+              "action": "deny"
+            },
+            {
+              "id": "R-LOCAL",
+              "sourceAssetId": "workstations",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "priority": 30,
+              "action": "allow"
+            }
+          ],
+          "knownAccounts": [
+            {
+              "id": "magazyn-07",
+              "blocked": false
+            }
+          ],
+          "sensors": {
+            "authentication": {
+              "id": "vpn-auth",
+              "sourceAssetId": "vpn",
+              "enabled": true,
+              "coverageFromMinute": 810,
+              "retentionMinutes": 120,
+              "delayMinutes": 0
+            },
+            "sessions": {
+              "id": "vpn-active-sessions",
+              "sourceAssetId": "vpn",
+              "enabled": true,
+              "retentionMinutes": 0,
+              "delayMinutes": 0
+            },
+            "file": null,
+            "endpoint": null
+          },
+          "endpoint": null,
+          "backupReadiness": null
+        },
+        "business": {
+          "totalReceived": 60,
+          "totalProcessed": 36,
+          "backlog": 24,
+          "lastReport": {
+            "turn": 3,
+            "received": 20,
+            "processed": 8,
+            "backlog": 24,
+            "localAvailable": true,
+            "remoteAvailable": false,
+            "capacity": 8,
+            "status": "degraded"
+          }
+        },
+        "pendingTasks": [],
+        "sourceLimitations": [
+          "Alert jest sygnałem do zbadania, nie identyfikacją sprawcy.",
+          "Brak rekordu nie oznacza braku zdarzenia: obowiązują pokrycie, dostępność, opóźnienie i retencja źródła.",
+          "Obserwacja jest migawką z czasu pobrania; nie aktualizuje się po kolejnych zmianach."
+        ],
+        "unknowns": [
+          "Nie pobrano migawki sesji VPN.",
+          "Nie pozyskano logów uwierzytelnienia.",
+          "Tożsamość człowieka za kontem oraz prywatny plan zagrożenia nie są wiedzą gracza."
+        ]
+      },
+      "actualStateAtDecision": {
+        "threatAccess": {
+          "applicable": true,
+          "activeSessionIds": [],
+          "usableSessionIds": [],
+          "stolenCredentialStillCurrent": true,
+          "newAuthenticationAllowed": false,
+          "accessAfterNewAuthentication": false,
+          "targetAccessCutOff": true,
+          "accountContained": false
+        },
+        "accounts": [
+          {
+            "id": "magazyn-07",
+            "identityId": "marta",
+            "loginStatus": "enabled",
+            "credentialVersion": 1,
+            "mfaPolicy": "not-required"
+          },
+          {
+            "id": "dispatch-team",
+            "identityId": "dispatchers",
+            "loginStatus": "enabled",
+            "credentialVersion": 1,
+            "mfaPolicy": "not-required"
+          }
+        ],
+        "sessions": [
+          {
+            "id": "S-19",
+            "accountId": "magazyn-07",
+            "gatewayAssetId": "vpn",
+            "status": "terminated",
+            "startedAtMinute": 838,
+            "expiresAtMinute": 960,
+            "origin": "unauthorized"
+          },
+          {
+            "id": "B-01",
+            "accountId": "dispatch-team",
+            "gatewayAssetId": "vpn",
+            "status": "terminated",
+            "startedAtMinute": 840,
+            "expiresAtMinute": 960,
+            "origin": "legitimate"
+          }
+        ],
+        "serviceAccess": [
+          {
+            "sessionId": "S-19",
+            "targetAssetId": "erp",
+            "protocol": "HTTPS",
+            "allowed": false
+          },
+          {
+            "sessionId": "S-19",
+            "targetAssetId": "fs-01",
+            "protocol": "SMB",
+            "allowed": false
+          },
+          {
+            "sessionId": "B-01",
+            "targetAssetId": "erp",
+            "protocol": "HTTPS",
+            "allowed": false
+          },
+          {
+            "sessionId": "B-01",
+            "targetAssetId": "fs-01",
+            "protocol": "SMB",
+            "allowed": false
+          }
+        ],
+        "exposedRecords": 0,
+        "endpoint": null,
+        "documents": null,
+        "availability": {
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded"
+        }
+      },
+      "expectedEffect": null,
+      "intentRecorded": false,
+      "actualEffect": {
+        "scope": "completion-boundary-including-concurrent-events",
+        "boundaryState": {
+          "threatAccess": {
+            "applicable": true,
+            "activeSessionIds": [
+              "S-20"
+            ],
+            "usableSessionIds": [],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": true,
+            "accessAfterNewAuthentication": false,
+            "targetAccessCutOff": true,
+            "accountContained": false
+          },
+          "accounts": [
+            {
+              "id": "magazyn-07",
+              "identityId": "marta",
+              "loginStatus": "enabled",
+              "credentialVersion": 1,
+              "mfaPolicy": "not-required"
+            },
+            {
+              "id": "dispatch-team",
+              "identityId": "dispatchers",
+              "loginStatus": "enabled",
+              "credentialVersion": 1,
+              "mfaPolicy": "not-required"
+            }
+          ],
+          "sessions": [
+            {
+              "id": "S-19",
+              "accountId": "magazyn-07",
+              "gatewayAssetId": "vpn",
+              "status": "terminated",
+              "startedAtMinute": 838,
+              "expiresAtMinute": 960,
+              "origin": "unauthorized"
+            },
+            {
+              "id": "B-01",
+              "accountId": "dispatch-team",
+              "gatewayAssetId": "vpn",
+              "status": "terminated",
+              "startedAtMinute": 840,
+              "expiresAtMinute": 960,
+              "origin": "legitimate"
+            },
+            {
+              "id": "B-reconnect-04",
+              "accountId": "dispatch-team",
+              "gatewayAssetId": "vpn",
+              "status": "active",
+              "startedAtMinute": 860,
+              "expiresAtMinute": 980,
+              "origin": "legitimate"
+            },
+            {
+              "id": "S-20",
+              "accountId": "magazyn-07",
+              "gatewayAssetId": "vpn",
+              "status": "active",
+              "startedAtMinute": 860,
+              "expiresAtMinute": 980,
+              "origin": "unauthorized"
+            }
+          ],
+          "serviceAccess": [
+            {
+              "sessionId": "S-19",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "allowed": false
+            },
+            {
+              "sessionId": "S-19",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "allowed": false
+            },
+            {
+              "sessionId": "B-01",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "allowed": false
+            },
+            {
+              "sessionId": "B-01",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "allowed": false
+            },
+            {
+              "sessionId": "B-reconnect-04",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "allowed": true
+            },
+            {
+              "sessionId": "B-reconnect-04",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "allowed": false
+            },
+            {
+              "sessionId": "S-20",
+              "targetAssetId": "erp",
+              "protocol": "HTTPS",
+              "allowed": false
+            },
+            {
+              "sessionId": "S-20",
+              "targetAssetId": "fs-01",
+              "protocol": "SMB",
+              "allowed": false
+            }
+          ],
+          "exposedRecords": 0,
+          "endpoint": null,
+          "documents": null,
+          "availability": {
+            "localAvailable": true,
+            "remoteAvailable": true,
+            "capacity": 22,
+            "status": "available"
+          }
+        },
+        "immediateAccessImpact": {
+          "threatAccessBefore": {
+            "applicable": true,
+            "activeSessionIds": [],
+            "usableSessionIds": [],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": false,
+            "accessAfterNewAuthentication": false,
+            "targetAccessCutOff": true,
+            "accountContained": false
+          },
+          "threatAccessAfter": {
+            "applicable": true,
+            "activeSessionIds": [],
+            "usableSessionIds": [],
+            "stolenCredentialStillCurrent": true,
+            "newAuthenticationAllowed": true,
+            "accessAfterNewAuthentication": false,
+            "targetAccessCutOff": true,
+            "accountContained": false
+          },
+          "totalCapacityBefore": 8,
+          "totalCapacityAfter": 8,
+          "exposedRecordsAtCompletion": 0,
+          "changedCapabilities": true
+        },
+        "eventIds": [
+          "TL-00130",
+          "TL-00131",
+          "TL-00132",
+          "TL-00133",
+          "TL-00134",
+          "TL-00135",
+          "TL-00136",
+          "TL-00137",
+          "TL-00138",
+          "TL-00139",
+          "TL-00140",
+          "TL-00141"
+        ]
+      },
+      "subsequentConsequences": {
+        "afterEventId": "TL-00128",
+        "throughEventId": "TL-00159",
+        "includesOtherCauses": true,
+        "finalSecurityRef": "securityConsequences",
+        "finalBusinessRef": "businessConsequences"
+      }
+    }
+  ],
+  "groundTruth": {
+    "explanation": "Przeciwnik użył wcześniej przejętego poświadczenia i uzyskał S-19 o 13:58. Błędy logowania uzasadniały alert, lecz nie dowodziły sposobu zdobycia hasła. Marta zaprzeczyła uruchomieniu sesji. Istniejący tunel zachowywał dostęp mimo blokady nowych logowań lub resetu.",
+    "initialState": {
+      "threatAccess": {
+        "applicable": true,
+        "activeSessionIds": [
+          "S-19"
+        ],
+        "usableSessionIds": [
+          "S-19"
+        ],
+        "stolenCredentialStillCurrent": true,
+        "newAuthenticationAllowed": true,
+        "accessAfterNewAuthentication": true,
+        "targetAccessCutOff": false,
+        "accountContained": false
+      },
+      "accounts": [
+        {
+          "id": "magazyn-07",
+          "identityId": "marta",
+          "loginStatus": "enabled",
+          "credentialVersion": 1,
+          "mfaPolicy": "not-required"
+        },
+        {
+          "id": "dispatch-team",
+          "identityId": "dispatchers",
+          "loginStatus": "enabled",
+          "credentialVersion": 1,
+          "mfaPolicy": "not-required"
+        }
+      ],
+      "sessions": [
+        {
+          "id": "S-19",
+          "accountId": "magazyn-07",
+          "gatewayAssetId": "vpn",
+          "status": "active",
+          "startedAtMinute": 838,
+          "expiresAtMinute": 960,
+          "origin": "unauthorized"
+        },
+        {
+          "id": "B-01",
+          "accountId": "dispatch-team",
+          "gatewayAssetId": "vpn",
+          "status": "active",
+          "startedAtMinute": 840,
+          "expiresAtMinute": 960,
+          "origin": "legitimate"
+        }
+      ],
+      "serviceAccess": [
+        {
+          "sessionId": "S-19",
+          "targetAssetId": "erp",
+          "protocol": "HTTPS",
+          "allowed": false
+        },
+        {
+          "sessionId": "S-19",
+          "targetAssetId": "fs-01",
+          "protocol": "SMB",
+          "allowed": true
+        },
+        {
+          "sessionId": "B-01",
+          "targetAssetId": "erp",
+          "protocol": "HTTPS",
+          "allowed": true
+        },
+        {
+          "sessionId": "B-01",
+          "targetAssetId": "fs-01",
+          "protocol": "SMB",
+          "allowed": false
+        }
+      ],
+      "exposedRecords": 0,
+      "endpoint": null,
+      "documents": null,
+      "availability": {
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      }
+    },
+    "finalState": {
+      "threatAccess": {
+        "applicable": true,
+        "activeSessionIds": [
+          "S-20"
+        ],
+        "usableSessionIds": [],
+        "stolenCredentialStillCurrent": true,
+        "newAuthenticationAllowed": true,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": true,
+        "accountContained": false
+      },
+      "accounts": [
+        {
+          "id": "magazyn-07",
+          "identityId": "marta",
+          "loginStatus": "enabled",
+          "credentialVersion": 1,
+          "mfaPolicy": "not-required"
+        },
+        {
+          "id": "dispatch-team",
+          "identityId": "dispatchers",
+          "loginStatus": "enabled",
+          "credentialVersion": 1,
+          "mfaPolicy": "not-required"
+        }
+      ],
+      "sessions": [
+        {
+          "id": "S-19",
+          "accountId": "magazyn-07",
+          "gatewayAssetId": "vpn",
+          "status": "terminated",
+          "startedAtMinute": 838,
+          "expiresAtMinute": 960,
+          "origin": "unauthorized"
+        },
+        {
+          "id": "B-01",
+          "accountId": "dispatch-team",
+          "gatewayAssetId": "vpn",
+          "status": "terminated",
+          "startedAtMinute": 840,
+          "expiresAtMinute": 960,
+          "origin": "legitimate"
+        },
+        {
+          "id": "B-reconnect-04",
+          "accountId": "dispatch-team",
+          "gatewayAssetId": "vpn",
+          "status": "active",
+          "startedAtMinute": 860,
+          "expiresAtMinute": 980,
+          "origin": "legitimate"
+        },
+        {
+          "id": "S-20",
+          "accountId": "magazyn-07",
+          "gatewayAssetId": "vpn",
+          "status": "active",
+          "startedAtMinute": 860,
+          "expiresAtMinute": 980,
+          "origin": "unauthorized"
+        }
+      ],
+      "serviceAccess": [
+        {
+          "sessionId": "S-19",
+          "targetAssetId": "erp",
+          "protocol": "HTTPS",
+          "allowed": false
+        },
+        {
+          "sessionId": "S-19",
+          "targetAssetId": "fs-01",
+          "protocol": "SMB",
+          "allowed": false
+        },
+        {
+          "sessionId": "B-01",
+          "targetAssetId": "erp",
+          "protocol": "HTTPS",
+          "allowed": false
+        },
+        {
+          "sessionId": "B-01",
+          "targetAssetId": "fs-01",
+          "protocol": "SMB",
+          "allowed": false
+        },
+        {
+          "sessionId": "B-reconnect-04",
+          "targetAssetId": "erp",
+          "protocol": "HTTPS",
+          "allowed": true
+        },
+        {
+          "sessionId": "B-reconnect-04",
+          "targetAssetId": "fs-01",
+          "protocol": "SMB",
+          "allowed": false
+        },
+        {
+          "sessionId": "S-20",
+          "targetAssetId": "erp",
+          "protocol": "HTTPS",
+          "allowed": false
+        },
+        {
+          "sessionId": "S-20",
+          "targetAssetId": "fs-01",
+          "protocol": "SMB",
+          "allowed": false
+        }
+      ],
+      "exposedRecords": 0,
+      "endpoint": null,
+      "documents": null,
+      "availability": {
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      }
+    },
+    "authentication": [
+      {
+        "id": "AUTH-0001",
+        "minute": 820,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0002",
+        "minute": 820,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0003",
+        "minute": 820,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0004",
+        "minute": 821,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0005",
+        "minute": 821,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0006",
+        "minute": 821,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0007",
+        "minute": 822,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0008",
+        "minute": 822,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0009",
+        "minute": 822,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0010",
+        "minute": 823,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0011",
+        "minute": 823,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0012",
+        "minute": 823,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0013",
+        "minute": 824,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0014",
+        "minute": 824,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0015",
+        "minute": 824,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0016",
+        "minute": 825,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0017",
+        "minute": 825,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0018",
+        "minute": 825,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0019",
+        "minute": 826,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0020",
+        "minute": 826,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0021",
+        "minute": 826,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0022",
+        "minute": 827,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0023",
+        "minute": 827,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0024",
+        "minute": 827,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0025",
+        "minute": 828,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0026",
+        "minute": 828,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0027",
+        "minute": 828,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0028",
+        "minute": 829,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0029",
+        "minute": 829,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0030",
+        "minute": 829,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0031",
+        "minute": 830,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0032",
+        "minute": 830,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0033",
+        "minute": 830,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0034",
+        "minute": 831,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0035",
+        "minute": 831,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0036",
+        "minute": 831,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0037",
+        "minute": 832,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0038",
+        "minute": 832,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0039",
+        "minute": 832,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0040",
+        "minute": 833,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0041",
+        "minute": 833,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0042",
+        "minute": 833,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0043",
+        "minute": 834,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0044",
+        "minute": 834,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0045",
+        "minute": 834,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0046",
+        "minute": 835,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0047",
+        "minute": 835,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0048",
+        "minute": 835,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0049",
+        "minute": 836,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0050",
+        "minute": 836,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0051",
+        "minute": 836,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0052",
+        "minute": 837,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "failure",
+        "sessionId": null
+      },
+      {
+        "id": "AUTH-0053",
+        "minute": 838,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "success",
+        "sessionId": "S-19"
+      },
+      {
+        "id": "AUTH-0054",
+        "minute": 840,
+        "sourceAssetId": "vpn",
+        "accountId": "dispatch-team",
+        "outcome": "success",
+        "sessionId": "B-01"
+      },
+      {
+        "id": "AUTH-0055",
+        "minute": 860,
+        "sourceAssetId": "vpn",
+        "accountId": "dispatch-team",
+        "outcome": "success",
+        "sessionId": "B-reconnect-04"
+      },
+      {
+        "id": "AUTH-0056",
+        "minute": 860,
+        "sourceAssetId": "vpn",
+        "accountId": "magazyn-07",
+        "outcome": "success",
+        "sessionId": "S-20"
+      }
+    ],
+    "vpnThreat": {
+      "accountId": "magazyn-07",
+      "stolenCredentialVersion": 1,
+      "gatewayAssetId": "vpn",
+      "targetAssetId": "fs-01",
+      "protocol": "SMB",
+      "finalStatus": "blocked",
+      "authenticationAttempts": 1,
+      "consecutiveFailures": 3
+    },
+    "vpnAttackerActivity": [
+      {
+        "id": "A-0001",
+        "turn": 2,
+        "minute": 850,
+        "action": "reconnaissance",
+        "outcome": "session-lost",
+        "sessionId": "S-19",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      },
+      {
+        "id": "A-0002",
+        "turn": 4,
+        "minute": 860,
+        "action": "authenticate",
+        "outcome": "authentication-accepted",
+        "sessionId": "S-20",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      },
+      {
+        "id": "A-0003",
+        "turn": 5,
+        "minute": 865,
+        "action": "reconnaissance",
+        "outcome": "access-denied",
+        "sessionId": "S-20",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      },
+      {
+        "id": "A-0004",
+        "turn": 7,
+        "minute": 875,
+        "action": "reconnaissance",
+        "outcome": "access-denied",
+        "sessionId": "S-20",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      },
+      {
+        "id": "A-0005",
+        "turn": 9,
+        "minute": 885,
+        "action": "reconnaissance",
+        "outcome": "access-denied",
+        "sessionId": "S-20",
+        "copiedRecords": 0,
+        "totalExposedRecords": 0
+      }
+    ],
+    "localOperations": [],
+    "localThreatAttempts": [],
+    "telemetry": {
+      "authenticationSensor": {
+        "id": "vpn-auth",
+        "sourceAssetId": "vpn",
+        "enabled": true,
+        "coverageFromMinute": 810,
+        "retentionMinutes": 120,
+        "delayMinutes": 0
+      },
+      "authenticationRecords": [
+        {
+          "id": "AUTH-0001",
+          "minute": 820,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0002",
+          "minute": 820,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0003",
+          "minute": 820,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0004",
+          "minute": 821,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0005",
+          "minute": 821,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0006",
+          "minute": 821,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0007",
+          "minute": 822,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0008",
+          "minute": 822,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0009",
+          "minute": 822,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0010",
+          "minute": 823,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0011",
+          "minute": 823,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0012",
+          "minute": 823,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0013",
+          "minute": 824,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0014",
+          "minute": 824,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0015",
+          "minute": 824,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0016",
+          "minute": 825,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0017",
+          "minute": 825,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0018",
+          "minute": 825,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0019",
+          "minute": 826,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0020",
+          "minute": 826,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0021",
+          "minute": 826,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0022",
+          "minute": 827,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0023",
+          "minute": 827,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0024",
+          "minute": 827,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0025",
+          "minute": 828,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0026",
+          "minute": 828,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0027",
+          "minute": 828,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0028",
+          "minute": 829,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0029",
+          "minute": 829,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0030",
+          "minute": 829,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0031",
+          "minute": 830,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0032",
+          "minute": 830,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0033",
+          "minute": 830,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0034",
+          "minute": 831,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0035",
+          "minute": 831,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0036",
+          "minute": 831,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0037",
+          "minute": 832,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0038",
+          "minute": 832,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0039",
+          "minute": 832,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0040",
+          "minute": 833,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0041",
+          "minute": 833,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0042",
+          "minute": 833,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0043",
+          "minute": 834,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0044",
+          "minute": 834,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0045",
+          "minute": 834,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0046",
+          "minute": 835,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0047",
+          "minute": 835,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0048",
+          "minute": 835,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0049",
+          "minute": 836,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0050",
+          "minute": 836,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0051",
+          "minute": 836,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0052",
+          "minute": 837,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "failure",
+          "sessionId": null,
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0053",
+          "minute": 838,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "success",
+          "sessionId": "S-19",
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0054",
+          "minute": 840,
+          "sourceAssetId": "vpn",
+          "accountId": "dispatch-team",
+          "outcome": "success",
+          "sessionId": "B-01",
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 840,
+          "availableAtMinute": 840
+        },
+        {
+          "id": "AUTH-0055",
+          "minute": 860,
+          "sourceAssetId": "vpn",
+          "accountId": "dispatch-team",
+          "outcome": "success",
+          "sessionId": "B-reconnect-04",
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 860,
+          "availableAtMinute": 860
+        },
+        {
+          "id": "AUTH-0056",
+          "minute": 860,
+          "sourceAssetId": "vpn",
+          "accountId": "magazyn-07",
+          "outcome": "success",
+          "sessionId": "S-20",
+          "sensorId": "vpn-auth",
+          "capturedAtMinute": 860,
+          "availableAtMinute": 860
+        }
+      ],
+      "fileAudit": null,
+      "endpoint": null
+    },
+    "backups": null
+  },
+  "securityConsequences": {
+    "exposedRecords": 0,
+    "containment": {
+      "applicable": true,
+      "activeSessionIds": [
+        "S-20"
+      ],
+      "usableSessionIds": [],
+      "stolenCredentialStillCurrent": true,
+      "newAuthenticationAllowed": true,
+      "accessAfterNewAuthentication": false,
+      "targetAccessCutOff": true,
+      "accountContained": false,
+      "required": true,
+      "goalMet": true,
+      "retryBudgetExhausted": true,
+      "stoppedOnlyByRetryBudget": false
+    },
+    "integrity": null,
+    "investmentUse": {
+      "mfaRefusals": 0,
+      "fileObservationCount": 0
+    }
+  },
+  "businessConsequences": {
+    "ordersReceived": 360,
+    "ordersProcessed": 352,
+    "finalBacklog": 8,
+    "peakBacklog": 36,
+    "perTurn": [
+      {
+        "turn": 1,
+        "received": 20,
+        "processed": 20,
+        "backlog": 0,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 2,
+        "received": 20,
+        "processed": 8,
+        "backlog": 12,
+        "localAvailable": true,
+        "remoteAvailable": false,
+        "capacity": 8,
+        "status": "degraded"
+      },
+      {
+        "turn": 3,
+        "received": 20,
+        "processed": 8,
+        "backlog": 24,
+        "localAvailable": true,
+        "remoteAvailable": false,
+        "capacity": 8,
+        "status": "degraded"
+      },
+      {
+        "turn": 4,
+        "received": 20,
+        "processed": 8,
+        "backlog": 36,
+        "localAvailable": true,
+        "remoteAvailable": false,
+        "capacity": 8,
+        "status": "degraded"
+      },
+      {
+        "turn": 5,
+        "received": 20,
+        "processed": 22,
+        "backlog": 34,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 6,
+        "received": 20,
+        "processed": 22,
+        "backlog": 32,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 7,
+        "received": 20,
+        "processed": 22,
+        "backlog": 30,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 8,
+        "received": 20,
+        "processed": 22,
+        "backlog": 28,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 9,
+        "received": 20,
+        "processed": 22,
+        "backlog": 26,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 10,
+        "received": 20,
+        "processed": 22,
+        "backlog": 24,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 11,
+        "received": 20,
+        "processed": 22,
+        "backlog": 22,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 12,
+        "received": 20,
+        "processed": 22,
+        "backlog": 20,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 13,
+        "received": 20,
+        "processed": 22,
+        "backlog": 18,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 14,
+        "received": 20,
+        "processed": 22,
+        "backlog": 16,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 15,
+        "received": 20,
+        "processed": 22,
+        "backlog": 14,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 16,
+        "received": 20,
+        "processed": 22,
+        "backlog": 12,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 17,
+        "received": 20,
+        "processed": 22,
+        "backlog": 10,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      },
+      {
+        "turn": 18,
+        "received": 20,
+        "processed": 22,
+        "backlog": 8,
+        "localAvailable": true,
+        "remoteAvailable": true,
+        "capacity": 22,
+        "status": "available"
+      }
+    ],
+    "capacityTransitions": [
+      {
+        "at": {
+          "minute": 845,
+          "turn": 1
+        },
+        "intervalStartMinute": 840,
+        "previousCapacity": null,
+        "capacity": 22
+      },
+      {
+        "at": {
+          "minute": 850,
+          "turn": 2
+        },
+        "intervalStartMinute": 845,
+        "previousCapacity": 22,
+        "capacity": 8
+      },
+      {
+        "at": {
+          "minute": 865,
+          "turn": 5
+        },
+        "intervalStartMinute": 860,
+        "previousCapacity": 8,
+        "capacity": 22
+      }
+    ]
+  },
+  "lessonsContext": {
+    "hypothesesAreUnverified": true,
+    "reasoningQuestions": [
+      "Jakie dowody były dostępne przed każdą decyzją, a jakie dotarły później?",
+      "Które mechanizmy zmieniło działanie, a które pozostały aktywne?",
+      "Jak ograniczenie bezpieczeństwa wpłynęło na legalną pracę?",
+      "Jak sprawdzono wynik odzyskiwania i trwałość ograniczenia?",
+      "Jakich danych lub kontrolowanego replay potrzeba do porównania alternatywy?"
+    ],
+    "replay": {
+      "mode": "unknown",
+      "seed": 0,
+      "scenarioId": "nexus-reference",
+      "requiresCampaignPreparation": false,
+      "campaignMissionId": null,
+      "warning": "Ponowienie z innymi decyzjami jest nowym przebiegiem. Hipotetyczny wynik nie jest faktem tego raportu."
+    }
+  },
+  "limitations": [
+    "Raport zawiera fikcyjną prywatną prawdę scenariusza; jest dostępny tylko po zakończeniu misji.",
+    "Nie ma kryptograficznej autentyczności lokalnego raportu. Zmieniony plik może przedstawiać inne dane.",
+    "MFA jest przygotowaniem przed misją, bez komendy zmiany MFA w środku incydentu. Nie oznacza automatycznego zakończenia wydanych sesji.",
+    "Nie zarejestrowano toku myślenia, uzasadnień ani informacji faktycznie przeczytanych przez człowieka. Hipoteza nie jest zweryfikowanym faktem.",
+    "Chronologia odtwarza zarejestrowane granice tur; nie zna czasu ściennego kliknięć ani kolejności fizycznej między niezależnymi źródłami w tej samej fazie.",
+    "Skutki wspólnej granicy tury nie stanowią izolowanego eksperymentu. Nie obliczamy nieprzeprowadzonych alternatyw ani pieniężnych strat zamówień.",
+    "Historyczne podsumowanie bez dziennika nie wystarcza do rekonstrukcji AAR. Raporty nie zastępują zapisu gry.",
+    "Brak sensora, opóźnienie, retencja i odcięcie dostarczania mogą ograniczyć dowody; nie dowodzą braku aktywności."
+  ],
+  "provenance": {
+    "method": "validated-command-replay",
+    "commandCount": 21,
+    "ordering": "Czas świata, kolejność komend w tej samej minucie, faza istniejącego silnika i kolejność źródła. Fazy: rozliczenie starego przedziału, ukończenie zadań/konfiguracja, aktorzy, sensory, badania. Prelude sprzed okna jest w groundTruth, nie na osi czasu.",
+    "sourceMap": {
+      "timeline": "SimulationState.history + istniejące źródła/rekordy telemetryczne i prywatne ślady aktorów; bez DOM.",
+      "knownEvidence": "Ukończone obserwacje i komunikaty zbierane podczas replay; nigdy końcowa wiedza nakładana wstecz.",
+      "actualState": "Istniejące assessThreatAccess, canUseService, canUseLocalService, businessAvailability i documentCounts.",
+      "campaignContext": "Pełny replay kampanii od initialSeed, stan przygotowania w chwili właściwego startu misji."
+    }
+  }
+}

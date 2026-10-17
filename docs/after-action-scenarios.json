@@ -1,0 +1,3950 @@
+[
+  {
+    "id": "A",
+    "family": "M01",
+    "outcome": {
+      "confidentialityMet": true,
+      "continuityMet": true,
+      "containmentMet": true,
+      "integrityMet": null,
+      "allObjectivesMet": true
+    },
+    "decisions": [
+      {
+        "id": "D-00001",
+        "action": "inspect-auth-logs",
+        "issuedAt": {
+          "minute": 840,
+          "turn": 0
+        },
+        "completedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00002",
+        "action": "set-network-rule",
+        "issuedAt": {
+          "minute": 840,
+          "turn": 0
+        },
+        "completedAt": {
+          "minute": 850,
+          "turn": 2
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing"
+        ],
+        "status": "completed"
+      }
+    ],
+    "orders": {
+      "ordersReceived": 360,
+      "ordersProcessed": 360,
+      "finalBacklog": 0,
+      "peakBacklog": 0,
+      "perTurn": [
+        {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 2,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 3,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 4,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 5,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 6,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 7,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 8,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 9,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 10,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 11,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 12,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 13,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 14,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 15,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 16,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 17,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 18,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        }
+      ],
+      "capacityTransitions": [
+        {
+          "at": {
+            "minute": 845,
+            "turn": 1
+          },
+          "intervalStartMinute": 840,
+          "previousCapacity": null,
+          "capacity": 22
+        }
+      ]
+    },
+    "security": {
+      "exposedRecords": 0,
+      "containment": {
+        "applicable": true,
+        "activeSessionIds": [
+          "S-19"
+        ],
+        "usableSessionIds": [],
+        "stolenCredentialStillCurrent": true,
+        "newAuthenticationAllowed": true,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": true,
+        "accountContained": false,
+        "required": true,
+        "goalMet": true,
+        "retryBudgetExhausted": true,
+        "stoppedOnlyByRetryBudget": false
+      },
+      "integrity": null,
+      "investmentUse": {
+        "mfaRefusals": 0,
+        "fileObservationCount": 0
+      }
+    },
+    "projectsAtStart": []
+  },
+  {
+    "id": "B",
+    "family": "M01",
+    "outcome": {
+      "confidentialityMet": false,
+      "continuityMet": true,
+      "containmentMet": false,
+      "integrityMet": null,
+      "allObjectivesMet": false
+    },
+    "decisions": [
+      {
+        "id": "D-00001",
+        "action": "block-account",
+        "issuedAt": {
+          "minute": 840,
+          "turn": 0
+        },
+        "completedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00003",
+        "action": "inspect-auth-logs",
+        "issuedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "completedAt": {
+          "minute": 850,
+          "turn": 2
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing",
+          "K-MSG-msg-T-0001"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00005",
+        "action": "inspect-vpn-sessions",
+        "issuedAt": {
+          "minute": 850,
+          "turn": 2
+        },
+        "completedAt": {
+          "minute": 855,
+          "turn": 3
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing",
+          "K-MSG-msg-T-0001",
+          "K-T-0002-auth",
+          "K-MSG-msg-T-0002"
+        ],
+        "status": "completed"
+      }
+    ],
+    "orders": {
+      "ordersReceived": 360,
+      "ordersProcessed": 360,
+      "finalBacklog": 0,
+      "peakBacklog": 0,
+      "perTurn": [
+        {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 2,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 3,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 4,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 5,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 6,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 7,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 8,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 9,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 10,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 11,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 12,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 13,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 14,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 15,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 16,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 17,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 18,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        }
+      ],
+      "capacityTransitions": [
+        {
+          "at": {
+            "minute": 845,
+            "turn": 1
+          },
+          "intervalStartMinute": 840,
+          "previousCapacity": null,
+          "capacity": 22
+        }
+      ]
+    },
+    "security": {
+      "exposedRecords": 2000,
+      "containment": {
+        "applicable": true,
+        "activeSessionIds": [
+          "S-19"
+        ],
+        "usableSessionIds": [
+          "S-19"
+        ],
+        "stolenCredentialStillCurrent": true,
+        "newAuthenticationAllowed": false,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": false,
+        "accountContained": false,
+        "required": true,
+        "goalMet": false,
+        "retryBudgetExhausted": false,
+        "stoppedOnlyByRetryBudget": false
+      },
+      "integrity": null,
+      "investmentUse": {
+        "mfaRefusals": 0,
+        "fileObservationCount": 0
+      }
+    },
+    "projectsAtStart": []
+  },
+  {
+    "id": "C",
+    "family": "M01",
+    "outcome": {
+      "confidentialityMet": true,
+      "continuityMet": true,
+      "containmentMet": true,
+      "integrityMet": null,
+      "allObjectivesMet": true
+    },
+    "decisions": [
+      {
+        "id": "D-00001",
+        "action": "set-vpn",
+        "issuedAt": {
+          "minute": 840,
+          "turn": 0
+        },
+        "completedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00003",
+        "action": "set-network-rule",
+        "issuedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "completedAt": {
+          "minute": 855,
+          "turn": 3
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing",
+          "K-MSG-msg-T-0001"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00006",
+        "action": "set-vpn",
+        "issuedAt": {
+          "minute": 855,
+          "turn": 3
+        },
+        "completedAt": {
+          "minute": 860,
+          "turn": 4
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing",
+          "K-MSG-msg-T-0001",
+          "K-MSG-ewa-queue",
+          "K-MSG-msg-T-0002"
+        ],
+        "status": "completed"
+      }
+    ],
+    "orders": {
+      "ordersReceived": 360,
+      "ordersProcessed": 352,
+      "finalBacklog": 8,
+      "peakBacklog": 36,
+      "perTurn": [
+        {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 2,
+          "received": 20,
+          "processed": 8,
+          "backlog": 12,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded"
+        },
+        {
+          "turn": 3,
+          "received": 20,
+          "processed": 8,
+          "backlog": 24,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded"
+        },
+        {
+          "turn": 4,
+          "received": 20,
+          "processed": 8,
+          "backlog": 36,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded"
+        },
+        {
+          "turn": 5,
+          "received": 20,
+          "processed": 22,
+          "backlog": 34,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 6,
+          "received": 20,
+          "processed": 22,
+          "backlog": 32,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 7,
+          "received": 20,
+          "processed": 22,
+          "backlog": 30,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 8,
+          "received": 20,
+          "processed": 22,
+          "backlog": 28,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 9,
+          "received": 20,
+          "processed": 22,
+          "backlog": 26,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 10,
+          "received": 20,
+          "processed": 22,
+          "backlog": 24,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 11,
+          "received": 20,
+          "processed": 22,
+          "backlog": 22,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 12,
+          "received": 20,
+          "processed": 22,
+          "backlog": 20,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 13,
+          "received": 20,
+          "processed": 22,
+          "backlog": 18,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 14,
+          "received": 20,
+          "processed": 22,
+          "backlog": 16,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 15,
+          "received": 20,
+          "processed": 22,
+          "backlog": 14,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 16,
+          "received": 20,
+          "processed": 22,
+          "backlog": 12,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 17,
+          "received": 20,
+          "processed": 22,
+          "backlog": 10,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        },
+        {
+          "turn": 18,
+          "received": 20,
+          "processed": 22,
+          "backlog": 8,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available"
+        }
+      ],
+      "capacityTransitions": [
+        {
+          "at": {
+            "minute": 845,
+            "turn": 1
+          },
+          "intervalStartMinute": 840,
+          "previousCapacity": null,
+          "capacity": 22
+        },
+        {
+          "at": {
+            "minute": 850,
+            "turn": 2
+          },
+          "intervalStartMinute": 845,
+          "previousCapacity": 22,
+          "capacity": 8
+        },
+        {
+          "at": {
+            "minute": 865,
+            "turn": 5
+          },
+          "intervalStartMinute": 860,
+          "previousCapacity": 8,
+          "capacity": 22
+        }
+      ]
+    },
+    "security": {
+      "exposedRecords": 0,
+      "containment": {
+        "applicable": true,
+        "activeSessionIds": [
+          "S-20"
+        ],
+        "usableSessionIds": [],
+        "stolenCredentialStillCurrent": true,
+        "newAuthenticationAllowed": true,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": true,
+        "accountContained": false,
+        "required": true,
+        "goalMet": true,
+        "retryBudgetExhausted": true,
+        "stoppedOnlyByRetryBudget": false
+      },
+      "integrity": null,
+      "investmentUse": {
+        "mfaRefusals": 0,
+        "fileObservationCount": 0
+      }
+    },
+    "projectsAtStart": []
+  },
+  {
+    "id": "D",
+    "family": "M02",
+    "outcome": {
+      "confidentialityMet": null,
+      "continuityMet": true,
+      "containmentMet": true,
+      "integrityMet": false,
+      "allObjectivesMet": false
+    },
+    "decisions": [
+      {
+        "id": "D-00001",
+        "action": "isolate-endpoint",
+        "issuedAt": {
+          "minute": 840,
+          "turn": 0
+        },
+        "completedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "knownEvidenceIds": [
+          "K-MSG-ewa-briefing"
+        ],
+        "status": "completed"
+      }
+    ],
+    "orders": {
+      "ordersReceived": 360,
+      "ordersProcessed": 326,
+      "finalBacklog": 34,
+      "peakBacklog": 34,
+      "perTurn": [
+        {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "received": 20,
+          "processed": 18,
+          "backlog": 2,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "received": 20,
+          "processed": 18,
+          "backlog": 4,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 4,
+          "received": 20,
+          "processed": 18,
+          "backlog": 6,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 5,
+          "received": 20,
+          "processed": 18,
+          "backlog": 8,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 6,
+          "received": 20,
+          "processed": 18,
+          "backlog": 10,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 7,
+          "received": 20,
+          "processed": 18,
+          "backlog": 12,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 8,
+          "received": 20,
+          "processed": 18,
+          "backlog": 14,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 9,
+          "received": 20,
+          "processed": 18,
+          "backlog": 16,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 10,
+          "received": 20,
+          "processed": 18,
+          "backlog": 18,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 11,
+          "received": 20,
+          "processed": 18,
+          "backlog": 20,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 12,
+          "received": 20,
+          "processed": 18,
+          "backlog": 22,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 13,
+          "received": 20,
+          "processed": 18,
+          "backlog": 24,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 14,
+          "received": 20,
+          "processed": 18,
+          "backlog": 26,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 15,
+          "received": 20,
+          "processed": 18,
+          "backlog": 28,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 16,
+          "received": 20,
+          "processed": 18,
+          "backlog": 30,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 17,
+          "received": 20,
+          "processed": 18,
+          "backlog": 32,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 18,
+          "received": 20,
+          "processed": 18,
+          "backlog": 34,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        }
+      ],
+      "capacityTransitions": [
+        {
+          "at": {
+            "minute": 845,
+            "turn": 1
+          },
+          "intervalStartMinute": 840,
+          "previousCapacity": null,
+          "capacity": 20
+        },
+        {
+          "at": {
+            "minute": 850,
+            "turn": 2
+          },
+          "intervalStartMinute": 845,
+          "previousCapacity": 20,
+          "capacity": 18
+        }
+      ]
+    },
+    "security": {
+      "exposedRecords": 0,
+      "containment": {
+        "applicable": false,
+        "activeSessionIds": [],
+        "usableSessionIds": [],
+        "stolenCredentialStillCurrent": false,
+        "newAuthenticationAllowed": false,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": false,
+        "accountContained": false,
+        "required": true,
+        "goalMet": false,
+        "retryBudgetExhausted": false,
+        "stoppedOnlyByRetryBudget": false
+      },
+      "integrity": {
+        "serviceOnline": true,
+        "dataAvailable": false,
+        "total": 100,
+        "correct": 88,
+        "damaged": 12,
+        "reconcile": 0,
+        "recovered": 0,
+        "everDamaged": 12,
+        "sourceHasWrite": false,
+        "endpointIsolated": true,
+        "writesRestricted": false,
+        "backupId": null,
+        "rpoMinutes": null,
+        "rtoMinutes": null,
+        "missingChanges": 0,
+        "reconstructed": 0,
+        "verified": false,
+        "limitedDataMinutes": 90,
+        "peakBacklog": 34
+      },
+      "investmentUse": {
+        "edr": null,
+        "firstLocalEvidenceMinute": null,
+        "backup": null,
+        "restoreMinutes": null
+      }
+    },
+    "projectsAtStart": []
+  },
+  {
+    "id": "E",
+    "family": "M02",
+    "outcome": {
+      "confidentialityMet": null,
+      "continuityMet": false,
+      "containmentMet": false,
+      "integrityMet": false,
+      "allObjectivesMet": false
+    },
+    "decisions": [
+      {
+        "id": "D-00001",
+        "action": "inspect-backups",
+        "issuedAt": {
+          "minute": 840,
+          "turn": 0
+        },
+        "completedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "knownEvidenceIds": [
+          "K-MSG-ewa-briefing"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00003",
+        "action": "verify-backup",
+        "issuedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "completedAt": {
+          "minute": 855,
+          "turn": 3
+        },
+        "knownEvidenceIds": [
+          "K-MSG-ewa-briefing",
+          "K-T-0001-backup"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00006",
+        "action": "restore-documents",
+        "issuedAt": {
+          "minute": 855,
+          "turn": 3
+        },
+        "completedAt": {
+          "minute": 870,
+          "turn": 6
+        },
+        "knownEvidenceIds": [
+          "K-MSG-ewa-briefing",
+          "K-T-0001-backup",
+          "K-T-0002-backup"
+        ],
+        "status": "completed"
+      }
+    ],
+    "orders": {
+      "ordersReceived": 360,
+      "ordersProcessed": 250,
+      "finalBacklog": 110,
+      "peakBacklog": 110,
+      "perTurn": [
+        {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "received": 20,
+          "processed": 17,
+          "backlog": 3,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 17,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 4,
+          "received": 20,
+          "processed": 17,
+          "backlog": 6,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 17,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 5,
+          "received": 20,
+          "processed": 14,
+          "backlog": 12,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 14,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 6,
+          "received": 20,
+          "processed": 14,
+          "backlog": 18,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 14,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 7,
+          "received": 20,
+          "processed": 19,
+          "backlog": 19,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 19,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 8,
+          "received": 20,
+          "processed": 19,
+          "backlog": 20,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 19,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 9,
+          "received": 20,
+          "processed": 16,
+          "backlog": 24,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 16,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 10,
+          "received": 20,
+          "processed": 16,
+          "backlog": 28,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 16,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 11,
+          "received": 20,
+          "processed": 13,
+          "backlog": 35,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 13,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 12,
+          "received": 20,
+          "processed": 13,
+          "backlog": 42,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 13,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 13,
+          "received": 20,
+          "processed": 10,
+          "backlog": 52,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 10,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 14,
+          "received": 20,
+          "processed": 10,
+          "backlog": 62,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 10,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 15,
+          "received": 20,
+          "processed": 8,
+          "backlog": 74,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 16,
+          "received": 20,
+          "processed": 8,
+          "backlog": 86,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 17,
+          "received": 20,
+          "processed": 8,
+          "backlog": 98,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 18,
+          "received": 20,
+          "processed": 8,
+          "backlog": 110,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        }
+      ],
+      "capacityTransitions": [
+        {
+          "at": {
+            "minute": 845,
+            "turn": 1
+          },
+          "intervalStartMinute": 840,
+          "previousCapacity": null,
+          "capacity": 20
+        },
+        {
+          "at": {
+            "minute": 855,
+            "turn": 3
+          },
+          "intervalStartMinute": 850,
+          "previousCapacity": 20,
+          "capacity": 17
+        },
+        {
+          "at": {
+            "minute": 865,
+            "turn": 5
+          },
+          "intervalStartMinute": 860,
+          "previousCapacity": 17,
+          "capacity": 14
+        },
+        {
+          "at": {
+            "minute": 875,
+            "turn": 7
+          },
+          "intervalStartMinute": 870,
+          "previousCapacity": 14,
+          "capacity": 19
+        },
+        {
+          "at": {
+            "minute": 885,
+            "turn": 9
+          },
+          "intervalStartMinute": 880,
+          "previousCapacity": 19,
+          "capacity": 16
+        },
+        {
+          "at": {
+            "minute": 895,
+            "turn": 11
+          },
+          "intervalStartMinute": 890,
+          "previousCapacity": 16,
+          "capacity": 13
+        },
+        {
+          "at": {
+            "minute": 905,
+            "turn": 13
+          },
+          "intervalStartMinute": 900,
+          "previousCapacity": 13,
+          "capacity": 10
+        },
+        {
+          "at": {
+            "minute": 915,
+            "turn": 15
+          },
+          "intervalStartMinute": 910,
+          "previousCapacity": 10,
+          "capacity": 8
+        }
+      ]
+    },
+    "security": {
+      "exposedRecords": 0,
+      "containment": {
+        "applicable": false,
+        "activeSessionIds": [],
+        "usableSessionIds": [],
+        "stolenCredentialStillCurrent": false,
+        "newAuthenticationAllowed": false,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": false,
+        "accountContained": false,
+        "required": true,
+        "goalMet": false,
+        "retryBudgetExhausted": false,
+        "stoppedOnlyByRetryBudget": false
+      },
+      "integrity": {
+        "serviceOnline": true,
+        "dataAvailable": false,
+        "total": 100,
+        "correct": 0,
+        "damaged": 100,
+        "reconcile": 0,
+        "recovered": 52,
+        "everDamaged": 100,
+        "sourceHasWrite": true,
+        "endpointIsolated": false,
+        "writesRestricted": false,
+        "backupId": "FS-1350",
+        "rpoMinutes": 10,
+        "rtoMinutes": null,
+        "missingChanges": 0,
+        "reconstructed": 0,
+        "verified": false,
+        "limitedDataMinutes": 90,
+        "peakBacklog": 110
+      },
+      "investmentUse": {
+        "edr": null,
+        "firstLocalEvidenceMinute": null,
+        "backup": null,
+        "restoreMinutes": 15
+      }
+    },
+    "projectsAtStart": []
+  },
+  {
+    "id": "F",
+    "family": "M02",
+    "outcome": {
+      "confidentialityMet": null,
+      "continuityMet": true,
+      "containmentMet": true,
+      "integrityMet": true,
+      "allObjectivesMet": true
+    },
+    "decisions": [
+      {
+        "id": "D-00001",
+        "action": "inspect-edr-telemetry",
+        "issuedAt": {
+          "minute": 840,
+          "turn": 0
+        },
+        "completedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "knownEvidenceIds": [
+          "K-AL-EDR-AL-endpoint-modify-burst-pakowanie-03",
+          "K-MSG-ewa-briefing"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00003",
+        "action": "isolate-endpoint",
+        "issuedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "completedAt": {
+          "minute": 850,
+          "turn": 2
+        },
+        "knownEvidenceIds": [
+          "K-AL-EDR-AL-endpoint-modify-burst-pakowanie-03",
+          "K-MSG-ewa-briefing",
+          "K-T-0001-edr"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00004",
+        "action": "inspect-backups",
+        "issuedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "completedAt": {
+          "minute": 850,
+          "turn": 2
+        },
+        "knownEvidenceIds": [
+          "K-AL-EDR-AL-endpoint-modify-burst-pakowanie-03",
+          "K-MSG-ewa-briefing",
+          "K-T-0001-edr"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00006",
+        "action": "restore-documents",
+        "issuedAt": {
+          "minute": 850,
+          "turn": 2
+        },
+        "completedAt": {
+          "minute": 860,
+          "turn": 4
+        },
+        "knownEvidenceIds": [
+          "K-AL-EDR-AL-endpoint-modify-burst-pakowanie-03",
+          "K-MSG-ewa-briefing",
+          "K-T-0001-edr",
+          "K-T-0003-backup",
+          "K-MSG-msg-T-0002"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00009",
+        "action": "restrict-endpoint-writes",
+        "issuedAt": {
+          "minute": 860,
+          "turn": 4
+        },
+        "completedAt": {
+          "minute": 870,
+          "turn": 6
+        },
+        "knownEvidenceIds": [
+          "K-AL-EDR-AL-endpoint-modify-burst-pakowanie-03",
+          "K-MSG-ewa-briefing",
+          "K-T-0001-edr",
+          "K-T-0003-backup",
+          "K-MSG-msg-T-0002",
+          "K-MSG-msg-T-0004"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00010",
+        "action": "inspect-documents",
+        "issuedAt": {
+          "minute": 860,
+          "turn": 4
+        },
+        "completedAt": {
+          "minute": 870,
+          "turn": 6
+        },
+        "knownEvidenceIds": [
+          "K-AL-EDR-AL-endpoint-modify-burst-pakowanie-03",
+          "K-MSG-ewa-briefing",
+          "K-T-0001-edr",
+          "K-T-0003-backup",
+          "K-MSG-msg-T-0002",
+          "K-MSG-msg-T-0004"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00013",
+        "action": "reconnect-endpoint",
+        "issuedAt": {
+          "minute": 870,
+          "turn": 6
+        },
+        "completedAt": {
+          "minute": 875,
+          "turn": 7
+        },
+        "knownEvidenceIds": [
+          "K-AL-EDR-AL-endpoint-modify-burst-pakowanie-03",
+          "K-MSG-ewa-briefing",
+          "K-T-0001-edr",
+          "K-T-0003-backup",
+          "K-MSG-msg-T-0002",
+          "K-MSG-msg-T-0004",
+          "K-T-0006-documents",
+          "K-MSG-msg-T-0005"
+        ],
+        "status": "completed"
+      }
+    ],
+    "orders": {
+      "ordersReceived": 360,
+      "ordersProcessed": 360,
+      "finalBacklog": 0,
+      "peakBacklog": 4,
+      "perTurn": [
+        {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "received": 20,
+          "processed": 18,
+          "backlog": 2,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 4,
+          "received": 20,
+          "processed": 18,
+          "backlog": 4,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 18,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 5,
+          "received": 20,
+          "processed": 20,
+          "backlog": 4,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 6,
+          "received": 20,
+          "processed": 20,
+          "backlog": 4,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 7,
+          "received": 20,
+          "processed": 20,
+          "backlog": 4,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": false,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 8,
+          "received": 20,
+          "processed": 22,
+          "backlog": 2,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 9,
+          "received": 20,
+          "processed": 22,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 10,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 11,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 12,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 13,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 14,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 15,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 16,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 17,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 18,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": true,
+              "capacity": 14
+            }
+          ]
+        }
+      ],
+      "capacityTransitions": [
+        {
+          "at": {
+            "minute": 845,
+            "turn": 1
+          },
+          "intervalStartMinute": 840,
+          "previousCapacity": null,
+          "capacity": 20
+        },
+        {
+          "at": {
+            "minute": 855,
+            "turn": 3
+          },
+          "intervalStartMinute": 850,
+          "previousCapacity": 20,
+          "capacity": 18
+        },
+        {
+          "at": {
+            "minute": 865,
+            "turn": 5
+          },
+          "intervalStartMinute": 860,
+          "previousCapacity": 18,
+          "capacity": 20
+        },
+        {
+          "at": {
+            "minute": 880,
+            "turn": 8
+          },
+          "intervalStartMinute": 875,
+          "previousCapacity": 20,
+          "capacity": 22
+        }
+      ]
+    },
+    "security": {
+      "exposedRecords": 0,
+      "containment": {
+        "applicable": false,
+        "activeSessionIds": [],
+        "usableSessionIds": [],
+        "stolenCredentialStillCurrent": false,
+        "newAuthenticationAllowed": false,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": false,
+        "accountContained": false,
+        "required": true,
+        "goalMet": false,
+        "retryBudgetExhausted": false,
+        "stoppedOnlyByRetryBudget": false
+      },
+      "integrity": {
+        "serviceOnline": true,
+        "dataAvailable": true,
+        "total": 100,
+        "correct": 100,
+        "damaged": 0,
+        "reconcile": 0,
+        "recovered": 12,
+        "everDamaged": 12,
+        "sourceHasWrite": false,
+        "endpointIsolated": false,
+        "writesRestricted": true,
+        "backupId": "FS-1350",
+        "rpoMinutes": 10,
+        "rtoMinutes": 30,
+        "missingChanges": 0,
+        "reconstructed": 0,
+        "verified": true,
+        "limitedDataMinutes": 20,
+        "peakBacklog": 4
+      },
+      "investmentUse": {
+        "edr": {
+          "coverage": {
+            "endpointId": "pakowanie-03",
+            "sensorId": "edr-pakowanie-03",
+            "agentAvailable": true,
+            "collectorId": "nexus-endpoint-collector",
+            "collectorAvailable": true,
+            "operations": [
+              "read",
+              "modify"
+            ],
+            "retentionMinutes": 120,
+            "delayMinutes": 5,
+            "detection": {
+              "id": "endpoint-modify-burst",
+              "name": "Nietypowa seria modyfikacji dokumentów z endpointu",
+              "operation": "modify",
+              "threshold": 10,
+              "windowMinutes": 10
+            }
+          },
+          "capturedEvents": 28,
+          "deliveredEvents": 28,
+          "alerts": [
+            {
+              "id": "AL-endpoint-modify-burst-pakowanie-03",
+              "ruleId": "endpoint-modify-burst",
+              "name": "Nietypowa seria modyfikacji dokumentów z endpointu",
+              "sensorId": "edr-pakowanie-03",
+              "endpointId": "pakowanie-03",
+              "minute": 840,
+              "windowStartMinute": 830,
+              "windowEndMinute": 840,
+              "modificationCount": 12,
+              "eventIds": [
+                "EDR-0001"
+              ],
+              "assessment": "requires-investigation"
+            }
+          ],
+          "observations": [
+            {
+              "id": "T-0001",
+              "source": "remote-collector",
+              "collectorId": "nexus-endpoint-collector",
+              "sensorId": "edr-pakowanie-03",
+              "observedAtMinute": 845,
+              "windowStartMinute": 835,
+              "windowEndMinute": 840,
+              "records": [
+                {
+                  "id": "EDR-0001",
+                  "sensorId": "edr-pakowanie-03",
+                  "source": "fortress-endpoint-agent",
+                  "endpointId": "pakowanie-03",
+                  "accountId": "packing-local",
+                  "minute": 835,
+                  "capturedAtMinute": 835,
+                  "operation": "modify",
+                  "targetAssetId": "fs-01",
+                  "protocol": "SMB",
+                  "outcome": "allowed",
+                  "documentIds": [
+                    "DOC-001",
+                    "DOC-002",
+                    "DOC-003",
+                    "DOC-004",
+                    "DOC-005",
+                    "DOC-006",
+                    "DOC-007",
+                    "DOC-008",
+                    "DOC-009",
+                    "DOC-010",
+                    "DOC-011",
+                    "DOC-012"
+                  ],
+                  "collectorId": "nexus-endpoint-collector",
+                  "deliveredAtMinute": 835,
+                  "availableAtMinute": 840
+                }
+              ]
+            }
+          ],
+          "informedActions": 2,
+          "firstEvidenceMinute": 845
+        },
+        "firstLocalEvidenceMinute": null,
+        "backup": {
+          "backupId": "FS-1350",
+          "testedAt": {
+            "window": 4,
+            "hour": 1
+          },
+          "snapshotSignature": "{\"id\":\"FS-1350\",\"minute\":830,\"documents\":[\"DOC-001\",\"DOC-002\",\"DOC-003\",\"DOC-004\",\"DOC-005\",\"DOC-006\",\"DOC-007\",\"DOC-008\",\"DOC-009\",\"DOC-010\",\"DOC-011\",\"DOC-012\",\"DOC-013\",\"DOC-014\",\"DOC-015\",\"DOC-016\",\"DOC-017\",\"DOC-018\",\"DOC-019\",\"DOC-020\",\"DOC-021\",\"DOC-022\",\"DOC-023\",\"DOC-024\",\"DOC-025\",\"DOC-026\",\"DOC-027\",\"DOC-028\",\"DOC-029\",\"DOC-030\",\"DOC-031\",\"DOC-032\",\"DOC-033\",\"DOC-034\",\"DOC-035\",\"DOC-036\",\"DOC-037\",\"DOC-038\",\"DOC-039\",\"DOC-040\",\"DOC-041\",\"DOC-042\",\"DOC-043\",\"DOC-044\",\"DOC-045\",\"DOC-046\",\"DOC-047\",\"DOC-048\",\"DOC-049\",\"DOC-050\",\"DOC-051\",\"DOC-052\",\"DOC-053\",\"DOC-054\",\"DOC-055\",\"DOC-056\",\"DOC-057\",\"DOC-058\",\"DOC-059\",\"DOC-060\",\"DOC-061\",\"DOC-062\",\"DOC-063\",\"DOC-064\",\"DOC-065\",\"DOC-066\",\"DOC-067\",\"DOC-068\",\"DOC-069\",\"DOC-070\",\"DOC-071\",\"DOC-072\",\"DOC-073\",\"DOC-074\",\"DOC-075\",\"DOC-076\",\"DOC-077\",\"DOC-078\",\"DOC-079\",\"DOC-080\",\"DOC-081\",\"DOC-082\",\"DOC-083\",\"DOC-084\",\"DOC-085\",\"DOC-086\",\"DOC-087\",\"DOC-088\",\"DOC-089\",\"DOC-090\",\"DOC-091\",\"DOC-092\",\"DOC-093\",\"DOC-094\",\"DOC-095\",\"DOC-096\",\"DOC-097\",\"DOC-098\",\"DOC-099\",\"DOC-100\"],\"damaged\":[]}",
+          "checkedDocumentIds": [
+            "DOC-001",
+            "DOC-002",
+            "DOC-003",
+            "DOC-004",
+            "DOC-005",
+            "DOC-006",
+            "DOC-007",
+            "DOC-008",
+            "DOC-009",
+            "DOC-010",
+            "DOC-011",
+            "DOC-012",
+            "DOC-013",
+            "DOC-014",
+            "DOC-015",
+            "DOC-016",
+            "DOC-017",
+            "DOC-018",
+            "DOC-019",
+            "DOC-020",
+            "DOC-021",
+            "DOC-022",
+            "DOC-023",
+            "DOC-024",
+            "DOC-025",
+            "DOC-026",
+            "DOC-027",
+            "DOC-028",
+            "DOC-029",
+            "DOC-030",
+            "DOC-031",
+            "DOC-032",
+            "DOC-033",
+            "DOC-034",
+            "DOC-035",
+            "DOC-036",
+            "DOC-037",
+            "DOC-038",
+            "DOC-039",
+            "DOC-040",
+            "DOC-041",
+            "DOC-042",
+            "DOC-043",
+            "DOC-044",
+            "DOC-045",
+            "DOC-046",
+            "DOC-047",
+            "DOC-048",
+            "DOC-049",
+            "DOC-050",
+            "DOC-051",
+            "DOC-052",
+            "DOC-053",
+            "DOC-054",
+            "DOC-055",
+            "DOC-056",
+            "DOC-057",
+            "DOC-058",
+            "DOC-059",
+            "DOC-060",
+            "DOC-061",
+            "DOC-062",
+            "DOC-063",
+            "DOC-064",
+            "DOC-065",
+            "DOC-066",
+            "DOC-067",
+            "DOC-068",
+            "DOC-069",
+            "DOC-070",
+            "DOC-071",
+            "DOC-072",
+            "DOC-073",
+            "DOC-074",
+            "DOC-075",
+            "DOC-076",
+            "DOC-077",
+            "DOC-078",
+            "DOC-079",
+            "DOC-080",
+            "DOC-081",
+            "DOC-082",
+            "DOC-083",
+            "DOC-084",
+            "DOC-085",
+            "DOC-086",
+            "DOC-087",
+            "DOC-088",
+            "DOC-089",
+            "DOC-090",
+            "DOC-091",
+            "DOC-092",
+            "DOC-093",
+            "DOC-094",
+            "DOC-095",
+            "DOC-096",
+            "DOC-097",
+            "DOC-098",
+            "DOC-099",
+            "DOC-100"
+          ],
+          "integrity": "clean",
+          "restoreTestPassed": true,
+          "testedRestoreTurns": 2
+        },
+        "restoreMinutes": 10
+      }
+    },
+    "projectsAtStart": [
+      "endpoint-edr",
+      "backup-resilience"
+    ]
+  },
+  {
+    "id": "G",
+    "family": "M02",
+    "outcome": {
+      "confidentialityMet": null,
+      "continuityMet": false,
+      "containmentMet": false,
+      "integrityMet": false,
+      "allObjectivesMet": false
+    },
+    "decisions": [],
+    "orders": {
+      "ordersReceived": 360,
+      "ordersProcessed": 206,
+      "finalBacklog": 154,
+      "peakBacklog": 154,
+      "perTurn": [
+        {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 20,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "received": 20,
+          "processed": 17,
+          "backlog": 3,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 17,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 4,
+          "received": 20,
+          "processed": 17,
+          "backlog": 6,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 17,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 5,
+          "received": 20,
+          "processed": 14,
+          "backlog": 12,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 14,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 6,
+          "received": 20,
+          "processed": 14,
+          "backlog": 18,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 14,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 7,
+          "received": 20,
+          "processed": 11,
+          "backlog": 27,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 11,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 8,
+          "received": 20,
+          "processed": 11,
+          "backlog": 36,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 11,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 9,
+          "received": 20,
+          "processed": 9,
+          "backlog": 47,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 9,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 10,
+          "received": 20,
+          "processed": 9,
+          "backlog": 58,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 9,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 11,
+          "received": 20,
+          "processed": 8,
+          "backlog": 70,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 12,
+          "received": 20,
+          "processed": 8,
+          "backlog": 82,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 13,
+          "received": 20,
+          "processed": 8,
+          "backlog": 94,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 14,
+          "received": 20,
+          "processed": 8,
+          "backlog": 106,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 15,
+          "received": 20,
+          "processed": 8,
+          "backlog": 118,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 16,
+          "received": 20,
+          "processed": 8,
+          "backlog": 130,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 17,
+          "received": 20,
+          "processed": 8,
+          "backlog": 142,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        },
+        {
+          "turn": 18,
+          "received": 20,
+          "processed": 8,
+          "backlog": 154,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "packing-station",
+              "name": "pakowanie-03 — legalna praca lokalna",
+              "available": true,
+              "capacity": 2
+            },
+            {
+              "id": "correct-documents",
+              "name": "Poprawne dokumenty FS-01 — lokalna droga",
+              "available": false,
+              "capacity": 14
+            }
+          ]
+        }
+      ],
+      "capacityTransitions": [
+        {
+          "at": {
+            "minute": 845,
+            "turn": 1
+          },
+          "intervalStartMinute": 840,
+          "previousCapacity": null,
+          "capacity": 20
+        },
+        {
+          "at": {
+            "minute": 855,
+            "turn": 3
+          },
+          "intervalStartMinute": 850,
+          "previousCapacity": 20,
+          "capacity": 17
+        },
+        {
+          "at": {
+            "minute": 865,
+            "turn": 5
+          },
+          "intervalStartMinute": 860,
+          "previousCapacity": 17,
+          "capacity": 14
+        },
+        {
+          "at": {
+            "minute": 875,
+            "turn": 7
+          },
+          "intervalStartMinute": 870,
+          "previousCapacity": 14,
+          "capacity": 11
+        },
+        {
+          "at": {
+            "minute": 885,
+            "turn": 9
+          },
+          "intervalStartMinute": 880,
+          "previousCapacity": 11,
+          "capacity": 9
+        },
+        {
+          "at": {
+            "minute": 895,
+            "turn": 11
+          },
+          "intervalStartMinute": 890,
+          "previousCapacity": 9,
+          "capacity": 8
+        }
+      ]
+    },
+    "security": {
+      "exposedRecords": 0,
+      "containment": {
+        "applicable": false,
+        "activeSessionIds": [],
+        "usableSessionIds": [],
+        "stolenCredentialStillCurrent": false,
+        "newAuthenticationAllowed": false,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": false,
+        "accountContained": false,
+        "required": true,
+        "goalMet": false,
+        "retryBudgetExhausted": false,
+        "stoppedOnlyByRetryBudget": false
+      },
+      "integrity": {
+        "serviceOnline": true,
+        "dataAvailable": false,
+        "total": 100,
+        "correct": 0,
+        "damaged": 100,
+        "reconcile": 0,
+        "recovered": 0,
+        "everDamaged": 100,
+        "sourceHasWrite": true,
+        "endpointIsolated": false,
+        "writesRestricted": false,
+        "backupId": null,
+        "rpoMinutes": null,
+        "rtoMinutes": null,
+        "missingChanges": 0,
+        "reconstructed": 0,
+        "verified": false,
+        "limitedDataMinutes": 90,
+        "peakBacklog": 154
+      },
+      "investmentUse": {
+        "edr": {
+          "coverage": {
+            "endpointId": "pakowanie-03",
+            "sensorId": "edr-pakowanie-03",
+            "agentAvailable": true,
+            "collectorId": "nexus-endpoint-collector",
+            "collectorAvailable": true,
+            "operations": [
+              "read",
+              "modify"
+            ],
+            "retentionMinutes": 120,
+            "delayMinutes": 5,
+            "detection": {
+              "id": "endpoint-modify-burst",
+              "name": "Nietypowa seria modyfikacji dokumentów z endpointu",
+              "operation": "modify",
+              "threshold": 10,
+              "windowMinutes": 10
+            }
+          },
+          "capturedEvents": 16,
+          "deliveredEvents": 16,
+          "alerts": [
+            {
+              "id": "AL-endpoint-modify-burst-pakowanie-03",
+              "ruleId": "endpoint-modify-burst",
+              "name": "Nietypowa seria modyfikacji dokumentów z endpointu",
+              "sensorId": "edr-pakowanie-03",
+              "endpointId": "pakowanie-03",
+              "minute": 840,
+              "windowStartMinute": 830,
+              "windowEndMinute": 840,
+              "modificationCount": 12,
+              "eventIds": [
+                "EDR-0001"
+              ],
+              "assessment": "requires-investigation"
+            }
+          ],
+          "observations": [],
+          "informedActions": 0,
+          "firstEvidenceMinute": null
+        },
+        "firstLocalEvidenceMinute": null,
+        "backup": null,
+        "restoreMinutes": null
+      }
+    },
+    "projectsAtStart": [
+      "endpoint-edr"
+    ]
+  },
+  {
+    "id": "H",
+    "family": "M01",
+    "outcome": {
+      "confidentialityMet": true,
+      "continuityMet": false,
+      "containmentMet": null,
+      "integrityMet": null,
+      "allObjectivesMet": false
+    },
+    "decisions": [
+      {
+        "id": "D-00001",
+        "action": "inspect-auth-logs",
+        "issuedAt": {
+          "minute": 840,
+          "turn": 0
+        },
+        "completedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00003",
+        "action": "block-account",
+        "issuedAt": {
+          "minute": 845,
+          "turn": 1
+        },
+        "completedAt": {
+          "minute": 850,
+          "turn": 2
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing",
+          "K-T-0001-auth",
+          "K-MSG-msg-T-0001"
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "D-00005",
+        "action": "set-vpn",
+        "issuedAt": {
+          "minute": 850,
+          "turn": 2
+        },
+        "completedAt": {
+          "minute": 855,
+          "turn": 3
+        },
+        "knownEvidenceIds": [
+          "K-AL-VPN-AL-vpn-auth-magazyn-07",
+          "K-MSG-ewa-briefing",
+          "K-T-0001-auth",
+          "K-MSG-msg-T-0001",
+          "K-MSG-msg-T-0002"
+        ],
+        "status": "completed"
+      }
+    ],
+    "orders": {
+      "ordersReceived": 360,
+      "ordersProcessed": 180,
+      "finalBacklog": 180,
+      "peakBacklog": 180,
+      "perTurn": [
+        {
+          "turn": 1,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": true
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": true
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "received": 20,
+          "processed": 20,
+          "backlog": 0,
+          "localAvailable": true,
+          "remoteAvailable": true,
+          "capacity": 22,
+          "status": "available",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": true
+            }
+          ]
+        },
+        {
+          "turn": 4,
+          "received": 20,
+          "processed": 8,
+          "backlog": 12,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 5,
+          "received": 20,
+          "processed": 8,
+          "backlog": 24,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 6,
+          "received": 20,
+          "processed": 8,
+          "backlog": 36,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 7,
+          "received": 20,
+          "processed": 8,
+          "backlog": 48,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 8,
+          "received": 20,
+          "processed": 8,
+          "backlog": 60,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 9,
+          "received": 20,
+          "processed": 8,
+          "backlog": 72,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 10,
+          "received": 20,
+          "processed": 8,
+          "backlog": 84,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 11,
+          "received": 20,
+          "processed": 8,
+          "backlog": 96,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 12,
+          "received": 20,
+          "processed": 8,
+          "backlog": 108,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 13,
+          "received": 20,
+          "processed": 8,
+          "backlog": 120,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 14,
+          "received": 20,
+          "processed": 8,
+          "backlog": 132,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 15,
+          "received": 20,
+          "processed": 8,
+          "backlog": 144,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 16,
+          "received": 20,
+          "processed": 8,
+          "backlog": 156,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 17,
+          "received": 20,
+          "processed": 8,
+          "backlog": 168,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        },
+        {
+          "turn": 18,
+          "received": 20,
+          "processed": 8,
+          "backlog": 180,
+          "localAvailable": true,
+          "remoteAvailable": false,
+          "capacity": 8,
+          "status": "degraded",
+          "contributions": [
+            {
+              "id": "shipping-files",
+              "name": "Dokumenty wysyłkowe FS-01",
+              "capacity": 6,
+              "available": false
+            }
+          ]
+        }
+      ],
+      "capacityTransitions": [
+        {
+          "at": {
+            "minute": 845,
+            "turn": 1
+          },
+          "intervalStartMinute": 840,
+          "previousCapacity": null,
+          "capacity": 22
+        },
+        {
+          "at": {
+            "minute": 860,
+            "turn": 4
+          },
+          "intervalStartMinute": 855,
+          "previousCapacity": 22,
+          "capacity": 8
+        }
+      ]
+    },
+    "security": {
+      "exposedRecords": 0,
+      "containment": {
+        "applicable": false,
+        "activeSessionIds": [],
+        "usableSessionIds": [],
+        "stolenCredentialStillCurrent": false,
+        "newAuthenticationAllowed": false,
+        "accessAfterNewAuthentication": false,
+        "targetAccessCutOff": false,
+        "accountContained": false,
+        "required": false,
+        "goalMet": null,
+        "retryBudgetExhausted": false,
+        "stoppedOnlyByRetryBudget": false
+      },
+      "integrity": null,
+      "investmentUse": {
+        "mfaRefusals": 0,
+        "fileObservationCount": 0
+      }
+    },
+    "projectsAtStart": []
+  }
+]

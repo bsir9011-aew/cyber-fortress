@@ -1,4 +1,4 @@
-# Architektura FORTRESS LAB — Sprint 9
+# Architektura FORTRESS LAB — Sprint 10
 
 Jedna aplikacja React + TypeScript + Vite z natywną mapą SVG. Silnik to czyste
 funkcje TypeScript: bez Reacta, DOM, zegara systemowego, I/O i losowości.
@@ -537,3 +537,34 @@ stan również podczas wdrożenia, badania EDR i restore.
 
 [Kontrakty i diagram](resilience-investments.md) · [V4](game-save-v4.md) ·
 [Pełne przebiegi i Chromium](resilience-validation.md).
+
+
+## After Action Review — projekcja bez zmiany silnika i zapisu
+
+`domain/afterActionReport.ts` definiuje Fortress AAR V1, oddzielony od formatów
+zapisów. `createAfterActionReport` weryfikuje GameSession istniejącym replay,
+a następnie wykonuje te same reducery od prawidłowego początku samodzielnej
+misji albo pełnej kampanii. Przy wcześniejszej operacji pobiera przygotowanie
+z jej rzeczywistego startu. Nie kopiuje obecnych inwestycji wstecz.
+
+`application/aar/missionTrace.ts` zbiera obserwowalne dowody przy ich uzyskaniu
+i projekcję wiedzy sprzed każdego zlecenia/hipotezy. Osobno zapisuje prawdę
+stanu i ślad ukończenia zadania. Nie archiwizuje SimulationState co turę,
+nie rozstrzyga alternatywnych ataków i nie nadaje ocen. Predykaty dostępu,
+raporty biznesowe i integralności pochodzą z istniejących funkcji.
+
+`validateAfterActionReport` sprawdza bilanse, chronologię i powiązania, w tym
+brak przyszłych dowodów. `afterActionMarkdown` prezentuje te same fakty,
+`afterActionExport` koduje pliki i dostarcza statyczną instrukcję coachingu.
+UI `AfterActionExport` rekonstruuje raport dopiero po kliknięciu i buforuje
+wynik dla obu formatów. Pobieranie Blob i obsługa schowka są osobną warstwą UI.
+Nie ma API AI, odczytu DOM do generowania faktów ani nowego zapisu localStorage.
+
+Bramka UI jest pomocnicza: generator niezależnie wymaga pełnego, zgodnego
+replay do końca 18. tury. Eksporty AAR nie są przyjmowane przez importer zapisów.
+Historyczne operacje kampanii można odtworzyć; starsze samodzielne podsumowania
+bez dziennika nie otrzymują wymyślonych raportów. Nie dodano notatek ani
+komend, więc V4 pozostaje bez zmian, tak jak kompatybilność V1/V2/V3.
+
+[Kontrakt, diagram i granice interpretacji](after-action-review.md) ·
+[Przykłady](aar-examples/README.md) · [Walidacja](after-action-review-validation.md).

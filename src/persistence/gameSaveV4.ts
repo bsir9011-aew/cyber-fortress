@@ -76,6 +76,10 @@ export function readCurrentGameSave(text: string): Result<FortressSaveV4> {
       throw new Error('Zapis przekracza limit 8 MiB.');
     const v: unknown = JSON.parse(text);
     if (!object(v)) throw new Error('Zapis jest niekompletny.');
+    if (v.format === 'FORTRESS_AAR')
+      throw new Error(
+        'Wybrany plik to raport AAR, nie zapis gry. Do wznowienia użyj eksportu zapisu.',
+      );
     if (
       v.schemaVersion === 1 ||
       v.schemaVersion === 2 ||

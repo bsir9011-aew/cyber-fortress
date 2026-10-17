@@ -48,3 +48,14 @@ bajtów z zachowanych artefaktów walidacji Sprintu 8:
 Nie generowano ich nowym silnikiem. Test V4 porównuje sesję ze starą migawką
 oraz odczytem V3. Chromium sprawdza eksport oryginału bajt w bajt, kontynuację,
 import i reload bez automatycznego finansowania/katalogu Etapu II.
+
+
+## V4 sprzed Sprintu 10
+
+`sprint9-restore-pending-v4.json` jest niezmienionym eksportem Chromium Sprintu 9
+(`084b12a`, PR #10), skopiowanym z zachowanego artefaktu
+`resilience-restore-v4.json`. Zawiera M02 z EDR i ukończonym programem backup,
+FS-1350 w trakcie odtwarzania (tura 3, termin 4), finansowanie Etapu II i
+rzeczywiste wcześniejsze komendy kampanii. Nie wygenerowano go nowym AAR.
+Test kontynuuje tę sesję i porównuje raport z faktycznym stanem silnika.
+Oryginalne bajty pliku pozostają bez zmian.
