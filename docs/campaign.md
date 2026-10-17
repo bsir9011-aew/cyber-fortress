@@ -98,7 +98,25 @@ prób logowania i świeżego stanu operacyjnego. Trwała polityka porządkowania
 uprawnień respektuje udokumentowaną rolę plikową danego przydziału pracy;
 nie identyfikuje napastnika na podstawie ukrytego wariantu.
 
-## Trzy decyzje
+## Kontrolowane odzyskanie dostępu
+
+Blokada konta pozostaje w `SecurityPosture.accountOverrides` między misjami.
+W trakcie następnego incydentu operacja **Przywróć nowe logowania · 5 min**
+(`unblock-account`) zajmuje administratora przez jedną turę. Wymaga konta
+znanego z obserwacji, istniejącego i zablokowanego, wolnego administratora
+oraz czasu na ukończenie przed końcem misji. Efekt następuje po zakończeniu,
+nie przy zleceniu. Po powrocie do centrali `enabled` zastępuje poprzednią
+blokadę w trwałym stanie; nie ma automatycznego resetu blokad.
+
+Operacja zmienia wyłącznie `loginStatus`. Nie odtwarza tuneli, nie resetuje
+wersji poświadczenia, MFA ani uprawnień. Legalny klient musi ponownie przejść
+zwykłe uwierzytelnienie; biznes odzyskuje tylko dostępne części procesu.
+Zablokowane SMB nadal ogranicza wydajność. Odblokowanie konta z ważnym
+przejętym hasłem bez skutecznego dodatkowego zabezpieczenia przywraca też
+techniczną możliwość uwierzytelnienia napastnika. Limit prób planera nie
+zastępuje oceny tej możliwości.
+
+## Trzy decyzje inwestycyjne
 
 **A — dostęp zdalny:** wskazane modelowane konta reprezentujące grupę 61 kont
 wymagają zarejestrowanego drugiego składnika. Legalne profile mają własny

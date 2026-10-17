@@ -56,6 +56,7 @@ export const taskSpecs: Record<
   'contact-account-owner': { workerId: 'analyst', turns: 1 },
   'terminate-session': { workerId: 'administrator', turns: 1 },
   'block-account': { workerId: 'administrator', turns: 1 },
+  'unblock-account': { workerId: 'administrator', turns: 1 },
   'reset-credential': { workerId: 'administrator', turns: 2 },
   'set-vpn': { workerId: 'administrator', turns: 1 },
   'set-network-rule': { workerId: 'administrator', turns: 2 },
@@ -121,6 +122,7 @@ export function taskRejection(
         ? null
         : 'invalid-state';
     case 'block-account':
+    case 'unblock-account':
     case 'reset-credential': {
       if (!knownAccountIds(state).includes(action.accountId))
         return 'target-not-observed';
@@ -129,6 +131,11 @@ export function taskRejection(
       );
       if (!account) return 'unknown-target';
       if (action.type === 'block-account' && account.loginStatus === 'blocked')
+        return 'invalid-state';
+      if (
+        action.type === 'unblock-account' &&
+        account.loginStatus !== 'blocked'
+      )
         return 'invalid-state';
       return null;
     }

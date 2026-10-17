@@ -14,3 +14,14 @@ obecnego drzewa. Jednorazowy generator użył starych `createOperationSession`,
 Metadane obu plików: 2026-10-16T12:00:00.000Z, wyłącznie fikcyjne dane gry.
 Nie poprawiamy ich razem z nową wersją silnika. Test aktualizacji musi porównać
 stary stan ze zweryfikowaną migawką V2 i zachować bajty starego klucza.
+
+## V2 sprzed poprawki odzyskiwania kont
+
+`sprint7-blocked-v2.json` wygenerowano niezmienionymi źródłami commita
+`a51312c` przez `git archive` i stare funkcje `createStrategicSession`,
+`applyCampaignSession`, `createGameSave`, `serializeGameSave`. Sekwencja:
+cztery godziny przygotowania → misja A → zlecenie blokady `magazyn-07` →
+18 tur → centrala → cztery godziny → start legalnego B. Konto jest zablokowane,
+S-19 nie powstaje, wersja poświadczenia wynosi 1. Metadane:
+2026-10-17T06:00:00.000Z, wyłącznie fikcyjne dane. Test wymaga identycznego
+odczytu dawnej migawki, a następnie pozwala wykonać nowe zadanie w tym świecie.

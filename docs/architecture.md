@@ -470,3 +470,9 @@ korzysta z faktycznych wyników logowania, obserwacji i raportów biznesowych.
 
 Specyfikacje: [kampania](campaign.md), [silnik](strategic-engine.md),
 [zapis V2](game-save-v2.md), [walidacja i ograniczenia](strategic-command-validation.md).
+
+`unblock-account` korzysta z istniejącej kolejki administratora (jedna tura).
+Walidacja celu i wykonawcy jest w `simulation/tasks.ts`, efekt zmienia tylko
+`loginStatus` w silniku. UI dostaje wyłącznie identyfikatory zablokowanych kont
+już znanych graczowi. Nowe sesje nadal wydaje ten sam `issueVpnSession`, a
+kampania zachowuje wynik w istniejącym `SecurityPosture.accountOverrides`.

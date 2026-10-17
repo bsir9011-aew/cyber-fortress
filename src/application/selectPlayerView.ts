@@ -46,6 +46,11 @@ export function selectPlayerView(state: SimulationState) {
     hypothesis: state.incident.hypothesis,
     messages: state.incident.messages,
     knownAccountIds: knownAccountIds(state),
+    blockedKnownAccountIds: knownAccountIds(state).filter((id) =>
+      state.access.accounts.some(
+        (account) => account.id === id && account.loginStatus === 'blocked',
+      ),
+    ),
     sensors: {
       authentication: state.telemetry.authenticationSensor,
       sessions: state.telemetry.sessionSensor,

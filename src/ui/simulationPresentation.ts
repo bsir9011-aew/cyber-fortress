@@ -18,6 +18,8 @@ export function actionLabel(action: TaskAction): string {
       return `Zakończenie sesji ${action.sessionId}`;
     case 'block-account':
       return `Blokada nowych logowań: ${action.accountId}`;
+    case 'unblock-account':
+      return `Przywrócenie nowych logowań: ${action.accountId}`;
     case 'reset-credential':
       return `Reset poświadczenia: ${action.accountId}`;
     case 'set-vpn':

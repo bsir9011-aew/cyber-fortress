@@ -31,6 +31,8 @@ export function deriveNarrative(
       text = `Zakończyłem tunel ${action.sessionId}. To nie zmienia zasad nowych logowań.`;
     if (action.type === 'block-account')
       text = `Nowe logowania konta ${action.accountId} są zablokowane. Istniejące tunele wymagają osobnej decyzji.`;
+    if (action.type === 'unblock-account')
+      text = `Przywróciłem nowe logowania konta ${action.accountId}. Zakończone tunele pozostają zakończone. Hasło i MFA nie zostały zmienione; nadal ważne przejęte poświadczenie może ponownie umożliwić dostęp.`;
     if (action.type === 'reset-credential')
       text = `Zmieniono poświadczenie konta ${action.accountId}. Wcześniej wydane sesje zachowują ważność.`;
     if (action.type === 'set-vpn')

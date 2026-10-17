@@ -84,6 +84,7 @@ export type TaskAction =
   | { readonly type: 'contact-account-owner'; readonly accountId: string }
   | { readonly type: 'terminate-session'; readonly sessionId: string }
   | { readonly type: 'block-account'; readonly accountId: string }
+  | { readonly type: 'unblock-account'; readonly accountId: string }
   | { readonly type: 'reset-credential'; readonly accountId: string }
   | {
       readonly type: 'set-vpn';

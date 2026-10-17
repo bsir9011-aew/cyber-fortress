@@ -59,6 +59,22 @@ przygotowania. Walidacja jest sprawdzeniem spójności, nie kryptografią przeci
 oszukiwaniu. Pliki zawierają fikcyjną prywatną prawdę; nie ma danych osobowych
 użytkownika, haseł lub prawdziwych kluczy MFA.
 
+## Zgodność kontrolowanego odblokowania
+
+Rozszerzenie `schedule-task` o `{ type: 'unblock-account', accountId }` jest
+dostępne wyłącznie w walidatorze komend V2 (zarówno samodzielnej misji, jak
+kampanii). Wymagamy dokładnych pól i poprawnego identyfikatora. Przy odtwarzaniu
+reducer sprawdza istniejące, znane i zablokowane konto, wykonawcę oraz czas.
+Migawka musi zgadzać się także w trakcie zadania i po jego ukończeniu; samo
+podmienienie stanu konta albo terminu zadania nie przechodzi walidacji.
+
+Koperta pozostaje `2 / 7.0.0 / nexus-strategy-1`: to dodanie nowej operacji bez
+zmiany wyników wcześniejszych komend ani kształtu zapisanej migawki. Istniejące
+V2 nie wymagają migracji, resetowania blokad ani uzupełniania pól. Fixture
+`sprint7-blocked-v2.json` pochodzi z niezmienionego kodu `a51312c`; test porównuje
+cały dawny stan, wykonuje nowe zadanie po imporcie i zapisuje jego wynik w
+następnym oknie. Kontrakt V1 nadal odrzuca nową operację.
+
 ## V1 pozostaje nienaruszony
 
 Klucze są rozdzielone:

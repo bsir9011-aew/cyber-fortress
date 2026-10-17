@@ -66,7 +66,7 @@ export function keys(value: Record<string, unknown>, fields: string[]) {
 }
 export function isRecordedCommand(
   value: unknown,
-  allowFileAudit = false,
+  allowV2Actions = false,
 ): value is RecordedCommand {
   if (!object(value)) return false;
   if (value.type === 'advance-turn') return keys(value, ['type']);
@@ -91,7 +91,13 @@ export function isRecordedCommand(
   const a = value.action;
   switch (a.type) {
     case 'inspect-file-access':
-      return allowFileAudit && keys(a, ['type']);
+      return allowV2Actions && keys(a, ['type']);
+    case 'unblock-account':
+      return (
+        allowV2Actions &&
+        keys(a, ['type', 'accountId']) &&
+        identifier(a.accountId)
+      );
     case 'inspect-auth-logs':
     case 'inspect-vpn-sessions':
       return keys(a, ['type']);

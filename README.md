@@ -266,8 +266,13 @@ chmurowych zapisów. Audyt obejmuje tylko jawnie modelowaną usługę FS-01. Od�
 
 Prosty planer nadal kończy próby po 3 kolejnych porażkach; raport odróżnia ten limit
 od odcięcia technicznych możliwości. Wyłączenie VPN nie zmienia ważności
-przejętego poświadczenia. Dowolne ręczne przywracanie kont i edytowanie nadań
-pozostają poza dostępnymi komendami. Projekt A porządkuje tylko jawnie określony
+przejętego poświadczenia. W Operacjach → Konto i poświadczenie administrator
+może przywrócić nowe logowania wskazanego zablokowanego konta zadaniem trwającym
+5 minut. Nie przywraca to zakończonych tuneli, nie zmienia hasła ani MFA.
+Nadal ważne przejęte poświadczenie może znów umożliwić dostęp. Legalna praca
+wymaga poprawnego nowego logowania i dostępnych usług; stan konta przechodzi do
+następnych misji. Dowolne edytowanie nadań pozostaje poza dostępnymi komendami.
+Projekt A porządkuje tylko jawnie określony
 zakres SMB.
 
 Przegląd techniczny pierwszych minut nie zastępuje testów grywalności z ludźmi.

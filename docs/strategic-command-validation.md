@@ -44,9 +44,9 @@ zakupu. Zwracane mogą być rezerwacje przed rozpoczęciem, nie ukończone wdro�
 
 | Kontrola            | Wynik                                            |
 | ------------------- | ------------------------------------------------ |
-| `npm test`          | 329/329, 12 plików, bez pominięć                 |
+| `npm test`          | 350/350, 13 plików, bez pominięć                 |
 | Dotychczasowe testy | Wszystkie 249 zachowane, bez modyfikacji asercji |
-| Nowe przypadki      | 45 kampanii/mechanizmów + 35 zapisu/aktualizacji |
+| Nowe przypadki      | 45 kampanii/mechanizmów + 46 zapisu/aktualizacji + 10 odzyskiwania kont |
 | `npm run typecheck` | PASS, domain/simulation także bez DOM            |
 | `npm run build`     | PASS, 80 modułów, poprawna baza Pages            |
 | `git diff --check`  | PASS                                             |
@@ -61,6 +61,48 @@ Dodatkowo sprawdzono pełną równość po eksporcie/importowaniu przygotowania,
 trwającej misji oraz następnego okna. Walidacja odrzuca podmienione finanse,
 polityki, tury, metadane misji, enumy udawane tablicą, obce komendy, wersje,
 nadmierny rozmiar/liczbę komend i klucze prototypu. Zła migracja nie jest udawana.
+
+## Poprawka przed merge PR #8: odzyskiwanie konta
+
+`unblock-account` jest zadaniem administratora trwającym 5 minut. Wymaga
+istniejącego, znanego z obserwacji i zablokowanego konta, wolnego wykonawcy
+oraz dostępnego czasu. Zlecenie nie zmienia od razu konfiguracji. Ukończenie
+zmienia tylko `loginStatus` na `enabled`, bez odtwarzania starych tuneli,
+resetowania wersji poświadczenia lub MFA. Ręczny stan przechodzi przez
+istniejący `SecurityPosture.accountOverrides`.
+
+Dodano 21 przypadków regresyjnych (10 logiki/kampanii, 11 walidacji/zapisu):
+
+- A: blokada `magazyn-07` → B: odmowa początkowego logowania, wydajność 16.
+  Zadanie zlecone o 14:00 kończy się 14:05; stary przedział nadal ma wydajność
+  16, S-19 nie powstaje. Legalny klient uzyskuje nową sesję o 14:10; następny
+  przedział ma wydajność 22. Finał: 360 obsłużonych, 0 zaległych. Powrót do
+  centrali i kolejna misja dziedziczą `enabled`.
+- Bez jawnej operacji blokada pozostaje przez B i do C. Legalne B kończy się
+  z 288 obsłużonymi i 72 zaległymi. Odblokowanie przy zachowanej odmowie SMB
+  także nie przyznaje pełnej wydajności.
+- Zakończony tunel pozostaje zakończony. Z nadal ważnym skradzionym hasłem
+  napastnik może uzyskać nowy tunel i wznowić transfer. Ocena zagrożenia nie
+  myli limitu prób planera z odcięciem możliwości logowania.
+- Wersja poświadczenia po resecie i ustawienia MFA pozostają bez zmian;
+  stare hasło lub brak wymaganego składnika nadal powodują odmowę.
+- Niepoprawny cel/stan, zły wykonawca, zajętość i koniec okna nie pozwalają
+  wykonać operacji. UI proponuje tylko znane zablokowane konta.
+- Statyczny V2 wygenerowany źródłami `a51312c` wczytuje cały świat identycznie,
+  zachowując blokadę. Nowe zadanie przechodzi zapis/import w toku, ukończenie
+  i następne okno. Niepoprawne pola, podmienione konto lub termin zadania są
+  odrzucane; kontrakt V1 nie został rozszerzony.
+
+Nie zmieniono kosztów projektów, segmentacji, algorytmu uwierzytelnienia ani
+planera przeciwnika. Nowa operacja korzysta z istniejącej kolejki i kolejności
+rozliczania tur. Koperta V2 pozostaje zgodna z wcześniejszymi plikami.
+
+Chromium na produkcyjnym buildzie `/cyber-fortress/`, 1366 i 375 px: blokada
+wykonana przyciskiem w A, odziedziczona w B, przywrócenie przez zajętego przez
+5 minut administratora, eksport/import oraz odświeżenie zadania w toku,
+nowa sesja `M-reconnect-02`, wydajność 16 → 22, finał 360/0 i trwałe `enabled`
+po powrocie do centrali. Import rzeczywistego dawnego V2 również udostępnia
+nową operację. Brak poziomego przewijania i błędów JS, konsoli lub zasobów.
 
 ## Pełne przebiegi: trzy warianty i inwestycje
 
@@ -188,8 +230,9 @@ Nie deklarujemy potwierdzonego FUN bez badań z ludźmi.
 Pozostałe granice: cztery względne godziny i 18 tur, trzy stałe warianty,
 uproszczony drugi składnik, grupowa praca zamiast 61 osobnych historii, jeden
 serwerowy audyt. Nie ma pełnego SIEM, kampanii wielowątkowej, rynku, backendu ani
-synchronizacji. Zachowana ręczna blokada/reset może obciążyć legalnego klienta
-w kolejnym incydencie; nie dodano pełnego zarządzania cyklem życia kont.
+synchronizacji. Zachowany reset może obciążyć legalnego klienta w kolejnym
+incydencie; odblokowanie nie przekazuje mu nowego hasła. Istnieje kontrolowane
+odblokowanie konta, ale nie pełne zarządzanie cyklem życia kont.
 Zapis V2 ma limity 8 MiB/10 000 komend/150 000 węzłów i 48 poziomów JSON, bez
 obcinania danych. Wiele kart nie synchronizuje się; nowy start offline nie jest
 gwarantowany przez service worker.

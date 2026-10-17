@@ -85,13 +85,18 @@ function applyTaskEffect(
         },
       };
     case 'block-account':
+    case 'unblock-account':
       return {
         ...state,
         access: {
           ...state.access,
           accounts: state.access.accounts.map((account) =>
             account.id === action.accountId
-              ? { ...account, loginStatus: 'blocked' }
+              ? {
+                  ...account,
+                  loginStatus:
+                    action.type === 'block-account' ? 'blocked' : 'enabled',
+                }
               : account,
           ),
         },

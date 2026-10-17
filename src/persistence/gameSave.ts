@@ -26,6 +26,8 @@ export const GAME_SAVE_KEY = 'fortress-lab.game.v2';
 export const MAX_GAME_BYTES = 8 * 1024 * 1024;
 export const MAX_GAME_COMMANDS = 10000;
 export interface FortressSaveV2 {
+  // Additive V2 actions (including unblock-account) preserve existing journals
+  // and snapshots, so the 7.0.0 envelope remains readable without migration.
   readonly schemaVersion: 2;
   readonly engineVersion: '7.0.0';
   readonly contentVersion: 'nexus-strategy-1';

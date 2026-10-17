@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import activeFixture from './fixtures/sprint6-active-v1.json?raw';
 import legalFixture from './fixtures/sprint6-legal-v1.json?raw';
+import blockedV2Fixture from './fixtures/sprint7-blocked-v2.json?raw';
 import {
   applyCampaignSession,
   createStandalone,
@@ -17,11 +18,17 @@ import {
   readGameSave,
   serializeGameSave,
   GAME_SAVE_KEY,
+  isCampaignCommand,
 } from './gameSave';
 import { loadGameState, storeGameState } from './gameStorage';
 import { SAVE_KEY } from './localStorage';
 import type { StorageAdapter } from './localStorage';
-import { createSave, readSave, sameJson } from './saveFormat';
+import {
+  createSave,
+  readSave,
+  sameJson,
+  isRecordedCommand,
+} from './saveFormat';
 const date = '2026-10-17T05:00:00.000Z';
 const later = '2026-10-17T06:00:00.000Z';
 const fixture = (name: string) =>
@@ -67,6 +74,165 @@ function finish(g: StrategicSession) {
   while (g.campaign.phase === 'incident') g = apply(g, turn);
   return g;
 }
+
+describe('FortressSaveV2 — kontrolowane odblokowanie i zgodność', () => {
+  const unblock = {
+    type: 'incident-command',
+    command: {
+      type: 'schedule-task',
+      workerId: 'administrator',
+      action: { type: 'unblock-account', accountId: 'magazyn-07' },
+    },
+  } as const;
+  function oldBlockedCampaign() {
+    const loaded = readGameSave(blockedV2Fixture);
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok || loaded.value.session.kind !== 'campaign')
+      throw new Error('Legacy V2 fixture rejected');
+    return loaded.value.session;
+  }
+  it('odtwarza bez migracji rzeczywisty zapis V2 z a51312c i zachowuje blokadę', () => {
+    const g = oldBlockedCampaign();
+    expect(g).toEqual(JSON.parse(blockedV2Fixture).session);
+    expect(g.campaign.posture.accountOverrides['magazyn-07']?.loginStatus).toBe(
+      'blocked',
+    );
+    expect(
+      g.campaign.incident!.access.accounts.find((a) => a.id === 'magazyn-07')
+        ?.loginStatus,
+    ).toBe('blocked');
+    expect(roundtrip(g)).toEqual(g);
+  });
+  it('wznawia zadanie z dawnego V2 bez przyspieszenia i zachowuje enabled w następnym oknie', () => {
+    const g = oldBlockedCampaign();
+    const pending = apply(g, unblock);
+    expect(pending.campaign.incident!.tasks.at(-1)).toMatchObject({
+      status: 'running',
+      dueTurn: 1,
+    });
+    const restored = roundtrip(pending);
+    expect(restored).toEqual(pending);
+    expect(restored.campaign.incident!.clock.turn).toBe(0);
+    expect(
+      restored.campaign.incident!.access.accounts.find(
+        (a) => a.id === 'magazyn-07',
+      )?.loginStatus,
+    ).toBe('blocked');
+    const done = apply(restored, turn);
+    expect(done).toEqual(apply(pending, turn));
+    expect(roundtrip(done)).toEqual(done);
+    expect(
+      done.campaign.incident!.access.accounts.find((a) => a.id === 'magazyn-07')
+        ?.loginStatus,
+    ).toBe('enabled');
+    const next = apply(finish(done), { type: 'return-headquarters' });
+    expect(next.campaign.posture.accountOverrides['magazyn-07']).toEqual({
+      loginStatus: 'enabled',
+      credentialVersion: 1,
+    });
+    expect(roundtrip(next)).toEqual(next);
+    expect(
+      finish(
+        apply(roundtrip(next), hour, hour, hour, hour, {
+          type: 'start-incident',
+        }),
+      ),
+    ).toEqual(
+      finish(apply(next, hour, hour, hour, hour, { type: 'start-incident' })),
+    );
+  });
+  it('obsługuje odblokowanie także w samodzielnym incydencie V2', () => {
+    let g = createStandalone('training', 0, 'recovery-standalone', date);
+    if (g.kind !== 'incident') throw new Error();
+    for (const command of [
+      {
+        ...unblock.command,
+        action: { type: 'block-account', accountId: 'magazyn-07' },
+      },
+      { type: 'advance-turn' },
+      unblock.command,
+    ] as const)
+      g = {
+        ...g,
+        operation: applyOperationCommand(g.operation, command, date),
+      };
+    expect(roundtrip(g)).toEqual(g);
+    expect(
+      applyOperationCommand(
+        roundtrip(g).operation,
+        { type: 'advance-turn' },
+        date,
+      ),
+    ).toEqual(
+      applyOperationCommand(g.operation, { type: 'advance-turn' }, date),
+    );
+  });
+  it('akceptuje nową komendę tylko w V2, bez rozszerzania historycznego kontraktu V1', () => {
+    expect(isCampaignCommand(unblock)).toBe(true);
+    expect(isRecordedCommand(unblock.command, true)).toBe(true);
+    expect(isRecordedCommand(unblock.command)).toBe(false);
+  });
+  it.each([
+    { type: 'unblock-account' },
+    { type: 'unblock-account', accountId: '' },
+    { type: 'unblock-account', accountId: null },
+    { type: 'unblock-account', accountId: ['magazyn-07'] },
+    { type: 'unblock-account', accountId: 'magazyn-07', credentialVersion: 1 },
+    { type: 'unblock-account', accountId: 'magazyn-07', enabled: true },
+  ])(
+    'odrzuca niepoprawny kształt lub dodatkowe pola operacji #%#',
+    (action) => {
+      const command = { ...unblock, command: { ...unblock.command, action } };
+      expect(isCampaignCommand(command)).toBe(false);
+      const g = oldBlockedCampaign();
+      expect(
+        readGameSave(
+          JSON.stringify({
+            ...createGameSave(g, later),
+            session: { ...g, commands: [...g.commands, command] },
+          }),
+        ).ok,
+      ).toBe(false);
+    },
+  );
+  it('nie pozwala sfałszować zakończenia zadania ani samego stanu konta', () => {
+    const pending = apply(oldBlockedCampaign(), unblock);
+    const incident = pending.campaign.incident!;
+    const forged = [
+      {
+        ...incident,
+        access: {
+          ...incident.access,
+          accounts: incident.access.accounts.map((a) => ({
+            ...a,
+            loginStatus: 'enabled',
+          })),
+        },
+      },
+      {
+        ...incident,
+        tasks: incident.tasks.map((t) => ({
+          ...t,
+          dueTurn: 0,
+          status: 'completed',
+        })),
+      },
+    ];
+    for (const fake of forged)
+      expect(
+        readGameSave(
+          JSON.stringify({
+            ...createGameSave(pending, later),
+            session: {
+              ...pending,
+              campaign: { ...pending.campaign, incident: fake },
+            },
+          }),
+        ).ok,
+      ).toBe(false);
+    expect(roundtrip(pending)).toEqual(pending);
+  });
+});
 
 describe('FortressSaveV2 — jeden autorytatywny stan', () => {
   it.each([0, 1, 2])(
