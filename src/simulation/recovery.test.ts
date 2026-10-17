@@ -296,6 +296,14 @@ describe('M04 — single order ledger and controlled recovery', () => {
     s = job(s, check);
     expect(s.recovery?.results.at(-1)?.outcome).toBe('partial');
   });
+  it('marks prior verification stale when new manual shipments await posting to ERP', () => {
+    let s = job(job(start(), restart), check);
+    expect(selectPlayerView(s).recovery?.confidence).toBe(true);
+    s = advance(job(s, manual));
+    expect(pendingErpOrderIds(s)).toHaveLength(10);
+    expect(selectPlayerView(s).recovery?.confidence).toBe(false);
+    expect(recoveryOutcome(s).operationalConfidence.verified).toBe(false);
+  });
   it('shared workers, operation prerequisites and deadline prevent impossible or concurrent work', () => {
     let s = start(1);
     expect(taskRejection(s, 'administrator', old)).toBe('target-not-observed');

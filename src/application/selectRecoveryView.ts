@@ -40,7 +40,9 @@ export function selectRecoveryView(state: SimulationState) {
     backups,
     manualProcessed: r.orders.filter((o) => o.fulfilledBy === 'manual').length,
     pendingOrders: pendingErpOrderIds(state).length,
-    confidence: r.verifiedRevision === r.revision,
+    confidence:
+      r.verifiedRevision === r.revision &&
+      pendingErpOrderIds(state).length === 0,
     rtoMinutes: state.hidden.scenario.recovery!.rtoMinutes,
     rpoMinutes: state.hidden.scenario.recovery!.rpoMinutes,
   };
