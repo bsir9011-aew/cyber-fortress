@@ -1,3 +1,4 @@
+import type { RecoveryDefinition } from './recovery';
 import type { VendorDefinition } from './vendor';
 import type { AccessState } from './access';
 import type { AttackDefinition } from './attack';
@@ -36,7 +37,11 @@ export interface HistoricalAuthenticationAttempt {
 }
 
 export interface ScenarioDefinition {
-  readonly familyId?: 'nexus-integrity-detection-v1' | 'nexus-vendor-access-v1';
+  readonly familyId?:
+    | 'nexus-integrity-detection-v1'
+    | 'nexus-vendor-access-v1'
+    | 'nexus-erp-recovery-v1';
+  readonly recovery?: RecoveryDefinition;
   readonly vendor?: VendorDefinition;
   readonly backupReadiness?: BackupReadiness;
   readonly integrity?: IntegrityDefinition;
@@ -48,7 +53,8 @@ export interface ScenarioDefinition {
     | 'legitimate-session'
     | 'stolen-credential'
     | 'local-integrity'
-    | 'third-party-access';
+    | 'third-party-access'
+    | 'erp-recovery';
   readonly explanation: string;
   readonly world: WorldState;
   readonly clock: Omit<SimulationClock, 'turn'>;

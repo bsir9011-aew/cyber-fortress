@@ -21,7 +21,7 @@ export function App() {
     return (
       !(operations.active || operations.hasSave) ||
       window.confirm(
-        'Nowa gra zastąpi bieżącą grę i zapis V6. Oryginały V1/V2/V3/V4/V5 oraz historia prób pozostaną. Kontynuować?',
+        'Nowa gra zastąpi bieżącą grę i zapis V7. Oryginały V1/V2/V3/V4/V5/V6 oraz historia prób pozostaną. Kontynuować?',
       )
     );
   }
@@ -70,6 +70,7 @@ export function App() {
         thirdRaw={operations.thirdRaw}
         fourthRaw={operations.fourthRaw}
         fifthRaw={operations.fifthRaw}
+        sixthRaw={operations.sixthRaw}
         canExport={operations.canResume}
         status={operations.saveStatus}
         error={operations.saveError}
@@ -78,7 +79,7 @@ export function App() {
         onImport={(save) => {
           if (
             !window.confirm(
-              'Import zastąpi bieżącą grę i zapis V6. Oryginały V1/V2/V3/V4/V5 oraz historia pozostaną. Kontynuować?',
+              'Import zastąpi bieżącą grę i zapis V7. Oryginały V1/V2/V3/V4/V5/V6 oraz historia pozostaną. Kontynuować?',
             )
           )
             return;

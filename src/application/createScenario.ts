@@ -1,3 +1,4 @@
+import { initializeRecovery } from '../simulation/recovery';
 import { initializeVendor } from '../simulation/vendor';
 import type { RunIdentity, ScenarioDefinition } from '../domain/scenario';
 import type { SimulationState } from '../domain/simulation';
@@ -98,7 +99,8 @@ export function validateScenario(
   check(integer(access.sessionLifetimeMinutes, 1), 'Invalid session lifetime');
   for (const item of world.assets)
     check(
-      world.zones.some((zone) => zone.id === item.zoneId) &&
+      ['online', 'offline'].includes(item.status) &&
+        world.zones.some((zone) => zone.id === item.zoneId) &&
         world.teams.some((team) => team.id === item.ownerTeamId),
       `Unknown zone or team: ${item.id}`,
     );
@@ -323,12 +325,38 @@ export function validateScenario(
           [6, 12].includes(definition.vendor.requiredBatches) &&
           Boolean(account('cargo-link-operator')) &&
           service('carrier-api', 'HTTPS')
-        : definition.kind === 'legitimate-session'
-          ? definition.attacker === null &&
-            Object.values(definition.initialSessionOrigins).every(
-              (origin) => origin === 'legitimate',
-            )
-          : definition.attacker !== null,
+        : definition.recovery
+          ? definition.kind === 'erp-recovery' &&
+            definition.attacker === null &&
+            definition.familyId === 'nexus-erp-recovery-v1' &&
+            definition.recovery.familyId === definition.familyId &&
+            definition.recovery.records.length === 24 &&
+            definition.recovery.records.every(
+              (r) => integer(r.minute) && r.minute < clock.startMinute,
+            ) &&
+            new Set(definition.recovery.records.map((r) => r.id)).size === 24 &&
+            definition.recovery.backups.every(
+              (b) =>
+                b.recordIds.every((id) =>
+                  definition.recovery!.records.some((r) => r.id === id),
+                ) &&
+                integer(b.restoreTurns, 1) &&
+                Boolean(asset(b.repositoryAssetId)) &&
+                Boolean(asset(b.storageAssetId)),
+            ) &&
+            [
+              'erp-db',
+              'erp-storage',
+              'erp-backups',
+              'erp-standby',
+              'standby-storage',
+            ].every((id) => Boolean(asset(id)))
+          : definition.kind === 'legitimate-session'
+            ? definition.attacker === null &&
+              Object.values(definition.initialSessionOrigins).every(
+                (origin) => origin === 'legitimate',
+              )
+            : definition.attacker !== null,
     'Scenario truth disagrees with actors',
   );
   return errors;
@@ -429,5 +457,7 @@ export function createScenario(
         },
       };
   }
-  return updateTelemetry(initializeVendor(initializeIntegrity(state)));
+  return updateTelemetry(
+    initializeRecovery(initializeVendor(initializeIntegrity(state))),
+  );
 }

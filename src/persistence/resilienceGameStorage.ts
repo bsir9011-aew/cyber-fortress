@@ -1,3 +1,4 @@
+import { CURRENT_GAME_SAVE_KEY as V6_KEY } from './gameSaveV6';
 import { CURRENT_GAME_SAVE_KEY as V5_KEY } from './gameSaveV5';
 import { CURRENT_GAME_SAVE_KEY as V4_KEY } from './gameSaveV4';
 import { CURRENT_GAME_SAVE_KEY as V3_KEY } from './gameSaveV3';
@@ -10,7 +11,7 @@ import {
   CURRENT_GAME_SAVE_KEY,
   readCurrentGameSave,
   serializeCurrentGameSave,
-} from './gameSaveV6';
+} from './gameSaveV7';
 import type { Result } from './saveFormat';
 /** Original bytes stay exportable even when replay validation rejects them. */
 export function loadCurrentGameState(storage: StorageAdapter) {
@@ -19,6 +20,7 @@ export function loadCurrentGameState(storage: StorageAdapter) {
   let thirdRaw: string | null = null;
   let fourthRaw: string | null = null;
   let fifthRaw: string | null = null;
+  let sixthRaw: string | null = null;
   let result: Result<GameSession | null>;
   try {
     legacyRaw = storage.getItem(SAVE_KEY);
@@ -26,9 +28,16 @@ export function loadCurrentGameState(storage: StorageAdapter) {
     thirdRaw = storage.getItem(V3_KEY);
     fourthRaw = storage.getItem(V4_KEY);
     fifthRaw = storage.getItem(V5_KEY);
+    sixthRaw = storage.getItem(V6_KEY);
     const current = storage.getItem(CURRENT_GAME_SAVE_KEY);
     const text =
-      current ?? fifthRaw ?? fourthRaw ?? thirdRaw ?? previousRaw ?? legacyRaw;
+      current ??
+      sixthRaw ??
+      fifthRaw ??
+      fourthRaw ??
+      thirdRaw ??
+      previousRaw ??
+      legacyRaw;
     if (text === null) result = { ok: true, value: null };
     else {
       const parsed = readCurrentGameSave(text);
@@ -42,7 +51,15 @@ export function loadCurrentGameState(storage: StorageAdapter) {
         'Pamięć przeglądarki jest niedostępna. Gra działa dalej; możesz eksportować zapis.',
     };
   }
-  return { result, legacyRaw, previousRaw, thirdRaw, fourthRaw, fifthRaw };
+  return {
+    result,
+    legacyRaw,
+    previousRaw,
+    thirdRaw,
+    fourthRaw,
+    fifthRaw,
+    sixthRaw,
+  };
 }
 export function storeCurrentGameState(
   storage: StorageAdapter,

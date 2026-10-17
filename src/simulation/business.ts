@@ -1,3 +1,4 @@
+import { recoveryBusinessAvailability } from './recoveryAccess';
 import { vendorWorkAvailable } from './vendor';
 import type {
   BusinessState,
@@ -19,6 +20,7 @@ export function isBusinessGoalMet(state: SimulationState): boolean {
 export function businessAvailability(
   state: SimulationState,
 ): ProcessAvailability {
+  if (state.recovery) return recoveryBusinessAvailability(state);
   const { world, access, process } = state;
   const localAvailable = networkAllows(world, access, {
     sourceAssetId: process.workstationAssetId,

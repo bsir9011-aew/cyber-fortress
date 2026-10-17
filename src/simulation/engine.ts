@@ -3,6 +3,14 @@ import {
   recordLegalVendorActivity,
   expireVendorException,
 } from './vendor';
+import {
+  applyRecoveryTask,
+  observeRecoveryTask,
+  isRecoveryAction,
+  recoveryTaskTurns,
+  recordRecoveryBusiness,
+  trackRecoveryAvailability,
+} from './recovery';
 import { observeVendorOperations } from './vendorTelemetry';
 import type {
   EmployeeTask,
@@ -49,6 +57,11 @@ function applyTaskEffect(
   task: EmployeeTask,
 ): SimulationState {
   const { action } = task;
+  if (isRecoveryAction(action))
+    return task.workerId === 'administrator' ||
+      action.type === 'reconcile-erp-records'
+      ? applyRecoveryTask(state, task)
+      : state;
   switch (action.type) {
     case 'set-vpn':
       return {
@@ -235,6 +248,7 @@ function observeCompletedResearch(
 function advanceTurn(state: SimulationState): SimulationState {
   // 1. Rozliczenie zakończonego przedziału na STAREJ konfiguracji.
   const business = settleBusiness(state);
+  state = recordRecoveryBusiness(state, business);
   state = recordLegalVendorActivity(recordLegalFileActivity(state));
   let next = record(
     {
@@ -270,16 +284,24 @@ function advanceTurn(state: SimulationState): SimulationState {
         task: completed,
       },
     );
-    if (task.workerId === 'administrator')
+    if (
+      task.workerId === 'administrator' &&
+      (!isRecoveryAction(task.action) ||
+        next.recovery?.results.find((r) => r.taskId === task.id)?.outcome !==
+          'failed')
+    )
       next = record(next, { kind: 'configuration-changed', task: completed });
   }
   // 3. Wygaśnięcia oraz legalny zespół i przeciwnik po zmianach konfiguracji.
   next = resumeLegitimateWork(next);
   next = stepAttacker(next);
-  next = updateTelemetry(next);
+  next = trackRecoveryAvailability(updateTelemetry(next));
   // 4. Tylko ukończone badanie ujawnia dozwoloną obserwację.
   for (const task of due)
-    next = observeIntegrityTask(observeCompletedResearch(next, task), task);
+    next = observeRecoveryTask(
+      observeIntegrityTask(observeCompletedResearch(next, task), task),
+      task,
+    );
   // 5. Ocena celu; brak nowych tur po terminie.
   if (isFinished(next.clock))
     next = record(next, {
@@ -349,7 +371,8 @@ export function applySimulationCommand(
     startTurn: state.clock.turn,
     dueTurn:
       state.clock.turn +
-      (integrityTaskTurns(state, command.action) ??
+      (recoveryTaskTurns(state, command.action) ??
+        integrityTaskTurns(state, command.action) ??
         taskSpecs[command.action.type].turns),
     status: 'running',
   };

@@ -2,6 +2,28 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
+## FORTRESS LAB — Misja 04: Blackout Protocol (Sprint 13)
+
+Po ukończeniu dowolnej Misji 03 rozlicz kolejne okno przygotowania i wybierz
+**Misję 04 — ERP nie odpowiada**. Rodzina `nexus-erp-recovery-v1` modeluje awarię
+procesu, uszkodzenie bazy lub niedostępny primary storage. Diagnozuj, restartuj
+(10 min), wybierz kopię ERP albo niezależny standby (15 min), uzgodnij dane
+i potwierdź spójność. Stan hosta nie przesądza o działaniu usługi.
+
+ERP ma 24 konkretne zapisy sprzed incydentu; ERP-1320 zawiera 18, ERP-1350 — 21,
+a standby 13:40 — 20. Kopie są odrębne od FS-01. RPO 15 min i RTO 30 min są
+raportowane osobno od brakujących zapisów i bilansu zamówień. Obsługa ręczna
+wymaga 5 min administratora, wysyła do 10/turę z manifestów pierwszych 180
+zamówień i **zastępuje** ERP. Zamknij ją i uzgodnij wykonane wysyłki z niezależnym
+dziennikiem magazynu: odtworzenie nie wysyła ich ponownie ani samo nie dopisuje
+brakujących transakcji. Pełne ERP osiąga 22/turę i może nadrabiać kolejkę.
+
+Raport oraz AAR M04 rozdzielają usługę, dane, ciągłość i potwierdzenie spójności.
+Nowe zapisy **V7**: silnik `13.0.0`, treść `nexus-recovery-1`, klucz
+`fortress-lab.game.v7`. Czytniki V1–V6 i oryginalne bajty pozostają zachowane;
+import wymaga zgodności stanu z pełnym replay. Bez nowych projektów, finansowania,
+backendu i zależności. Model to mały rejestr ERP i dwie instancje, bez pełnego HA.
+
 ## FORTRESS LAB — Misja 03: Dostawca na godzinę (Sprint 12)
 
 Po jednej ukończonej Misji 02 Centrala udostępnia **Dostęp zewnętrzny —
@@ -46,7 +68,7 @@ legalne i nieuprawnione operacje, stan sesji, odcięcie dostępu i bilans
 zamówień. Nie oceniają szerokiego zakresu w oderwaniu od potrzeb i nie
 wyliczają nieprzeprowadzonych alternatyw.
 
-Aktywny **FortressSaveV6**: silnik `12.0.0`, treść `nexus-vendor-1`, klucz
+Historyczny **FortressSaveV6**: silnik `12.0.0`, treść `nexus-vendor-1`, klucz
 `fortress-lab.game.v6`. Odczyt/replay **V1–V5** oraz stare raporty pozostają
 obsługiwane. Nowe komendy są walidowane ściśle, a migawka musi zgadzać się
 z pełnym dziennikiem. Stare klucze i oryginalne bajty pozostają do eksportu;
@@ -187,7 +209,7 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 - **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
   strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
   Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu. Nowe zapisy mają
-  format V6; poprzednie oryginały V1/V2/V3/V4/V5 pozostają zachowane i możliwe do wyeksportowania.
+  format V7; poprzednie oryginały V1/V2/V3/V4/V5/V6 pozostają zachowane i możliwe do wyeksportowania.
 - **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
   działalność, ograniczenie dostępu i działania samodzielnych misji. Wyniki strategii
   znajdziesz w Centrali w historii bieżącej kampanii. Powtórka tworzy nową próbę tego

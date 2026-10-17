@@ -31,14 +31,16 @@
           "enum": [
             "9.0.0",
             "11.0.0",
-            "12.0.0"
+            "12.0.0",
+            "13.0.0"
           ]
         },
         "reportGenerator": {
           "enum": [
             "1.0.0",
             "1.1.0",
-            "1.2.0"
+            "1.2.0",
+            "1.3.0"
           ]
         }
       },
@@ -86,7 +88,8 @@
           "enum": [
             "M01",
             "M02",
-            "M03"
+            "M03",
+            "M04"
           ]
         },
         "name": {
@@ -98,7 +101,8 @@
             "legitimate-session",
             "stolen-credential",
             "local-integrity",
-            "third-party-access"
+            "third-party-access",
+            "erp-recovery"
           ]
         },
         "mode": {
@@ -125,7 +129,8 @@
         "variantFamilyId": {
           "enum": [
             "nexus-integrity-detection-v1",
-            "nexus-vendor-access-v1"
+            "nexus-vendor-access-v1",
+            "nexus-erp-recovery-v1"
           ]
         }
       },
@@ -278,6 +283,15 @@
           "type": "boolean"
         },
         "vendorWorkMet": {
+          "type": "boolean"
+        },
+        "serviceRecoveryMet": {
+          "type": "boolean"
+        },
+        "operationalConfidenceMet": {
+          "type": "boolean"
+        },
+        "manualClosedMet": {
           "type": "boolean"
         }
       },
@@ -555,6 +569,9 @@
           "$ref": "#/$defs/data"
         },
         "vendorAccess": {
+          "$ref": "#/$defs/data"
+        },
+        "erpRecovery": {
           "$ref": "#/$defs/data"
         }
       },
@@ -1109,6 +1126,9 @@
         },
         "vendorAuthorization": {
           "$ref": "#/$defs/data"
+        },
+        "erpRecovery": {
+          "$ref": "#/$defs/data"
         }
       },
       "required": [
@@ -1366,6 +1386,9 @@
               "$ref": "#/$defs/data"
             },
             "vendorAuthorization": {
+              "$ref": "#/$defs/data"
+            },
+            "erpRecovery": {
               "$ref": "#/$defs/data"
             }
           },

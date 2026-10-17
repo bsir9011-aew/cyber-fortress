@@ -1,3 +1,4 @@
+import type { RecoveryState, RecoveryTaskAction } from './recovery';
 import type { VendorState, VendorTaskAction } from './vendor';
 import type { AccessState, NetworkRule } from './access';
 import type { WorldState } from './world';
@@ -84,6 +85,7 @@ export interface BusinessState {
 
 export type WorkerId = 'analyst' | 'administrator';
 export type TaskAction =
+  | RecoveryTaskAction
   | VendorTaskAction
   | { readonly type: 'inspect-edr-telemetry' }
   | IntegrityTaskAction
@@ -184,6 +186,7 @@ export type SimulationEventData =
 export type SimulationEvent = EventBase & SimulationEventData;
 
 export interface SimulationState {
+  readonly recovery?: RecoveryState;
   readonly vendor?: VendorState;
   readonly integrity?: IntegrityState;
   readonly run: RunIdentity;

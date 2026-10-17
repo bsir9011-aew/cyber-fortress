@@ -4,8 +4,8 @@ import {
   MAX_GAME_BYTES,
   readCurrentGameSave,
   serializeCurrentGameSave,
-} from '../persistence/gameSaveV6';
-import type { FortressSaveV6 } from '../persistence/gameSaveV6';
+} from '../persistence/gameSaveV7';
+import type { FortressSaveV7 } from '../persistence/gameSaveV7';
 import type { GameSession } from '../application/gameSession';
 
 export function PersistenceToolbar({
@@ -15,6 +15,7 @@ export function PersistenceToolbar({
   thirdRaw,
   fourthRaw,
   fifthRaw,
+  sixthRaw,
   canExport,
   status,
   error,
@@ -28,11 +29,12 @@ export function PersistenceToolbar({
   thirdRaw: string | null;
   fourthRaw: string | null;
   fifthRaw: string | null;
+  sixthRaw: string | null;
   canExport: boolean;
   status: string;
   error: string;
   onRetry: () => void;
-  onImport: (save: FortressSaveV6) => void;
+  onImport: (save: FortressSaveV7) => void;
   onHistory: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -147,6 +149,11 @@ export function PersistenceToolbar({
         {fifthRaw !== null && (
           <button onClick={() => exportLegacy(fifthRaw, 'v5')}>
             Eksportuj oryginał V5
+          </button>
+        )}
+        {sixthRaw !== null && (
+          <button onClick={() => exportLegacy(sixthRaw, 'v6')}>
+            Eksportuj oryginał V6
           </button>
         )}
         <button onClick={onHistory}>Historia prób</button>

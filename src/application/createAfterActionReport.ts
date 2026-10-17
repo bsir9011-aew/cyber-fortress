@@ -18,7 +18,7 @@ import { validateGameSession, MAX_GAME_BYTES } from '../persistence/gameSave';
 import {
   isCurrentCampaignCommand,
   isCurrentRecordedCommand,
-} from '../persistence/gameSaveV6';
+} from '../persistence/gameSaveV7';
 import { sameJson, timestamp } from '../persistence/saveFormat';
 import { MissionTrace } from './aar/missionTrace';
 import { actualState, facts, timeAt } from './aar/facts';
@@ -205,6 +205,7 @@ export function createAfterActionReport(
     if (!report || s.clock.turn !== 18 || s.clock.turnLimit !== 18)
       return fail('not-finished');
     const integrity = report.integrity;
+    const recovery = report.recovery;
     const detectionEngineering =
       s.telemetry.endpoint?.coverage.detection.counting ===
         'unique-documents-v2' ||
@@ -221,12 +222,20 @@ export function createAfterActionReport(
       generatedAt,
       gameVersion: {
         application: '0.2.0',
-        engine: s.vendor ? '12.0.0' : detectionEngineering ? '11.0.0' : '9.0.0',
-        reportGenerator: s.vendor
-          ? '1.2.0'
-          : detectionEngineering
-            ? '1.1.0'
-            : '1.0.0',
+        engine: recovery
+          ? '13.0.0'
+          : s.vendor
+            ? '12.0.0'
+            : detectionEngineering
+              ? '11.0.0'
+              : '9.0.0',
+        reportGenerator: recovery
+          ? '1.3.0'
+          : s.vendor
+            ? '1.2.0'
+            : detectionEngineering
+              ? '1.1.0'
+              : '1.0.0',
       },
       fieldGuide: {
         format:
@@ -259,7 +268,7 @@ export function createAfterActionReport(
         ...(s.hidden.scenario.familyId
           ? { variantFamilyId: s.hidden.scenario.familyId }
           : {}),
-        family: s.vendor ? 'M03' : integrity ? 'M02' : 'M01',
+        family: recovery ? 'M04' : s.vendor ? 'M03' : integrity ? 'M02' : 'M01',
         name: report.scenario.name,
         kind: report.scenario.kind,
         mode: s.run.mode,
@@ -272,15 +281,26 @@ export function createAfterActionReport(
       },
       campaignContext: context,
       missionObjectives: facts({
-        maxExposedRecords: integrity
-          ? null
-          : s.hidden.scenario.goals.maxExposedRecords,
+        ...(recovery
+          ? {
+              rtoTargetMinutes: s.hidden.scenario.recovery!.rtoMinutes,
+              rpoTargetMinutes: s.hidden.scenario.recovery!.rpoMinutes,
+              verifiedRecoveryRequired: true,
+              manualReconciliationRequired: true,
+            }
+          : {}),
+        maxExposedRecords:
+          recovery || integrity
+            ? null
+            : s.hidden.scenario.goals.maxExposedRecords,
         maxFinalBacklog: s.process.maxFinalBacklog,
         ...(s.vendor
           ? { requiredVendorBatches: s.hidden.scenario.vendor!.requiredBatches }
           : {}),
         requireThreatContainment:
-          !integrity && s.hidden.scenario.goals.requireThreatContainment,
+          !recovery &&
+          !integrity &&
+          s.hidden.scenario.goals.requireThreatContainment,
         ...(integrity
           ? {
               correctDocuments: 100,
@@ -290,6 +310,13 @@ export function createAfterActionReport(
           : {}),
       }),
       finalOutcome: {
+        ...(recovery
+          ? {
+              serviceRecoveryMet: recovery.useful,
+              operationalConfidenceMet: recovery.operationalConfidence.verified,
+              manualClosedMet: !recovery.businessContinuity.manualActive,
+            }
+          : {}),
         ...(report.vendor
           ? {
               vendorWorkMet:
@@ -297,23 +324,28 @@ export function createAfterActionReport(
                 report.vendor.summary.requiredBatches,
             }
           : {}),
-        confidentialityMet: integrity ? null : report.confidentiality.goalMet,
+        confidentialityMet:
+          recovery || integrity ? null : report.confidentiality.goalMet,
         continuityMet: report.continuity.goalMet,
         containmentMet: integrity
           ? !integrity.summary.sourceHasWrite
           : report.containment.goalMet,
-        integrityMet: integrity
-          ? integrity.summary.correct === integrity.summary.total &&
-            integrity.summary.verified &&
-            integrity.summary.dataAvailable
-          : null,
-        allObjectivesMet: report.vendor
-          ? report.vendor.goalMet
+        integrityMet: recovery
+          ? recovery.dataRecovery.met
           : integrity
-            ? integrity.goalMet
-            : report.confidentiality.goalMet &&
-              report.continuity.goalMet &&
-              report.containment.goalMet !== false,
+            ? integrity.summary.correct === integrity.summary.total &&
+              integrity.summary.verified &&
+              integrity.summary.dataAvailable
+            : null,
+        allObjectivesMet: recovery
+          ? recovery.goalMet
+          : report.vendor
+            ? report.vendor.goalMet
+            : integrity
+              ? integrity.goalMet
+              : report.confidentiality.goalMet &&
+                report.continuity.goalMet &&
+                report.containment.goalMet !== false,
       },
       ...trace.finish(),
       groundTruth: {
@@ -344,18 +376,24 @@ export function createAfterActionReport(
           endpoint: s.telemetry.endpoint ?? null,
         }),
         backups: facts(
-          s.hidden.scenario.integrity
+          recovery
             ? {
-                snapshots: s.hidden.scenario.integrity.backups,
-                verification: s.integrity?.backups,
-                readiness: s.hidden.scenario.backupReadiness ?? null,
-                recoveries: s.integrity?.recoveries,
-                reconciledIds: s.integrity?.reconciledIds,
+                snapshots: s.hidden.scenario.recovery!.backups,
+                standby: s.hidden.scenario.recovery!.standby,
               }
-            : null,
+            : s.hidden.scenario.integrity
+              ? {
+                  snapshots: s.hidden.scenario.integrity.backups,
+                  verification: s.integrity?.backups,
+                  readiness: s.hidden.scenario.backupReadiness ?? null,
+                  recoveries: s.integrity?.recoveries,
+                  reconciledIds: s.integrity?.reconciledIds,
+                }
+              : null,
         ),
       },
       securityConsequences: {
+        ...(recovery ? { erpRecovery: facts(recovery) } : {}),
         exposedRecords: report.confidentiality.exposedRecords,
         containment: report.containment,
         integrity: integrity?.summary ?? null,

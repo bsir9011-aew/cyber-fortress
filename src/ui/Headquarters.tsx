@@ -146,6 +146,32 @@ export function Headquarters({
           </p>
         </section>
       )}
+      {view.history.some((r) => r.vendor) && (
+        <section
+          className="integrity-mission-card"
+          aria-label="Misja 04: ERP nie odpowiada"
+        >
+          <p className="eyebrow">Blackout Protocol</p>
+          <h2>Misja 04 — ERP nie odpowiada</h2>
+          <p>
+            Diagnoza awarii, odtworzenie danych i ciągłość wysyłek. RTO 30 min,
+            RPO 15 min. Dostępna po ukończeniu Misji 03 niezależnie od wyniku.
+            Bez dodatkowego finansowania.
+          </p>
+          <button
+            className="primary-button"
+            disabled={view.preparation.hour !== 4}
+            onClick={() =>
+              onCommand({
+                type: 'start-recovery-incident',
+                familyId: 'nexus-erp-recovery-v1',
+              })
+            }
+          >
+            Rozpocznij Misję 04 →
+          </button>
+        </section>
+      )}
       <div className="hq-window">
         <div>
           <span className="eyebrow">Przygotowanie poza incydentem</span>
@@ -365,9 +391,11 @@ export function Headquarters({
                     Operacja {r.number} · {r.name}
                   </strong>
                   <p>
-                    {r.integrity
-                      ? `${r.integrity.correct}/100 poprawnych dokumentów · ${r.integrity.damaged} uszkodzonych · ${r.integrity.reconcile} do uzgodnienia`
-                      : `${r.exposedRecords} ujawnionych rekordów`}{' '}
+                    {r.recovery
+                      ? `ERP ${r.recovery.useful ? 'użyteczny' : 'niedostępny'} · ${r.recovery.missingRecordIds.length} brakujących zapisów · ${r.recovery.pendingOrderIds.length} nieuzgodnionych wysyłek`
+                      : r.integrity
+                        ? `${r.integrity.correct}/100 poprawnych dokumentów · ${r.integrity.damaged} uszkodzonych · ${r.integrity.reconcile} do uzgodnienia`
+                        : `${r.exposedRecords} ujawnionych rekordów`}{' '}
                     · {r.processed} obsłużonych · {r.backlog} zaległych · wydano{' '}
                     {money(r.spent)}.
                   </p>

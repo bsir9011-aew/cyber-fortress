@@ -316,6 +316,45 @@ export class MissionTrace {
         'observation',
         observation.id,
       );
+    for (const o of s.recovery?.observations ?? [])
+      this.addEvidence(
+        s,
+        o.id,
+        'erp-recovery-observation',
+        o.source,
+        o,
+        o.source === 'Warehouse journal' ? 'human-statement' : 'observation',
+        o.taskId,
+      );
+    for (const result of s.recovery?.results ?? []) {
+      if (!s.recovery?.observations.some((o) => o.taskId === result.taskId))
+        this.addEvidence(
+          s,
+          `erp-result-${result.taskId}`,
+          'erp-task-result',
+          'ERP task console',
+          result,
+          'observation',
+          result.taskId,
+        );
+    }
+    for (const result of s.recovery?.results ?? [])
+      this.once(`erp-result:${result.taskId}`, () =>
+        this.emit(
+          'erp-task-result',
+          s,
+          result.action.type.startsWith('inspect-') ||
+            result.action.type === 'verify-erp-backup' ||
+            result.action.type === 'contact-warehouse-operations'
+            ? 'observation'
+            : 'task-completion',
+          'erp-recovery',
+          result.outcome,
+          result,
+          { taskId: result.taskId },
+          result.minute,
+        ),
+      );
     for (const a of s.incident.alerts)
       this.addEvidence(
         s,

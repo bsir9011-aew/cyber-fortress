@@ -1275,3 +1275,23 @@ div.evidence-empty {
     scroll-behavior: auto !important;
   }
 }
+
+.recovery-card {
+  overflow-wrap: anywhere;
+}
+.recovery-card article {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.recovery-card details {
+  margin: 12px 0;
+}
+.recovery-card h3 {
+  margin-top: 24px;
+}
+.status-unknown {
+  color: #9ba9b9;
+}
+.status-dot.status-unknown {
+  fill: #9ba9b9;
+}

@@ -1,3 +1,7 @@
+import {
+  selectRecoveryView,
+  selectKnownRecoveryWorld,
+} from './selectRecoveryView';
 import { selectVendorView } from './selectVendorView';
 import type { SimulationState } from '../domain/simulation';
 import type { NetworkRule } from '../domain/access';
@@ -14,12 +18,13 @@ import { selectIntegrityView } from './selectIntegrityView';
 /** Jawna projekcja: nigdy spread SimulationState/access/hidden do komponentów. */
 export function selectPlayerView(state: SimulationState) {
   return {
+    ...(state.recovery ? { recovery: selectRecoveryView(state) } : {}),
     ...(state.vendor ? { vendor: selectVendorView(state) } : {}),
     ...(state.integrity ? { integrity: selectIntegrityView(state) } : {}),
     run: { ...state.run },
     briefing: { ...state.hidden.scenario.briefing },
     recordPool: state.hidden.scenario.goals.recordPool,
-    world: state.world,
+    world: selectKnownRecoveryWorld(state),
     clock: state.clock,
     minute: currentMinute(state.clock),
     finished: isFinished(state.clock),

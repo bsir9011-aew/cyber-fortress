@@ -1,3 +1,5 @@
+import { RecoveryPanel } from './RecoveryPanel';
+import { RecoveryReport } from './RecoveryReport';
 import { VendorPanel } from './VendorPanel';
 import { VendorReport } from './VendorReport';
 import { AfterActionExport } from './AfterActionExport';
@@ -83,7 +85,8 @@ export function MissionWorkspace({
     view.fileObservations.length +
     view.ownerStatements.length +
     (view.sessionObservation ? 1 : 0) +
-    (view.vendor?.observations.length ?? 0);
+    (view.vendor?.observations.length ?? 0) +
+    (view.recovery?.observations.length ?? 0);
 
   useEffect(() => {
     if (!briefing) headingRef.current?.focus();
@@ -182,7 +185,12 @@ export function MissionWorkspace({
               <h1 ref={headingRef} tabIndex={-1} className="sr-only">
                 Raport po zakończeniu misji
               </h1>
-              {report.vendor ? (
+              {report.recovery ? (
+                <RecoveryReport
+                  report={report.recovery}
+                  onHeadquarters={newIncident}
+                />
+              ) : report.vendor ? (
                 <VendorReport
                   report={report.vendor}
                   onHeadquarters={newIncident}
@@ -213,22 +221,37 @@ export function MissionWorkspace({
               >
                 <div>
                   <span className="eyebrow">
-                    {view.vendor
-                      ? 'Dostawca na godzinę'
-                      : 'Ostatnie okno wysyłkowe'}
+                    {view.recovery
+                      ? 'ERP nie odpowiada'
+                      : view.vendor
+                        ? 'Dostawca na godzinę'
+                        : 'Ostatnie okno wysyłkowe'}
                   </span>
-                  <strong>Chroń dane. Dowieź wysyłki.</strong>
+                  <strong>
+                    {view.recovery
+                      ? 'Przywróć ERP. Uzgodnij wysyłki.'
+                      : 'Chroń dane. Dowieź wysyłki.'}
+                  </strong>
                 </div>
                 <div>
                   <small>
-                    Sprawa {view.vendor ? '03' : view.integrity ? '02' : '01'}
+                    Sprawa{' '}
+                    {view.recovery
+                      ? '04'
+                      : view.vendor
+                        ? '03'
+                        : view.integrity
+                          ? '02'
+                          : '01'}
                   </small>
                   <button onClick={() => setContext('cases')}>
-                    {view.vendor
-                      ? 'Operacje CARGO-LINK →'
-                      : view.integrity
-                        ? 'Rozbieżności dokumentów →'
-                        : 'Nietypowe logowania VPN →'}
+                    {view.recovery
+                      ? 'Centrum odzyskiwania ERP →'
+                      : view.vendor
+                        ? 'Operacje CARGO-LINK →'
+                        : view.integrity
+                          ? 'Rozbieżności dokumentów →'
+                          : 'Nietypowe logowania VPN →'}
                   </button>
                 </div>
                 <div>
@@ -301,7 +324,13 @@ export function MissionWorkspace({
                     <div>
                       <p className="eyebrow">
                         NEXUS / Misja{' '}
-                        {view.vendor ? '03' : view.integrity ? '02' : '01'}
+                        {view.recovery
+                          ? '04'
+                          : view.vendor
+                            ? '03'
+                            : view.integrity
+                              ? '02'
+                              : '01'}
                       </p>
                       <h1 ref={headingRef} tabIndex={-1}>
                         {context === 'cases'
@@ -341,7 +370,9 @@ export function MissionWorkspace({
                   )}
                   {context === 'cases' && (
                     <>
-                      {view.vendor ? (
+                      {view.recovery ? (
+                        <RecoveryPanel view={view.recovery} />
+                      ) : view.vendor ? (
                         <>
                           <VendorPanel view={view.vendor} />
                           <FileEvidence view={view} />

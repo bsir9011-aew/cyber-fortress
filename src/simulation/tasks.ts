@@ -4,6 +4,12 @@ import type {
   TaskAction,
   WorkerId,
 } from '../domain/simulation';
+import {
+  recoveryTaskSpecs,
+  isRecoveryAction,
+  recoveryTaskRejection,
+  recoveryTaskTurns,
+} from './recovery';
 import { vendorTaskRejection } from './vendor';
 import { isAssetOnline, isSessionActive } from './access';
 import { currentMinute } from './clock';
@@ -62,6 +68,7 @@ export const taskSpecs: Record<
   TaskAction['type'],
   { readonly workerId: WorkerId; readonly turns: number }
 > = {
+  ...recoveryTaskSpecs,
   'inspect-vendor-operations': { workerId: 'analyst', turns: 1 },
   'revoke-vendor-exception': { workerId: 'administrator', turns: 1 },
   'narrow-vendor-exception': { workerId: 'administrator', turns: 2 },
@@ -104,10 +111,14 @@ export function taskRejection(
   )
     return 'worker-busy';
   if (
-    state.clock.turn + (integrityTaskTurns(state, action) ?? spec.turns) >
+    state.clock.turn +
+      (recoveryTaskTurns(state, action) ??
+        integrityTaskTurns(state, action) ??
+        spec.turns) >
     state.clock.turnLimit
   )
     return 'outside-time-window';
+  if (isRecoveryAction(action)) return recoveryTaskRejection(state, action);
   if (isIntegrityAction(action)) return integrityTaskRejection(state, action);
   switch (action.type) {
     case 'inspect-vendor-operations':

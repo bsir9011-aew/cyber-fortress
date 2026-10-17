@@ -1,5 +1,7 @@
+import { recoveryLabels } from '../../content/recoveryLabels';
 import type { AarDecision } from '../../domain/afterActionReport';
 const actions: Record<AarDecision['action']['type'], string> = {
+  ...recoveryLabels,
   'inspect-vendor-operations': 'Sprawdzenie operacji CARGO-LINK',
   'revoke-vendor-exception': 'Cofnięcie wyjątku dostawcy',
   'narrow-vendor-exception': 'Ograniczenie wyjątku do HTTPS',
