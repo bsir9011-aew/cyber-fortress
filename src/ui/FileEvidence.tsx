@@ -16,9 +16,9 @@ export function FileEvidence({ view }: { view: PlayerView }) {
         zebrania.
       </p>
       <p>
-        Sensor obserwuje list/open/read w usłudze, również legalne odczyty. Nie
-        widzi żądań zatrzymanych przez sieć. Brak zapisu nie dowodzi braku
-        aktywności.
+        Sensor obserwuje list/open/read{view.integrity ? '/modify' : ''} w
+        usłudze, również legalne odczyty. Nie widzi żądań zatrzymanych przez
+        sieć. Brak zapisu nie dowodzi braku aktywności.
       </p>
       {view.fileObservations.length === 0 ? (
         <p>Nie pozyskano jeszcze dowodu. Zleć analitykowi pobranie audytu.</p>
@@ -55,7 +55,11 @@ export function FileEvidence({ view }: { view: PlayerView }) {
                       <td>{formatMinute(r.minute)}</td>
                       <td>
                         {r.accountId}
-                        <small>{r.sessionId}</small>
+                        <small>
+                          {r.endpointId
+                            ? `Stacja ${r.endpointId} · lokalny kontekst`
+                            : r.sessionId}
+                        </small>
                       </td>
                       <td>
                         {r.targetAssetId} / {r.operation}
@@ -64,7 +68,9 @@ export function FileEvidence({ view }: { view: PlayerView }) {
                         {r.outcome === 'allowed' ? 'Dopuszczono' : 'Odmówiono'}
                         <small>
                           {r.recordsRead === null
-                            ? 'Wolumen niemierzony'
+                            ? r.documentIds
+                              ? `${r.documentIds.length} dokumentów w zakresie (${r.documentIds[0] ?? 'brak'}…${r.documentIds.at(-1) ?? 'brak'})`
+                              : 'Wolumen niemierzony'
                             : `${r.recordsRead} rekordów odczytu`}
                         </small>
                       </td>

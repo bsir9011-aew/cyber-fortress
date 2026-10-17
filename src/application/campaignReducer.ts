@@ -8,7 +8,10 @@ import {
   securityProjects,
   projectDefinition,
 } from '../content/securityProjects';
-import { createCampaignIncident } from './prepareCampaignIncident';
+import {
+  createCampaignIncident,
+  createIntegrityIncident,
+} from './prepareCampaignIncident';
 import { simulationReducer } from './simulationReducer';
 import { selectMissionReport } from './selectMissionReport';
 
@@ -151,6 +154,9 @@ export function campaignReducer(
       ? [
           ...state.history,
           {
+            ...(report.integrity
+              ? { integrity: report.integrity.summary }
+              : {}),
             number: state.history.length + 1,
             seed: state.nextSeed,
             scenarioId: report.scenario.id,
@@ -158,7 +164,9 @@ export function campaignReducer(
             exposedRecords: report.confidentiality.exposedRecords,
             processed: report.continuity.processed,
             backlog: report.continuity.backlog,
-            containmentMet: report.containment.goalMet,
+            containmentMet: report.integrity
+              ? !report.integrity.summary.sourceHasWrite
+              : report.containment.goalMet,
             spent: budgetBalance(state).spent,
             activeProjects: state.projects
               .filter((p) => p.status === 'completed')
@@ -234,6 +242,18 @@ export function campaignReducer(
         phase: 'preparation',
         posture: {
           ...state.posture,
+          ...(incident.integrity
+            ? {
+                endpointOverrides: {
+                  ...state.posture.endpointOverrides,
+                  [incident.integrity.endpoint.id]: {
+                    isolated: incident.integrity.endpoint.isolated,
+                    writesRestricted:
+                      incident.integrity.endpoint.writesRestricted,
+                  },
+                },
+              }
+            : {}),
           ruleOverrides,
           accountOverrides,
           assetOverrides,
@@ -250,7 +270,15 @@ export function campaignReducer(
   }
   if (state.phase !== 'preparation')
     return reject('Planowanie jest dostępne w centrali, poza incydentem.');
-  if (command.type === 'start-incident') {
+  if (
+    command.type === 'start-incident' ||
+    command.type === 'start-integrity-incident'
+  ) {
+    if (
+      command.type === 'start-integrity-incident' &&
+      !state.history.some((r) => r.scenarioId !== 'nexus-last-clean-copy')
+    )
+      return reject('Najpierw ukończ co najmniej jeden incydent Misji 01.');
     if (state.preparation.hour !== 4)
       return reject('Najpierw rozlicz czterogodzinne okno przygotowawcze.');
     return decide(
@@ -258,7 +286,10 @@ export function campaignReducer(
       {
         ...state,
         phase: 'incident',
-        incident: createCampaignIncident(state.nextSeed, state.posture),
+        incident:
+          command.type === 'start-integrity-incident'
+            ? createIntegrityIncident(state.nextSeed, state.posture)
+            : createCampaignIncident(state.nextSeed, state.posture),
       },
       command,
     );

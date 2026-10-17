@@ -14,6 +14,12 @@ import { updateNarrative } from './narrative';
 import { completeDecision, rememberDecision } from './threatAssessment';
 import { resumeLegitimateWork } from './legitimateActors';
 import { readFileAccess, recordLegalFileActivity } from './fileAudit';
+import {
+  applyIntegrityTask,
+  observeIntegrityTask,
+  rememberIntegrityDecision,
+  integrityTaskTurns,
+} from './integrity';
 
 function record(
   state: SimulationState,
@@ -119,6 +125,7 @@ function applyTaskEffect(
     case 'contact-account-owner':
       return state;
   }
+  return applyIntegrityTask(state, task);
 }
 
 function observeVpnSessions(state: SimulationState): SimulationState {
@@ -261,7 +268,8 @@ function advanceTurn(state: SimulationState): SimulationState {
   next = stepAttacker(next);
   next = updateTelemetry(next);
   // 4. Tylko ukończone badanie ujawnia dozwoloną obserwację.
-  for (const task of due) next = observeCompletedResearch(next, task);
+  for (const task of due)
+    next = observeIntegrityTask(observeCompletedResearch(next, task), task);
   // 5. Ocena celu; brak nowych tur po terminie.
   if (isFinished(next.clock))
     next = record(next, {
@@ -287,6 +295,17 @@ export function applySimulationCommand(
       reason: 'invalid-command',
     });
   if (command.type === 'advance-turn') return advanceTurn(state);
+  if (
+    command.type === 'set-integrity-hypothesis' &&
+    state.integrity &&
+    ['insufficient-evidence', 'local-modification', 'data-drift'].includes(
+      command.hypothesis,
+    )
+  )
+    return {
+      ...state,
+      integrity: { ...state.integrity, hypothesis: command.hypothesis },
+    };
   if (command.type === 'set-hypothesis') {
     if (
       ![
@@ -318,11 +337,17 @@ export function applySimulationCommand(
     workerId: command.workerId,
     action: { ...command.action },
     startTurn: state.clock.turn,
-    dueTurn: state.clock.turn + taskSpecs[command.action.type].turns,
+    dueTurn:
+      state.clock.turn +
+      (integrityTaskTurns(state, command.action) ??
+        taskSpecs[command.action.type].turns),
     status: 'running',
   };
   return record(
-    rememberDecision({ ...state, tasks: [...state.tasks, task] }, task),
+    rememberIntegrityDecision(
+      rememberDecision({ ...state, tasks: [...state.tasks, task] }, task),
+      task,
+    ),
     { kind: 'task-started', task },
   );
 }

@@ -1,5 +1,9 @@
 # FortressSaveV2 — kampania i bezpieczna aktualizacja
 
+Kontrakt historyczny Sprintu 7 pozostaje obsługiwany. UI Sprintu 8 zapisuje
+[V3](game-save-v3.md), zachowując oryginalne bajty V1/V2 i dokładny świat przy
+migracji. Poniższy dokument opisuje format i zachowanie wcześniejszej wersji.
+
 ## Koperta i sesja
 
 `src/persistence/gameSave.ts` definiuje:

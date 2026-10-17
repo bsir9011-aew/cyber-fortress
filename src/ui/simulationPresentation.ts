@@ -6,6 +6,24 @@ import type {
 
 export function actionLabel(action: TaskAction): string {
   switch (action.type) {
+    case 'inspect-documents':
+      return 'Porównanie dokumentów z ERP';
+    case 'inspect-backups':
+      return 'Sprawdzenie punktów odtworzenia';
+    case 'verify-backup':
+      return `Weryfikacja kopii ${action.backupId}`;
+    case 'restore-documents':
+      return `Odtworzenie dokumentów z ${action.backupId}`;
+    case 'reconcile-documents':
+      return 'Uzgodnienie brakujących dokumentów z ERP';
+    case 'examine-endpoint':
+      return `Badanie stacji ${action.endpointId}`;
+    case 'isolate-endpoint':
+      return `Izolacja stacji ${action.endpointId}`;
+    case 'restrict-endpoint-writes':
+      return `Ograniczenie zapisu stacji ${action.endpointId}`;
+    case 'reconnect-endpoint':
+      return `Kontrolowane podłączenie ${action.endpointId}`;
     case 'inspect-vpn-sessions':
       return 'Sprawdzenie aktywnych sesji VPN';
     case 'inspect-file-access':

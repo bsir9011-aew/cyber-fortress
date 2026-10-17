@@ -1,4 +1,5 @@
 import type { Account } from './access';
+import type { IntegrityMissionSummary } from './integrity';
 import type { AssetStatus } from './infrastructure';
 import type {
   SimulationState,
@@ -32,6 +33,12 @@ export interface SecurityBudget {
   readonly ledger: readonly BudgetOperation[];
 }
 export interface SecurityPosture {
+  readonly endpointOverrides?: Readonly<
+    Record<
+      string,
+      { readonly isolated: boolean; readonly writesRestricted: boolean }
+    >
+  >;
   readonly remoteAccess: boolean;
   readonly fileVisibility: boolean;
   readonly segmentation: boolean;
@@ -52,6 +59,7 @@ export interface PreparationWork {
   readonly status: 'running' | 'completed' | 'paused';
 }
 export interface CampaignMissionReport {
+  readonly integrity?: IntegrityMissionSummary;
   readonly number: number;
   readonly seed: number;
   readonly scenarioId: string;
@@ -106,6 +114,7 @@ export type CampaignCommand =
       readonly scope: SegmentationScope;
     }
   | { readonly type: 'start-incident' }
+  | { readonly type: 'start-integrity-incident' }
   | {
       readonly type: 'incident-command';
       readonly command: Exclude<SimulationCommand, { type: 'reset' }>;

@@ -1,5 +1,35 @@
 import type { AccessState, NetworkRule, VpnSession } from '../domain/access';
 import type { WorldState } from '../domain/world';
+import type { LocalEndpoint, LocalOperation } from '../domain/integrity';
+
+/** A held local context is not a VPN session or a new authentication attempt. */
+export function canUseLocalService(
+  world: WorldState,
+  access: AccessState,
+  endpoint: LocalEndpoint,
+  targetAssetId: string,
+  protocol: string,
+  operation: LocalOperation,
+): boolean {
+  return (
+    !endpoint.isolated &&
+    isAssetOnline(world, endpoint.assetId) &&
+    access.accounts.some((a) => a.id === endpoint.accountId) &&
+    !(operation === 'modify' && endpoint.writesRestricted) &&
+    endpoint.permissions.some(
+      (p) =>
+        p.assetId === targetAssetId &&
+        p.protocol === protocol &&
+        p.operations.includes(operation),
+    ) &&
+    networkAllows(world, access, {
+      sourceAssetId: endpoint.assetId,
+      accountId: endpoint.accountId,
+      targetAssetId,
+      protocol,
+    })
+  );
+}
 
 export interface NetworkFlow {
   readonly accountId?: string;

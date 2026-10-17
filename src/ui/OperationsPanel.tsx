@@ -7,6 +7,7 @@ import type {
 } from '../domain/simulation';
 import { taskSpecs } from '../simulation/tasks';
 import { actionLabel } from './simulationPresentation';
+import { IntegrityOperations } from './IntegrityPanel';
 
 export function OperationsPanel({
   view,
@@ -29,9 +30,15 @@ export function OperationsPanel({
           ] as const,
       ),
       ...view.fileObservations.flatMap((o) =>
-        o.records.map(
-          (r) =>
-            [r.sessionId, { id: r.sessionId, accountId: r.accountId }] as const,
+        o.records.flatMap((r) =>
+          r.sessionId
+            ? [
+                [
+                  r.sessionId,
+                  { id: r.sessionId, accountId: r.accountId },
+                ] as const,
+              ]
+            : [],
         ),
       ),
       ...view.authObservations.flatMap((observation) =>
@@ -76,7 +83,11 @@ export function OperationsPanel({
       aria-label="Zespół operacyjny"
     >
       <p className="eyebrow">Twoje zasoby</p>
-      <h2>Zbadać czy ograniczyć?</h2>
+      <h2>
+        {view.integrity
+          ? 'Rozpoznaj. Ogranicz. Odtwórz.'
+          : 'Zbadać czy ograniczyć?'}
+      </h2>
       {(['analyst', 'administrator'] as const).map((workerId) => {
         const task = busy(workerId);
         return (
@@ -106,256 +117,277 @@ export function OperationsPanel({
           </div>
         );
       })}
-      <h3 className="action-group-title">
-        Pozyskaj dowód <span>analityk</span>
-      </h3>
-      <div className="operation-actions">
+      {view.integrity && view.fileSensor && (
         <button
-          disabled={
-            disabled('inspect-auth-logs') ||
-            !view.vpnOnline ||
-            !view.sensors.authentication.enabled
-          }
-          onClick={() => schedule({ type: 'inspect-auth-logs' })}
-        >
-          Zbadaj logi uwierzytelnienia · 5 min
-        </button>
-        <button
-          disabled={
-            disabled('inspect-vpn-sessions') ||
-            !view.vpnOnline ||
-            !view.sensors.sessions.enabled
-          }
-          onClick={() => schedule({ type: 'inspect-vpn-sessions' })}
-        >
-          Sprawdź sesje VPN · 5 min
-        </button>
-        <button
-          disabled={
-            disabled('contact-account-owner') ||
-            !view.knownAccountIds.includes('magazyn-07')
-          }
-          onClick={() =>
-            schedule({ type: 'contact-account-owner', accountId: 'magazyn-07' })
-          }
-        >
-          Porozmawiaj z Martą · 5 min
-        </button>
-      </div>
-      {view.fileSensor && (
-        <button
-          className="file-research-button"
-          disabled={disabled('inspect-file-access') || !view.fileSensor.enabled}
+          disabled={disabled('inspect-file-access')}
           onClick={() => schedule({ type: 'inspect-file-access' })}
         >
           Pobierz audyt FS-01 · 5 min
         </button>
       )}
-      <p className="source-note">
-        Wynik po zakończeniu zadania. Czytanie dowodów nie zajmuje czasu.
-      </p>
-      {!view.vpnOnline && (
-        <p className="decision-warning">
-          VPN jest wyłączony: odczyt lokalnych sensorów bramy jest niedostępny.
-          Pozyskane wcześniej dowody pozostają w sprawie.
-        </p>
+      {view.integrity && (
+        <IntegrityOperations view={view.integrity} onCommand={onCommand} />
       )}
-      <h3 className="action-group-title">
-        Zmień dostęp <span>administrator</span>
-      </h3>
-      <details className="policy-controls">
-        <summary>Polityka komunikacji · 10 min</summary>
-        <label htmlFor="network-rule">Reguła sieciowa</label>
-        <select
-          id="network-rule"
-          value={rule?.id ?? ''}
-          onChange={(event) => setRuleId(event.target.value)}
-        >
-          {view.rules.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.id} · {item.protocol} →{' '}
-              {
-                view.world.assets.find(
-                  (asset) => asset.id === item.targetAssetId,
-                )?.name
-              }
-            </option>
-          ))}
-        </select>
-        {rule && (
-          <>
-            <p className="source-note">
-              Obecnie: <strong>{rule.action.toUpperCase()}</strong>. Reguła
-              obejmuje także istniejący ruch tego protokołu. Inne przepływy mają
-              osobne reguły.
-            </p>
-            {rule.accountIds && (
-              <p className="source-note">
-                Zakres kont:{' '}
-                {rule.accountIds.length
-                  ? rule.accountIds.join(', ')
-                  : 'pusta grupa — reguła nie dopasuje żadnego konta'}
-                .
-              </p>
-            )}
-            {view.rules.some((r) => r.accountIds) && (
-              <p className="source-note">
-                Reguły zależą od konta sesji. Zmiana szerokiej reguły R-SMB może
-                nie zmienić pierwszeństwa reguł SEG. Domyślna odmowa działa po
-                dopasowaniu zakresu.
-              </p>
-            )}
-            {view.businessDependencies.additionalWork
-              .filter((work) =>
-                work.services.some(
-                  (service) =>
-                    service.targetAssetId === rule.targetAssetId &&
-                    service.protocol === rule.protocol,
-                ),
-              )
-              .map((work) => (
-                <p className="decision-warning" key={work.id}>
-                  Ten przepływ jest wymagany przez legalne konto{' '}
-                  {work.accountId} dla {work.capacity} zamówień na turę:{' '}
-                  {work.name}.
-                </p>
-              ))}
-            <button
-              disabled={disabled('set-network-rule')}
-              onClick={() =>
-                schedule({
-                  type: 'set-network-rule',
-                  ruleId: rule.id,
-                  action: rule.action === 'allow' ? 'deny' : 'allow',
-                })
-              }
-            >
-              {rule.action === 'allow'
-                ? 'Zablokuj przepływ'
-                : 'Dopuść przepływ'}{' '}
-              · 10 min
-            </button>
-          </>
+      <details className="legacy-operations" open={!view.integrity}>
+        <summary hidden={!view.integrity}>
+          Narzędzia dostępu VPN i reguły sieciowe
+        </summary>
+        <h3 className="action-group-title">
+          Pozyskaj dowód <span>analityk</span>
+        </h3>
+        <div className="operation-actions">
+          <button
+            disabled={
+              disabled('inspect-auth-logs') ||
+              !view.vpnOnline ||
+              !view.sensors.authentication.enabled
+            }
+            onClick={() => schedule({ type: 'inspect-auth-logs' })}
+          >
+            Zbadaj logi uwierzytelnienia · 5 min
+          </button>
+          <button
+            disabled={
+              disabled('inspect-vpn-sessions') ||
+              !view.vpnOnline ||
+              !view.sensors.sessions.enabled
+            }
+            onClick={() => schedule({ type: 'inspect-vpn-sessions' })}
+          >
+            Sprawdź sesje VPN · 5 min
+          </button>
+          <button
+            disabled={
+              disabled('contact-account-owner') ||
+              !view.knownAccountIds.includes('magazyn-07')
+            }
+            onClick={() =>
+              schedule({
+                type: 'contact-account-owner',
+                accountId: 'magazyn-07',
+              })
+            }
+          >
+            Porozmawiaj z Martą · 5 min
+          </button>
+        </div>
+        {view.fileSensor && !view.integrity && (
+          <button
+            className="file-research-button"
+            disabled={
+              disabled('inspect-file-access') || !view.fileSensor.enabled
+            }
+            onClick={() => schedule({ type: 'inspect-file-access' })}
+          >
+            Pobierz audyt FS-01 · 5 min
+          </button>
         )}
-      </details>
-      <details className="session-controls">
-        <summary>Zakończenie tunelu · 5 min</summary>
-        {session ? (
-          <>
-            <label htmlFor="observed-session">
-              Sesja znana z pozyskanych dowodów
-            </label>
-            <select
-              id="observed-session"
-              value={session.id}
-              onChange={(event) => setSessionId(event.target.value)}
-            >
-              {knownSessions.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.id} · {item.accountId}
-                </option>
-              ))}
-            </select>
-            <p className="source-note">
-              Historyczny log nie potwierdza, że tunel nadal działa. Zakończenie
-              sesji nie blokuje nowych logowań.
-            </p>
-            <button
-              disabled={disabled('terminate-session')}
-              onClick={() =>
-                schedule({ type: 'terminate-session', sessionId: session.id })
-              }
-            >
-              Zakończ sesję · 5 min
-            </button>
-          </>
-        ) : (
-          <p className="source-note">
-            Najpierw zbadaj logi lub aktywne sesje, aby wskazać tunel.
-          </p>
-        )}
-      </details>
-      <details className="account-controls">
-        <summary>Konto i poświadczenie</summary>
-        {account ? (
-          <>
-            <label htmlFor="known-account">Konto znane ze sprawy</label>
-            <select
-              id="known-account"
-              value={account}
-              onChange={(event) => setAccountId(event.target.value)}
-            >
-              {view.knownAccountIds.map((id) => (
-                <option key={id} value={id}>
-                  {id}
-                </option>
-              ))}
-            </select>
-            <p className="source-note">
-              Zmiany dotyczą nowych uwierzytelnień. Nie kończą wcześniej
-              wydanych sesji.
-            </p>
-            <div className="operation-actions">
-              <button
-                disabled={disabled('block-account')}
-                onClick={() =>
-                  schedule({ type: 'block-account', accountId: account })
-                }
-              >
-                Zablokuj nowe logowania · 5 min
-              </button>
-              <button
-                disabled={
-                  disabled('unblock-account') ||
-                  !view.blockedKnownAccountIds.includes(account)
-                }
-                onClick={() =>
-                  schedule({ type: 'unblock-account', accountId: account })
-                }
-              >
-                Przywróć nowe logowania · 5 min
-              </button>
-              <button
-                disabled={disabled('reset-credential')}
-                onClick={() =>
-                  schedule({ type: 'reset-credential', accountId: account })
-                }
-              >
-                Resetuj poświadczenie · 10 min
-              </button>
-            </div>
-            <p className="decision-warning">
-              Przywrócenie konta nie odtwarza zakończonych tuneli ani nie
-              zmienia hasła i MFA. Nadal ważne przejęte poświadczenie może
-              ponownie umożliwić dostęp. Legalna praca wymaga nowego poprawnego
-              logowania i dostępu do wymaganych usług.
-            </p>
-          </>
-        ) : (
-          <p className="source-note">
-            Brak kont wskazanych przez dostępne obserwacje.
-          </p>
-        )}
-      </details>
-      <details className="vpn-controls">
-        <summary>Szerokie odcięcie VPN · 5 min</summary>
-        <p className="decision-warning">
-          Wyłączenie bramy kończy wszystkie tunele i odbiera zdalnym
-          dyspozytorom dostęp do ERP. Obsługa lokalna pozostaje dostępna.
+        <p className="source-note">
+          Wynik po zakończeniu zadania. Czytanie dowodów nie zajmuje czasu.
         </p>
-        <button
-          className="vpn-action"
-          disabled={disabled('set-vpn')}
-          onClick={() =>
-            schedule({
-              type: 'set-vpn',
-              assetId: view.vpnAssetId,
-              enabled: !view.vpnOnline,
-            })
-          }
-        >
-          {view.vpnOnline ? 'Wyłącz VPN' : 'Włącz VPN'} · 5 min
-        </button>
+        {!view.vpnOnline && (
+          <p className="decision-warning">
+            VPN jest wyłączony: odczyt lokalnych sensorów bramy jest
+            niedostępny. Pozyskane wcześniej dowody pozostają w sprawie.
+          </p>
+        )}
+        <h3 className="action-group-title">
+          Zmień dostęp <span>administrator</span>
+        </h3>
+        <details className="policy-controls">
+          <summary>Polityka komunikacji · 10 min</summary>
+          <label htmlFor="network-rule">Reguła sieciowa</label>
+          <select
+            id="network-rule"
+            value={rule?.id ?? ''}
+            onChange={(event) => setRuleId(event.target.value)}
+          >
+            {view.rules.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.id} · {item.protocol} →{' '}
+                {
+                  view.world.assets.find(
+                    (asset) => asset.id === item.targetAssetId,
+                  )?.name
+                }
+              </option>
+            ))}
+          </select>
+          {rule && (
+            <>
+              <p className="source-note">
+                Obecnie: <strong>{rule.action.toUpperCase()}</strong>. Reguła
+                obejmuje także istniejący ruch tego protokołu. Inne przepływy
+                mają osobne reguły.
+              </p>
+              {rule.accountIds && (
+                <p className="source-note">
+                  Zakres kont:{' '}
+                  {rule.accountIds.length
+                    ? rule.accountIds.join(', ')
+                    : 'pusta grupa — reguła nie dopasuje żadnego konta'}
+                  .
+                </p>
+              )}
+              {view.rules.some((r) => r.accountIds) && (
+                <p className="source-note">
+                  Reguły zależą od konta sesji. Zmiana szerokiej reguły R-SMB
+                  może nie zmienić pierwszeństwa reguł SEG. Domyślna odmowa
+                  działa po dopasowaniu zakresu.
+                </p>
+              )}
+              {view.businessDependencies.additionalWork
+                .filter((work) =>
+                  work.services.some(
+                    (service) =>
+                      service.targetAssetId === rule.targetAssetId &&
+                      service.protocol === rule.protocol,
+                  ),
+                )
+                .map((work) => (
+                  <p className="decision-warning" key={work.id}>
+                    Ten przepływ jest wymagany przez legalne konto{' '}
+                    {work.accountId} dla {work.capacity} zamówień na turę:{' '}
+                    {work.name}.
+                  </p>
+                ))}
+              <button
+                disabled={disabled('set-network-rule')}
+                onClick={() =>
+                  schedule({
+                    type: 'set-network-rule',
+                    ruleId: rule.id,
+                    action: rule.action === 'allow' ? 'deny' : 'allow',
+                  })
+                }
+              >
+                {rule.action === 'allow'
+                  ? 'Zablokuj przepływ'
+                  : 'Dopuść przepływ'}{' '}
+                · 10 min
+              </button>
+            </>
+          )}
+        </details>
+        <details className="session-controls">
+          <summary>Zakończenie tunelu · 5 min</summary>
+          {session ? (
+            <>
+              <label htmlFor="observed-session">
+                Sesja znana z pozyskanych dowodów
+              </label>
+              <select
+                id="observed-session"
+                value={session.id}
+                onChange={(event) => setSessionId(event.target.value)}
+              >
+                {knownSessions.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.id} · {item.accountId}
+                  </option>
+                ))}
+              </select>
+              <p className="source-note">
+                Historyczny log nie potwierdza, że tunel nadal działa.
+                Zakończenie sesji nie blokuje nowych logowań.
+              </p>
+              <button
+                disabled={disabled('terminate-session')}
+                onClick={() =>
+                  schedule({ type: 'terminate-session', sessionId: session.id })
+                }
+              >
+                Zakończ sesję · 5 min
+              </button>
+            </>
+          ) : (
+            <p className="source-note">
+              Najpierw zbadaj logi lub aktywne sesje, aby wskazać tunel.
+            </p>
+          )}
+        </details>
+        <details className="account-controls">
+          <summary>Konto i poświadczenie</summary>
+          {account ? (
+            <>
+              <label htmlFor="known-account">Konto znane ze sprawy</label>
+              <select
+                id="known-account"
+                value={account}
+                onChange={(event) => setAccountId(event.target.value)}
+              >
+                {view.knownAccountIds.map((id) => (
+                  <option key={id} value={id}>
+                    {id}
+                  </option>
+                ))}
+              </select>
+              <p className="source-note">
+                Zmiany dotyczą nowych uwierzytelnień. Nie kończą wcześniej
+                wydanych sesji.
+              </p>
+              <div className="operation-actions">
+                <button
+                  disabled={disabled('block-account')}
+                  onClick={() =>
+                    schedule({ type: 'block-account', accountId: account })
+                  }
+                >
+                  Zablokuj nowe logowania · 5 min
+                </button>
+                <button
+                  disabled={
+                    disabled('unblock-account') ||
+                    !view.blockedKnownAccountIds.includes(account)
+                  }
+                  onClick={() =>
+                    schedule({ type: 'unblock-account', accountId: account })
+                  }
+                >
+                  Przywróć nowe logowania · 5 min
+                </button>
+                <button
+                  disabled={disabled('reset-credential')}
+                  onClick={() =>
+                    schedule({ type: 'reset-credential', accountId: account })
+                  }
+                >
+                  Resetuj poświadczenie · 10 min
+                </button>
+              </div>
+              <p className="decision-warning">
+                Przywrócenie konta nie odtwarza zakończonych tuneli ani nie
+                zmienia hasła i MFA. Nadal ważne przejęte poświadczenie może
+                ponownie umożliwić dostęp. Legalna praca wymaga nowego
+                poprawnego logowania i dostępu do wymaganych usług.
+              </p>
+            </>
+          ) : (
+            <p className="source-note">
+              Brak kont wskazanych przez dostępne obserwacje.
+            </p>
+          )}
+        </details>
+        <details className="vpn-controls">
+          <summary>Szerokie odcięcie VPN · 5 min</summary>
+          <p className="decision-warning">
+            Wyłączenie bramy kończy wszystkie tunele i odbiera zdalnym
+            dyspozytorom dostęp do ERP. Obsługa lokalna pozostaje dostępna.
+          </p>
+          <button
+            className="vpn-action"
+            disabled={disabled('set-vpn')}
+            onClick={() =>
+              schedule({
+                type: 'set-vpn',
+                assetId: view.vpnAssetId,
+                enabled: !view.vpnOnline,
+              })
+            }
+          >
+            {view.vpnOnline ? 'Wyłącz VPN' : 'Włącz VPN'} · 5 min
+          </button>
+        </details>
       </details>
       <p className="source-note">
         Zlecenie rezerwuje pracownika. Zmiana zaczyna działać dopiero po jej

@@ -1,4 +1,4 @@
-# Architektura FORTRESS LAB — Sprint 7
+# Architektura FORTRESS LAB — Sprint 8
 
 Jedna aplikacja React + TypeScript + Vite z natywną mapą SVG. Silnik to czyste
 funkcje TypeScript: bez Reacta, DOM, zegara systemowego, I/O i losowości.
@@ -458,9 +458,9 @@ opcjonalnym rozszerzeniem istniejącej telemetrii. Nie kopiuje ukrytej historii;
 obserwuje rozstrzygnięte żądania, własny zakres, retencję i opóźnienie.
 `inspect-file-access` używa tego samego analityka i kolejki zadań.
 
-Nowy zapis `FortressSaveV2` zawiera całą sesję i journal. Walidacja powtarza
+Zachowany zapis `FortressSaveV2` zawiera całą sesję i journal. Walidacja powtarza
 komendy istniejącym reducerem i porównuje cały stan. V1 jest sprawdzany
-historycznym kontraktem oraz fixture'ami ze scalonego Sprintu 6. Nowy adapter
+historycznym kontraktem oraz fixture'ami ze scalonego Sprintu 6. Historyczny adapter V2
 pisze wyłącznie do nowego klucza V2 i udostępnia eksport oryginalnego V1.
 Daty i ID pozostają metadanymi spoza autorytatywnego stanu kampanii/symulacji.
 
@@ -470,6 +470,28 @@ korzysta z faktycznych wyników logowania, obserwacji i raportów biznesowych.
 
 Specyfikacje: [kampania](campaign.md), [silnik](strategic-engine.md),
 [zapis V2](game-save-v2.md), [walidacja i ograniczenia](strategic-command-validation.md).
+
+## Odrębna rodzina integralności i V3
+
+`content/scenarios/integrity.ts` jest wybierany jawną komendą kampanii po
+jednym ukończonym incydencie. Nie zmienia historycznego katalogu trzech seedów.
+Opcjonalne `SimulationState.integrity` oraz `hidden.integrityThreat` istnieją
+wyłącznie w tej rodzinie. Typy endpointu, dokumentów i kopii są w
+`domain/integrity.ts`. `simulation/integrity.ts` rozstrzyga lokalne operacje,
+plan, efekty i obserwacje w tym samym zegarze i kolejce pracowników co Misja 01.
+Istniejące predykaty sieciowe, biznes i serwerowy sensor są współdzielone.
+
+`selectIntegrityView` zwraca wyłącznie konfigurację i ukończone obserwacje;
+prywatne dokumenty, plan i kompromitacja trafiają tylko do gated
+`selectIntegrityReport` po 18 turach. React renderuje tę projekcję i komendy,
+nie przechowuje alternatywnej logiki odzyskiwania.
+
+UI zapisuje teraz `FortressSaveV3` przez `currentGameStorage`. Wspólny
+`validateGameSession` ma osobne walidatory komend V2/V3. Stare formaty zachowują
+pełną kontrolę przez replay; zgodna sesja przechodzi do koperty V3 bez zmiany
+świata. Oryginały V1/V2 nie są zapisywane ani usuwane przez aktualny UI.
+[Modele i diagramy](mission-02-integrity.md), [V3](game-save-v3.md),
+[wyniki i Chromium](mission-02-validation.md).
 
 `unblock-account` korzysta z istniejącej kolejki administratora (jedna tura).
 Walidacja celu i wykonawcy jest w `simulation/tasks.ts`, efekt zmienia tylko

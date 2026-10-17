@@ -3,7 +3,12 @@ import type {
   ProcessAvailability,
   SimulationState,
 } from '../domain/simulation';
-import { canUseService, networkAllows } from './access';
+import {
+  canUseService,
+  networkAllows,
+  canUseLocalService,
+  isAssetOnline,
+} from './access';
 import { currentMinute } from './clock';
 
 export function isBusinessGoalMet(state: SimulationState): boolean {
@@ -50,6 +55,69 @@ export function businessAvailability(
         ),
     ),
   }));
+  if (state.integrity) {
+    const i = state.integrity;
+    const fs = state.hidden.scenario.integrity!.datasetAssetId;
+    const packing =
+      canUseLocalService(world, access, i.endpoint, fs, 'SMB', 'read') &&
+      canUseLocalService(
+        world,
+        access,
+        i.endpoint,
+        process.erpAssetId,
+        process.protocol,
+        'read',
+      );
+    const correct = i.documents.filter((d) => d.status === 'correct').length;
+    const reader = state.hidden.scenario.integrity!.businessReadAccountId;
+    const documentPath =
+      isAssetOnline(world, fs) &&
+      networkAllows(world, access, {
+        sourceAssetId: process.workstationAssetId,
+        targetAssetId: fs,
+        protocol: 'SMB',
+        accountId: reader,
+      }) &&
+      access.permissions.some(
+        (p) =>
+          p.accountId === reader &&
+          p.targetAssetId === fs &&
+          p.protocol === 'SMB',
+      );
+    const documentCapacity =
+      remoteAvailable && documentPath
+        ? Math.floor((process.remoteCapacity * correct) / i.documents.length)
+        : 0;
+    const capacity =
+      (localAvailable
+        ? process.localCapacity - (packing ? 0 : i.endpoint.businessCapacity)
+        : 0) + documentCapacity;
+    return {
+      localAvailable,
+      remoteAvailable,
+      capacity,
+      status:
+        capacity === 0
+          ? 'unavailable'
+          : capacity === process.localCapacity + process.remoteCapacity
+            ? 'available'
+            : 'degraded',
+      contributions: [
+        {
+          id: 'packing-station',
+          name: 'pakowanie-03 — legalna praca lokalna',
+          available: packing && localAvailable,
+          capacity: i.endpoint.businessCapacity,
+        },
+        {
+          id: 'correct-documents',
+          name: 'Poprawne dokumenty FS-01 — lokalna droga',
+          available: documentPath && correct === i.documents.length,
+          capacity: process.remoteCapacity,
+        },
+      ],
+    };
+  }
   const capacity =
     (localAvailable ? process.localCapacity : 0) +
     (remoteAvailable ? process.remoteCapacity : 0) +

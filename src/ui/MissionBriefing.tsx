@@ -16,9 +16,19 @@ export function MissionBriefing({
         </span>
         <span className="mission-tag">14:00 — 15:30 · 18 tur</span>
         <h1>
-          Ostatnie okno
-          <br />
-          <span className="accent">wysyłkowe.</span>
+          {view.integrity ? (
+            <>
+              Ostatnia czysta
+              <br />
+              <span className="accent">kopia.</span>
+            </>
+          ) : (
+            <>
+              Ostatnie okno
+              <br />
+              <span className="accent">wysyłkowe.</span>
+            </>
+          )}
         </h1>
         <p className="briefing-role">
           Pierwszy dzień w roli Security Engineer.
@@ -29,11 +39,23 @@ export function MissionBriefing({
         </blockquote>
         <div className="briefing-objectives">
           <article>
-            <span className="eyebrow">Cel 01 / Poufność</span>
-            <h2>Chroń dane operacyjne</h2>
+            <span className="eyebrow">
+              Cel 01 / {view.integrity ? 'Integralność' : 'Poufność'}
+            </span>
+            <h2>
+              {view.integrity
+                ? 'Odzyskaj poprawne dokumenty'
+                : 'Chroń dane operacyjne'}
+            </h2>
             <p>
-              Cel: 0 ujawnionych rekordów z {view.recordPool}. Podczas gry znasz
-              tylko to, co uda się zaobserwować.
+              {view.integrity ? (
+                'Ogranicz źródło zmian, odtwórz lub uzgodnij dokumenty i sprawdź rezultat. Serwer online nie potwierdza integralności.'
+              ) : (
+                <>
+                  Cel: 0 ujawnionych rekordów z {view.recordPool}. Podczas gry
+                  znasz tylko to, co uda się zaobserwować.
+                </>
+              )}
             </p>
           </article>
           <article>
@@ -41,7 +63,10 @@ export function MissionBriefing({
             <h2>Dowieź wysyłki</h2>
             <p>
               Do 15:30 pozostaw najwyżej {view.maxFinalBacklog} zaległych
-              zamówień. Zdalny zespół potrzebuje ERP przez VPN.
+              zamówień.{' '}
+              {view.integrity
+                ? 'Wysyłki wymagają także poprawnych dokumentów FS-01. Izolacja odbiera legalną pracę stacji.'
+                : 'Zdalny zespół potrzebuje ERP przez VPN.'}
             </p>
           </article>
         </div>
@@ -75,8 +100,9 @@ export function MissionBriefing({
           <div>
             <h3>Bartek · administrator</h3>
             <p>
-              Kończy tunele, zmienia logowania i reguły dostępu. Każda zmiana
-              wymaga czasu.
+              {view.integrity
+                ? 'Izoluje stację, ogranicza jej zapis i odtwarza dokumenty. Podłączenie wymaga spełnienia warunków bezpieczeństwa.'
+                : 'Kończy tunele, zmienia logowania i reguły dostępu. Każda zmiana wymaga czasu.'}
             </p>
           </div>
         </article>

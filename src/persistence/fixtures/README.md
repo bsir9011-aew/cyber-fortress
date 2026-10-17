@@ -1,4 +1,4 @@
-# Rzeczywiste pliki Sprintu 6
+# Rzeczywiste pliki V1/V2
 
 Pliki wygenerowano niezmienionym kodem commita
 `d1c3d56e9293f78ac6cadeef4339b8e699341508` (PR #7, scalony na main).
@@ -25,3 +25,10 @@ cztery godziny przygotowania → misja A → zlecenie blokady `magazyn-07` →
 S-19 nie powstaje, wersja poświadczenia wynosi 1. Metadane:
 2026-10-17T06:00:00.000Z, wyłącznie fikcyjne dane. Test wymaga identycznego
 odczytu dawnej migawki, a następnie pozwala wykonać nowe zadanie w tym świecie.
+
+`sprint7-recovery-v2.json` to niezmieniony eksport z Chromium wykonany kodem
+poprawki `660ad00`, przed rozpoczęciem Sprintu 8. Obejmuje początek legalnego B
+po blokadzie w A, z zadaniem `unblock-account` w toku (tura 0, termin 1).
+Metadane eksportu: 2026-10-17T06:34:37.339Z. Test V3 wymaga identycznego
+odczytu całej sesji, w tym trwającego zadania i zachowanej blokady. Plik jest
+fikcyjnym zapisem gry; nie został wygenerowany silnikiem Sprintu 8.

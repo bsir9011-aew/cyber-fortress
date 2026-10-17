@@ -3,6 +3,7 @@ import type { AttackDefinition } from './attack';
 import type { BusinessProcess, SimulationClock } from './simulation';
 import type { TelemetryState } from './telemetry';
 import type { WorldState } from './world';
+import type { IntegrityDefinition } from './integrity';
 
 export type ScenarioMode = 'training' | 'unknown';
 export interface RunIdentity {
@@ -33,13 +34,15 @@ export interface HistoricalAuthenticationAttempt {
 }
 
 export interface ScenarioDefinition {
+  readonly integrity?: IntegrityDefinition;
   readonly id: string;
   /** Prywatny opis, ujawniany dopiero w raporcie. */
   readonly name: string;
   readonly kind:
     | 'unauthorized-session'
     | 'legitimate-session'
-    | 'stolen-credential';
+    | 'stolen-credential'
+    | 'local-integrity';
   readonly explanation: string;
   readonly world: WorldState;
   readonly clock: Omit<SimulationClock, 'turn'>;

@@ -11,6 +11,7 @@ import './mission.css';
 import './scenario.css';
 import './persistence.css';
 import './strategy.css';
+import './integrity.css';
 
 export function App() {
   const operations = usePersistentOperations();
@@ -20,7 +21,7 @@ export function App() {
     return (
       !(operations.active || operations.hasSave) ||
       window.confirm(
-        'Nowa gra zastąpi bieżącą grę i zapis V2. Oryginał V1 oraz historia prób pozostaną. Kontynuować?',
+        'Nowa gra zastąpi bieżącą grę i zapis V3. Oryginały V1/V2 oraz historia prób pozostaną. Kontynuować?',
       )
     );
   }
@@ -59,12 +60,13 @@ export function App() {
           </div>
         </div>
         <span className="version">
-          DEV 0.2 <span>· Strategic Command</span>
+          DEV 0.2 <span>· The Last Clean Copy</span>
         </span>
       </header>
       <PersistenceToolbar
         game={game}
         legacyRaw={operations.legacyRaw}
+        previousRaw={operations.previousRaw}
         canExport={operations.canResume}
         status={operations.saveStatus}
         error={operations.saveError}
@@ -73,7 +75,7 @@ export function App() {
         onImport={(save) => {
           if (
             !window.confirm(
-              'Import zastąpi bieżącą grę i zapis V2. Oryginał V1 oraz historia pozostaną. Kontynuować?',
+              'Import zastąpi bieżącą grę i zapis V3. Oryginały V1/V2 oraz historia pozostaną. Kontynuować?',
             )
           )
             return;
@@ -158,7 +160,7 @@ export function App() {
       <footer className="app-footer">
         <span>FORTRESS LAB / NEXUS Logistics</span>
         <span>
-          Strategic Command <span className="footer-dot" /> Sprint 7
+          The Last Clean Copy <span className="footer-dot" /> Sprint 8
         </span>
       </footer>
     </div>

@@ -5,6 +5,7 @@ import type { AccessState, NetworkRule } from '../domain/access';
 import { selectScenario } from './scenarioSelectors';
 import { createScenario } from './createScenario';
 import { issueVpnSession } from '../simulation/access';
+import { integrityScenario } from '../content/scenarios/integrity';
 
 /** Trwałe polityki nakładamy przed wszystkimi modelowanymi logowaniami. */
 export function prepareCampaignDefinition(
@@ -12,6 +13,7 @@ export function prepareCampaignDefinition(
   posture: SecurityPosture,
 ): ScenarioDefinition {
   const changed =
+    (base.integrity && posture.endpointOverrides) ||
     posture.remoteAccess ||
     posture.fileVisibility ||
     posture.segmentation ||
@@ -186,13 +188,14 @@ export function prepareCampaignDefinition(
     world,
     access,
     legitimateBehaviors: legal,
-    briefing: events.length
-      ? source.briefing
-      : {
-          ...source.briefing,
-          message:
-            'Do 15:30 musimy zamknąć wysyłki. Odziedziczona dostępność usług nie pozwala zebrać początkowych logów VPN. Sprawdź dokumentację, przywróć wymagane przepływy i pozyskaj dostępne dowody; brak odczytu nie dowodzi braku zagrożenia.',
-        },
+    briefing:
+      events.length || source.integrity
+        ? source.briefing
+        : {
+            ...source.briefing,
+            message:
+              'Do 15:30 musimy zamknąć wysyłki. Odziedziczona dostępność usług nie pozwala zebrać początkowych logów VPN. Sprawdź dokumentację, przywróć wymagane przepływy i pozyskaj dostępne dowody; brak odczytu nie dowodzi braku zagrożenia.',
+          },
     initialSessionOrigins: origins,
     authenticationPrelude: [],
     attacker: prevented
@@ -229,7 +232,27 @@ export function prepareCampaignDefinition(
           }
         : {}),
     },
+    ...(source.integrity
+      ? {
+          integrity: {
+            ...source.integrity,
+            endpoint: {
+              ...source.integrity.endpoint,
+              ...posture.endpointOverrides?.[source.integrity.endpoint.id],
+            },
+          },
+        }
+      : {}),
   };
+}
+export function createIntegrityIncident(
+  seed: number,
+  posture: SecurityPosture,
+) {
+  return createScenario(prepareCampaignDefinition(integrityScenario, posture), {
+    mode: 'unknown',
+    seed,
+  });
 }
 export function createCampaignIncident(seed: number, posture: SecurityPosture) {
   return createScenario(

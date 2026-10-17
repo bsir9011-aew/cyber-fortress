@@ -2,7 +2,29 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — Strategic Command (Sprint 7)
+## FORTRESS LAB — The Last Clean Copy (Sprint 8)
+
+Po jednym ukończonym incydencie Misji 01 w centrali odblokowuje się
+**Misja 02 — Ostatnia czysta kopia**. Rozlicz następne cztery godziny i wybierz
+jej kartę. FS-01 odpowiada, lecz dokumenty nie zgadzają się z ERP. Zbadaj
+dane i lokalną stację, ogranicz źródło modyfikacji, wybierz kopię, odtwórz
+brakujące dokumenty i sprawdź rezultat. Sama izolacja nie naprawia danych;
+samo odtworzenie nie usuwa przyczyny. MFA i segmentacja VPN nie kontrolują
+automatycznie lokalnego SMB.
+
+Masz 100 dokumentów, dwie kopie o różnym wieku i czasie odtworzenia,
+czasowe zadania obu pracowników oraz rzeczywisty bilans 360 zamówień.
+Kontrolowane podłączenie stacji wymaga izolacji, badania i ograniczenia zapisu;
+nie oznacza oczyszczenia hosta. Audyt FS-01 daje dodatkowy dowód tylko po
+wdrożeniu projektu. Nie ma nowego projektu zakupowego ani backendu.
+
+[Modele, parametry i diagramy Misji 02](docs/mission-02-integrity.md) ·
+[Wyniki strategii i screenshoty](docs/mission-02-validation.md) ·
+[Zapis V3 i bezpieczna obsługa V1/V2](docs/game-save-v3.md).
+
+![Misja 02: poprawność dokumentów po odzyskaniu](docs/screenshots/mission-02/05-recovered-documents-desktop.png)
+
+### Misja 01 — stabilne dotychczasowe warianty
 
 Trzy warianty misji **„Ostatnie okno wysyłkowe”** w NEXUS Logistics.
 Jako Security Engineer otrzymujesz sygnał nietypowych logowań VPN, pozyskujesz
@@ -57,7 +79,7 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 - **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
   strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
   Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu. Nowe zapisy mają
-  format V2; poprzedni oryginał V1 pozostaje zachowany i możliwy do wyeksportowania.
+  format V3; poprzednie oryginały V1/V2 pozostają zachowane i możliwe do wyeksportowania.
 - **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
   działalność, ograniczenie dostępu i działania samodzielnych misji. Wyniki strategii
   znajdziesz w Centrali w historii bieżącej kampanii. Powtórka tworzy nową próbę tego
@@ -80,8 +102,8 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 ### Wersja przeglądarkowa
 
 Docelowy adres: **https://bsir9011-aew.github.io/cyber-fortress/**.
-Repozytorium ma już Pages w trybie GitHub Actions i wdrożenie scalonego Sprintu 6.
-Sprint 7 czeka na zatwierdzenie PR; nie został opublikowany w produkcji.
+Repozytorium ma Pages w trybie GitHub Actions. Sprint 7 jest scalony na main.
+Sprint 8 wymaga review PR i nie jest publikowany z gałęzi funkcjonalnej.
 Workflow nadal wdraża wyłącznie `main`, po testach i produkcyjnym buildzie.
 
 ### Rozpoczęcie misji
@@ -234,14 +256,17 @@ src/
   domain/       # typy i kontrakty świata
   simulation/   # czas, dostęp, biznes, zadania, przeciwnik, sensory, narracja i przejścia stanu
   application/  # inicjalizacja, reducer misji/kampanii, sesje gry, projekcje i raporty
-  content/      # infrastruktura, trzy konfiguracje NEXUS oraz projekty ochrony
+  content/      # infrastruktura, trzy stabilne warianty VPN, odrębna Misja 02 i projekty
   ui/           # React, style i SVG
-  persistence/  # zapis V2, zgodność V1, walidacja, localStorage i historia prób
+  persistence/  # zapis V3, zgodność V1/V2, walidacja, localStorage i historia prób
 docs/           # architektura i GDD
 prototype/      # archiwalny prototyp HTML 0.1
 ```
 
 - [Kampania i budżet](docs/campaign.md)
+- [Misja 02: lokalny dostęp, integralność i recovery](docs/mission-02-integrity.md)
+- [Zapis V3 i zachowane oryginały](docs/game-save-v3.md)
+- [Walidacja i strategie Sprintu 8](docs/mission-02-validation.md)
 - [Semantyka silnika Sprintu 7](docs/strategic-engine.md)
 - [Zapis V2 i ochrona V1](docs/game-save-v2.md)
 - [Raport Sprintu 7](docs/strategic-command-validation.md)
@@ -258,8 +283,8 @@ Licencja: [MIT](LICENSE).
 
 ### Granice etapu
 
-Jedna organizacja, trzy stałe warianty i co najwyżej jeden deterministyczny przeciwnik. Kopiowanie zmienia wyłącznie
-licznik abstrakcyjnych rekordów w TypeScript. Działania symulacji nie wykonują
+Jedna organizacja, trzy stałe warianty Misji 01 i osobna Misja 02 z jednym lokalnym źródłem zmian. Kopiowanie i modyfikacje zmieniają wyłącznie
+abstrakcyjny stan rekordów i dokumentów w TypeScript. Działania symulacji nie wykonują
 operacji w prawdziwej sieci ani na plikach. Nie ma pełnego SOC/SIEM, sensorów ruchu,
 generatywnych dialogów, wielowątkowej kampanii, gospodarki rynkowej, kont ani
 chmurowych zapisów. Audyt obejmuje tylko jawnie modelowaną usługę FS-01. Odświeżenie strony proponuje wznowienie lokalnej próby.

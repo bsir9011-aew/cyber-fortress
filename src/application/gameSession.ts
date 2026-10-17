@@ -95,7 +95,12 @@ export function currentOperation(game: GameSession): OperationSession | null {
   if (game.kind === 'incident') return game.operation;
   if (!game.campaign.incident || !game.missionMetadata) return null;
   let start = game.commands.length - 1;
-  while (start >= 0 && game.commands[start]?.type !== 'start-incident') start--;
+  while (
+    start >= 0 &&
+    game.commands[start]?.type !== 'start-incident' &&
+    game.commands[start]?.type !== 'start-integrity-incident'
+  )
+    start--;
   const commands = game.commands
     .slice(start + 1)
     .flatMap((command) =>

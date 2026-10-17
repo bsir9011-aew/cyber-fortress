@@ -12,12 +12,14 @@ import {
   statusLabels,
 } from './infrastructurePresentation';
 import type { MapSelection } from './infrastructurePresentation';
+import type { IntegrityView } from '../application/selectIntegrityView';
 
 interface Props {
   world: WorldState;
   selection: MapSelection;
   onSelect: (selection: MapSelection) => void;
   networkRules?: readonly NetworkRule[];
+  endpoint?: IntegrityView['endpoint'] | undefined;
 }
 
 export function InfrastructureInspector({
@@ -25,6 +27,7 @@ export function InfrastructureInspector({
   selection,
   onSelect,
   networkRules = [],
+  endpoint,
 }: Props) {
   const asset =
     selection?.kind === 'asset'
@@ -51,6 +54,25 @@ export function InfrastructureInspector({
           </div>
           <p className="eyebrow muted">{assetLabels[asset.kind]}</p>
           <h2>{asset.name}</h2>
+          {endpoint?.assetId === asset.id && (
+            <section className="inspector-section">
+              <h3>Podzasób logiczny: {endpoint.id}</h3>
+              <p>
+                Jedna z istniejących 94 stacji, lokalny kontekst{' '}
+                {endpoint.accountId}. Izolacja:{' '}
+                {endpoint.isolated ? 'tak' : 'nie'}; zapis:{' '}
+                {endpoint.writesRestricted
+                  ? 'ograniczony'
+                  : 'dozwolony uprawnieniem'}
+                .
+              </p>
+              <p>
+                ERP/HTTPS i FS-01/SMB. Odczyt dokumentów wspiera{' '}
+                {endpoint.businessCapacity} zamówienia na turę. Konfiguracja nie
+                dowodzi kompromitacji. Działania dostępne w panelu zespołu.
+              </p>
+            </section>
+          )}
           <span className={`status-badge status-${asset.status}`}>
             ● {statusLabels[asset.status]} operacyjnie
           </span>
