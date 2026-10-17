@@ -7,8 +7,8 @@ export type AssetKind =
   | 'workstation'
   | 'cloud-service';
 
-/** Dostępność zasobu nie opisuje jego bezpieczeństwa ani wiedzy gracza. */
-export type AssetStatus = 'online' | 'offline';
+/** Physical scenarios use online/offline; unknown is reserved for the public knowledge projection. */
+export type AssetStatus = 'online' | 'offline' | 'unknown';
 
 export interface InfrastructureAsset {
   readonly id: AssetId;

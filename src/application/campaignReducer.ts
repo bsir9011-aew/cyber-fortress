@@ -17,6 +17,7 @@ import {
   createIntegrityIncident,
   createDetectionIncident,
   createVendorIncident,
+  createRecoveryIncident,
 } from './prepareCampaignIncident';
 import { simulationReducer } from './simulationReducer';
 import { selectMissionReport } from './selectMissionReport';
@@ -160,6 +161,16 @@ export function campaignReducer(
       ? [
           ...state.history,
           {
+            ...(report.recovery
+              ? {
+                  recovery: {
+                    useful: report.recovery.useful,
+                    missingRecordIds: report.recovery.missingRecordIds,
+                    pendingOrderIds: report.recovery.pendingOrderIds,
+                    goalMet: report.recovery.goalMet,
+                  },
+                }
+              : {}),
             ...(report.vendor
               ? {
                   vendor: {
@@ -358,6 +369,27 @@ export function campaignReducer(
             : command.type === 'start-integrity-incident'
               ? createIntegrityIncident(state.nextSeed, state.posture)
               : createCampaignIncident(state.nextSeed, state.posture),
+      },
+      command,
+    );
+  }
+  if (command.type === 'start-recovery-incident') {
+    if (command.familyId !== 'nexus-erp-recovery-v1')
+      return reject('Nieznana rodzina odzyskiwania.');
+    if (!state.history.some((r) => r.vendor))
+      return reject('Najpierw ukończ co najmniej jedną Misję 03.');
+    if (state.preparation.hour !== 4)
+      return reject('Najpierw rozlicz czterogodzinne przygotowanie.');
+    return decide(
+      state,
+      {
+        ...state,
+        phase: 'incident',
+        incident: createRecoveryIncident(
+          state.nextSeed,
+          state.posture,
+          command.familyId,
+        ),
       },
       command,
     );

@@ -73,6 +73,12 @@ export interface PreparationWork {
   readonly status: 'running' | 'completed' | 'paused';
 }
 export interface CampaignMissionReport {
+  readonly recovery?: {
+    readonly useful: boolean;
+    readonly missingRecordIds: readonly string[];
+    readonly pendingOrderIds: readonly string[];
+    readonly goalMet: boolean;
+  };
   readonly vendor?: {
     readonly approvalId: string | null;
     readonly approvedScope: VendorScope | null;
@@ -125,6 +131,10 @@ export interface CampaignState {
   }[];
 }
 export type CampaignCommand =
+  | {
+      readonly type: 'start-recovery-incident';
+      readonly familyId: 'nexus-erp-recovery-v1';
+    }
   | {
       readonly type: 'prepare-vendor-exception';
       readonly scope: VendorScope;

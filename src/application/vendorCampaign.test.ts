@@ -1,3 +1,4 @@
+import { CURRENT_GAME_SAVE_KEY } from '../persistence/gameSaveV7';
 import { describe, expect, it } from 'vitest';
 import { createStrategicSession, currentOperation } from './gameSession';
 import type { StrategicSession } from './gameSession';
@@ -35,7 +36,6 @@ import {
   serializeCurrentGameSave,
   isCurrentCampaignCommand,
   isCurrentRecordedCommand,
-  CURRENT_GAME_SAVE_KEY,
 } from '../persistence/gameSaveV6';
 import {
   createCurrentGameSave as saveV5,

@@ -49,6 +49,7 @@ function stateSummary(s: AarActualState) {
     s.vendorAuthorization
       ? `Autoryzacja dostawcy:\n\n${details(s.vendorAuthorization)}`
       : '',
+    s.erpRecovery ? `ERP recovery:\n\n${details(s.erpRecovery)}` : '',
     s.endpoint ? `Endpoint:\n\n${details(s.endpoint)}` : '',
     `Konta (prawda po misji):\n\n${s.accounts.map((a) => `- ${text(a.id)}: ${a.loginStatus}, credentialVersion=${a.credentialVersion}, MFA=${a.mfaPolicy}.`).join('\n')}`,
     `Sesje (prawda po misji):\n\n${s.sessions.map((a) => `- ${text(a.id)} / ${text(a.accountId)}: ${a.status}, pochodzenie ${a.origin}; ${aarClock(a.startedAtMinute)}–${aarClock(a.expiresAtMinute)}.`).join('\n') || 'Brak.'}`,
@@ -125,13 +126,22 @@ export function renderAfterActionMarkdown(
     `Wykradzione rekordy: ${s.exposedRecords}. Stan końcowy:\n\n${stateSummary(r.groundTruth.finalState)}`,
     i
       ? `RPO: ${i.rpoMinutes === null ? 'nie dotyczy' : i.rpoMinutes + ' min'}. RTO od początku okna do skutecznej kontroli danych: ${i.rtoMinutes === null ? 'niepotwierdzone' : i.rtoMinutes + ' min'}. Ostatnia kopia: ${text(i.backupId)}. Źródło nadal może zapisywać: ${yes(i.sourceHasWrite)}. Brakujące zmiany z kopii: ${i.missingChanges}; odtworzone jawnie z ERP: ${i.reconstructed}; nadal do uzgodnienia: ${i.reconcile}.\n\nKopie i wykonane odtworzenia:\n\n${details(r.groundTruth.backups)}`
-      : 'Brak modelu integralności kopii w tej misji.',
+      : s.erpRecovery
+        ? 'Kopie ERP i uzgodnienia opisano w sekcji Misji 04.'
+        : 'Brak modelu integralności kopii w tej misji.',
     `Rzeczywiste wykorzystanie inwestycji:\n\n${details(s.investmentUse)}`,
     ...(s.detectionReview
       ? [
           '### Detection Engineering — wynik tego przebiegu',
           details(s.detectionReview),
           'Alert jest przesłanką do badania. Etykieta FP/FN jest dostępna dopiero po misji; nie stanowi oceny racjonalności decyzji. Następstwa i stany po decyzji opisano także w sekcjach 4 i 8.',
+        ]
+      : []),
+    ...(s.erpRecovery
+      ? [
+          '### Misja 04 — Service Recovery / Data Recovery / Business Continuity / Operational Confidence',
+          details(s.erpRecovery),
+          'Nieudany restart i starsza kopia są wynikami operacji; raport nie ocenia racjonalności decyzji ani nie tworzy alternatywnych wyników.',
         ]
       : []),
     ...(s.vendorAccess

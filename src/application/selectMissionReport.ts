@@ -1,3 +1,4 @@
+import { selectRecoveryReport } from './selectRecoveryReport';
 import { selectVendorReport } from './selectVendorReport';
 import type { SimulationState } from '../domain/simulation';
 import { isFinished } from '../simulation/clock';
@@ -14,6 +15,7 @@ export function selectMissionReport(state: SimulationState) {
     attacker?.status === 'blocked' &&
     attacker.consecutiveFailures >= attacker.definition.maxConsecutiveFailures;
   return {
+    ...(state.recovery ? { recovery: selectRecoveryReport(state) } : {}),
     ...(state.vendor ? { vendor: selectVendorReport(state) } : {}),
     ...(state.integrity ? { integrity: selectIntegrityReport(state) } : {}),
     scenario: {

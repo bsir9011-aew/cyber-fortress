@@ -62,6 +62,7 @@ export const assetLabels: Record<AssetKind, string> = {
 };
 
 export const statusLabels: Record<AssetStatus, string> = {
+  unknown: 'Nie zbadano',
   online: 'Działa',
   offline: 'Niedostępny',
 };

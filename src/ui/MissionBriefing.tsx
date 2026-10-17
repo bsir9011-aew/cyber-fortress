@@ -16,7 +16,9 @@ export function MissionBriefing({
         </span>
         <span className="mission-tag">14:00 — 15:30 · 18 tur</span>
         <h1>
-          {view.vendor ? (
+          {view.recovery ? (
+            'ERP nie odpowiada.'
+          ) : view.vendor ? (
             <>
               Dostawca
               <br />
@@ -46,15 +48,24 @@ export function MissionBriefing({
         <div className="briefing-objectives">
           <article>
             <span className="eyebrow">
-              Cel 01 / {view.integrity ? 'Integralność' : 'Poufność'}
+              Cel 01 /{' '}
+              {view.recovery
+                ? 'Odzyskiwanie'
+                : view.integrity
+                  ? 'Integralność'
+                  : 'Poufność'}
             </span>
             <h2>
-              {view.integrity
-                ? 'Odzyskaj poprawne dokumenty'
-                : 'Chroń dane operacyjne'}
+              {view.recovery
+                ? 'Odzyskaj usługę i poprawne dane'
+                : view.integrity
+                  ? 'Odzyskaj poprawne dokumenty'
+                  : 'Chroń dane operacyjne'}
             </h2>
             <p>
-              {view.vendor ? (
+              {view.recovery ? (
+                'Przywróć użyteczny ERP, uzgodnij brakujące zapisy i wykonane wysyłki. Sprawdź wynik na podstawie niezależnego dziennika.'
+              ) : view.vendor ? (
                 <>
                   Dostawca
                   <br />
@@ -76,11 +87,13 @@ export function MissionBriefing({
             <p>
               Do 15:30 pozostaw najwyżej {view.maxFinalBacklog} zaległych
               zamówień.{' '}
-              {view.vendor
-                ? 'CARGO-LINK wnosi 6 z 22 zamówień wydajności. Zbadaj potrzebne przepływy i pamiętaj o terminie wyjątku.'
-                : view.integrity
-                  ? 'Wysyłki wymagają także poprawnych dokumentów FS-01. Izolacja odbiera legalną pracę stacji.'
-                  : 'Zdalny zespół potrzebuje ERP przez VPN.'}
+              {view.recovery
+                ? 'Zamknij i uzgodnij tryb ręczny. Potwierdź spójność danych po odtworzeniu.'
+                : view.vendor
+                  ? 'CARGO-LINK wnosi 6 z 22 zamówień wydajności. Zbadaj potrzebne przepływy i pamiętaj o terminie wyjątku.'
+                  : view.integrity
+                    ? 'Wysyłki wymagają także poprawnych dokumentów FS-01. Izolacja odbiera legalną pracę stacji.'
+                    : 'Zdalny zespół potrzebuje ERP przez VPN.'}
             </p>
           </article>
         </div>
@@ -114,11 +127,13 @@ export function MissionBriefing({
           <div>
             <h3>Bartek · administrator</h3>
             <p>
-              {view.vendor
-                ? 'Cofa, zawęża lub rozszerza ważny wyjątek dostawcy. Zmiany wymagają czasu i nie kończą sesji.'
-                : view.integrity
-                  ? 'Izoluje stację, ogranicza jej zapis i odtwarza dokumenty. Podłączenie wymaga spełnienia warunków bezpieczeństwa.'
-                  : 'Kończy tunele, zmienia logowania i reguły dostępu. Każda zmiana wymaga czasu.'}
+              {view.recovery
+                ? 'Restartuje ERP, odtwarza wybraną kopię, przełącza ruch na standby i zarządza obsługą ręczną. Każde zadanie wymaga czasu.'
+                : view.vendor
+                  ? 'Cofa, zawęża lub rozszerza ważny wyjątek dostawcy. Zmiany wymagają czasu i nie kończą sesji.'
+                  : view.integrity
+                    ? 'Izoluje stację, ogranicza jej zapis i odtwarza dokumenty. Podłączenie wymaga spełnienia warunków bezpieczeństwa.'
+                    : 'Kończy tunele, zmienia logowania i reguły dostępu. Każda zmiana wymaga czasu.'}
             </p>
           </div>
         </article>

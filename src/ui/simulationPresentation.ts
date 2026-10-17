@@ -1,3 +1,5 @@
+import { recoveryLabels } from '../content/recoveryLabels';
+import { isRecoveryAction } from '../simulation/recovery';
 import type {
   CommandRejection,
   SimulationEvent,
@@ -5,6 +7,11 @@ import type {
 } from '../domain/simulation';
 
 export function actionLabel(action: TaskAction): string {
+  if (isRecoveryAction(action))
+    return (
+      recoveryLabels[action.type] +
+      ('backupId' in action ? ` · ${action.backupId}` : '')
+    );
   switch (action.type) {
     case 'inspect-vendor-operations':
       return 'Sprawdź operacje CARGO-LINK';

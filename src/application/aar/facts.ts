@@ -1,3 +1,7 @@
+import {
+  assessErpAvailability,
+  pendingErpOrderIds,
+} from '../../simulation/recoveryAccess';
 import { knownSessionIds } from '../../simulation/tasks';
 import type { DecisionRecord } from '../../domain/incident';
 import type {
@@ -34,6 +38,17 @@ export function actualState(state: SimulationState): AarActualState {
     i = state.integrity,
     d = state.hidden.scenario.integrity;
   return {
+    ...(state.recovery
+      ? {
+          erpRecovery: facts({
+            ...assessErpAvailability(state),
+            manualActive: state.recovery.manualActive,
+            pendingOrderIds: pendingErpOrderIds(state),
+            revision: state.recovery.revision,
+            verifiedRevision: state.recovery.verifiedRevision,
+          }),
+        }
+      : {}),
     threatAccess: assessThreatAccess(state),
     ...(state.access.vendorAuthorization
       ? { vendorAuthorization: facts(state.access.vendorAuthorization) }
@@ -111,6 +126,7 @@ export function knownAtDecision(
       integrity: v.integrity?.hypothesis ?? null,
     },
     configuration: {
+      ...(v.recovery ? { erpRecovery: facts(v.recovery) } : {}),
       assets: v.world.assets.map((a) => ({
         id: a.id,
         name: a.name,
@@ -222,7 +238,9 @@ export function actionTarget(
     return {
       kind: 'backup',
       id: action.backupId,
-      resourceIds: [state.hidden.scenario.integrity?.datasetAssetId ?? 'fs-01'],
+      resourceIds: state.recovery
+        ? ['erp', 'erp-backups', 'erp-storage']
+        : [state.hidden.scenario.integrity?.datasetAssetId ?? 'fs-01'],
       flow: null,
     };
   if ('assetId' in action)

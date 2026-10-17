@@ -24,6 +24,16 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
       </div>
       <details className="business-dependencies">
         <summary>Od czego zależy wydajność firmy?</summary>
+        {view.recovery && (
+          <p>
+            ERP wymaga sprawnego hosta, procesu, bazy, storage, poprawnych
+            danych i drogi użytkownika. Brakujące zapisy ograniczają wydajność
+            proporcjonalnie: floor(8 × kompletność) + floor(14 × kompletność).
+            Ręczne manifesty zastępują ERP: do 10/turę z tej samej kolejki.
+            Zrealizowane zamówienia nie są ponownie wysyłane po odtworzeniu, ale
+            wymagają uzgodnienia potwierdzeń.
+          </p>
+        )}
         {view.integrity && (
           <p>
             W tej misji 14 zamówień wydajności zdalnej zależy także od
@@ -88,7 +98,9 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
           VPN: {view.vpnOnline ? 'działa' : 'wyłączony'}
         </span>
         <span className={view.erpOnline ? 'status-online' : 'status-offline'}>
-          ERP: {view.erpOnline ? 'działa' : 'niedostępny'}
+          {view.recovery
+            ? 'ERP: stan hosta i danych w centrum odzyskiwania'
+            : `ERP: ${view.erpOnline ? 'działa' : 'niedostępny'}`}
         </span>
         <span>
           Zdalna obsługa ERP:{' '}

@@ -61,6 +61,36 @@ export function validateAfterActionReport(
         : null)
     )
       return bad();
+  } else if (r.scenario.family === 'M04') {
+    const erp = r.securityConsequences.erpRecovery;
+    if (
+      !isObject(erp ?? null) ||
+      r.finalOutcome.confidentialityMet !== null ||
+      r.finalOutcome.containmentMet !== null
+    )
+      return bad();
+    if (erp && isObject(erp)) {
+      const data = erp.dataRecovery,
+        confidence = erp.operationalConfidence,
+        operations = erp.businessContinuity;
+      if (
+        !data ||
+        !isObject(data) ||
+        !confidence ||
+        !isObject(confidence) ||
+        !operations ||
+        !isObject(operations) ||
+        erp.goalMet !== r.finalOutcome.allObjectivesMet ||
+        erp.useful !== r.finalOutcome.serviceRecoveryMet ||
+        data.met !== r.finalOutcome.integrityMet ||
+        confidence.verified !== r.finalOutcome.operationalConfidenceMet ||
+        !operations.manualActive !== r.finalOutcome.manualClosedMet ||
+        operations.received !== b.ordersReceived ||
+        operations.processed !== b.ordersProcessed ||
+        operations.backlog !== b.finalBacklog
+      )
+        return bad();
+    }
   } else if (
     !documents ||
     r.finalOutcome.integrityMet !==
@@ -78,6 +108,9 @@ export function validateAfterActionReport(
       r.finalOutcome.containmentMet,
       r.finalOutcome.integrityMet,
       r.finalOutcome.vendorWorkMet ?? true,
+      r.finalOutcome.serviceRecoveryMet ?? true,
+      r.finalOutcome.operationalConfidenceMet ?? true,
+      r.finalOutcome.manualClosedMet ?? true,
     ].every((v) => v !== false)
   )
     return bad();
