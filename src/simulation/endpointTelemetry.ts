@@ -98,6 +98,30 @@ export function availableEndpointRecords(
       r.minute <= minute,
   );
 }
+/** Observable records eligible for the rule's source-time window. */
+export function endpointDetectionRecords(
+  records: readonly EndpointRecord[],
+  rule: EndpointCoverage['detection'],
+  minute: number,
+): readonly EndpointRecord[] {
+  return [...new Map(records.map((r) => [r.id, r])).values()].filter(
+    (r) =>
+      r.operation === rule.operation &&
+      r.outcome === 'allowed' &&
+      r.availableAtMinute <= minute &&
+      r.deliveredAtMinute <= minute &&
+      r.minute <= minute &&
+      r.minute >= minute - rule.windowMinutes,
+  );
+}
+/** Same series test for the live detector and its read-only debrief projection. */
+export function continuesEndpointSeries(
+  records: readonly EndpointRecord[],
+  cursor: number,
+  windowMinutes: number,
+): boolean {
+  return records.some((r) => r.minute <= cursor + windowMinutes);
+}
 /** Detector has no input for compromise, planner, actor origin or private world. */
 export function detectEndpointAlerts(
   records: readonly EndpointRecord[],
@@ -106,35 +130,54 @@ export function detectEndpointAlerts(
   existing: readonly EndpointAlert[],
 ): readonly EndpointAlert[] {
   const groups = new Map<string, EndpointRecord[]>();
-  for (const r of new Map(records.map((r) => [r.id, r])).values()) {
-    if (
-      r.operation !== rule.operation ||
-      r.outcome !== 'allowed' ||
-      r.availableAtMinute > minute ||
-      r.deliveredAtMinute > minute ||
-      r.minute > minute ||
-      r.minute < minute - rule.windowMinutes
-    )
-      continue;
+  for (const r of endpointDetectionRecords(records, rule, minute)) {
     const key = `${r.sensorId}:${r.endpointId}`;
     groups.set(key, [...(groups.get(key) ?? []), r]);
   }
   const alerts = [...existing];
   for (const group of groups.values()) {
     const first = group[0]!;
-    const count = group.reduce((n, r) => n + new Set(r.documentIds).size, 0);
-    if (
-      count < rule.threshold ||
-      alerts.some(
-        (a) =>
-          a.ruleId === rule.id &&
-          a.endpointId === first.endpointId &&
-          a.sensorId === first.sensorId,
-      )
-    )
-      continue;
+    const modern = rule.counting === 'unique-documents-v2';
+    const count = modern
+      ? new Set(group.flatMap((r) => r.documentIds)).size
+      : group.reduce((n, r) => n + new Set(r.documentIds).size, 0);
+    const previousIndex =
+      alerts
+        .map((a, index) => ({ a, index }))
+        .reverse()
+        .find(
+          ({ a }) =>
+            a.ruleId === rule.id &&
+            a.endpointId === first.endpointId &&
+            a.sensorId === first.sensorId,
+        )?.index ?? -1;
+    const previous = alerts[previousIndex];
+    const lastActivity = Math.max(...group.map((r) => r.minute));
+    if (previous) {
+      if (!modern) continue;
+      const cursor =
+        previous.lastSeriesActivityMinute ?? previous.windowEndMinute;
+      // A new series needs a gap strictly greater than the declared window.
+      // Keep its cursor separate from the original alert's triggering evidence.
+      if (continuesEndpointSeries(group, cursor, rule.windowMinutes)) {
+        alerts[previousIndex] = {
+          ...previous,
+          lastSeriesActivityMinute: Math.max(cursor, lastActivity),
+        };
+        continue;
+      }
+    }
+    if (count < rule.threshold) continue;
     alerts.push({
-      id: `AL-${rule.id}-${first.endpointId}`,
+      id: `AL-${rule.id}-${first.endpointId}${modern ? `-${alerts.length + 1}` : ''}`,
+      ...(modern
+        ? {
+            lastSeriesActivityMinute: lastActivity,
+            threshold: rule.threshold,
+            windowMinutes: rule.windowMinutes,
+            counting: rule.counting,
+          }
+        : {}),
       ruleId: rule.id,
       name: rule.name,
       sensorId: first.sensorId,
@@ -179,12 +222,15 @@ export function collectEndpointTelemetry(
     ...state.telemetry,
     endpoint: {
       ...next,
-      alerts: detectEndpointAlerts(
-        availableEndpointRecords(next, minute),
-        c.detection,
-        minute,
-        telemetry.alerts,
-      ),
+      alerts:
+        c.detection.counting && !c.collectorAvailable
+          ? telemetry.alerts
+          : detectEndpointAlerts(
+              availableEndpointRecords(next, minute),
+              c.detection,
+              minute,
+              telemetry.alerts,
+            ),
     },
   };
 }

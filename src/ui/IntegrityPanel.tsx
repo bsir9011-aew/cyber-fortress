@@ -22,11 +22,8 @@ export function IntegrityPanel({
         <span>Udokumentowany zbiór: {view.documentedTotal} dokumentów</span>
       </div>
       <blockquote>
-        <strong>Zgłoszenie zespołu · 13:55</strong>
-        <p>
-          Na pakowanie-03 widzimy rozbieżności między dokumentami a ERP. Usługa
-          działa, lecz część wysyłek wymaga sprawdzenia.
-        </p>
+        <strong>Zgłoszenie zespołu</strong>
+        <p>{view.briefing}</p>
         <small>Relacja człowieka; nie ustala przyczyny ani sprawcy.</small>
       </blockquote>
       <div className="integrity-route" aria-label="Dwie odrębne drogi dostępu">
@@ -127,8 +124,11 @@ export function IntegrityPanel({
           </p>
           <p>
             Reguła {view.edr.coverage.detection.id}: ≥
-            {view.edr.coverage.detection.threshold} modyfikacji /{' '}
-            {view.edr.coverage.detection.windowMinutes} min z jednej stacji.
+            {view.edr.coverage.detection.threshold}{' '}
+            {view.edr.coverage.detection.counting
+              ? 'unikalnych dokumentów objętych modify'
+              : 'wystąpień dokumentów w operacjach modify'}{' '}
+            / {view.edr.coverage.detection.windowMinutes} min z jednej stacji.
           </p>
           {view.edr.alerts.map((a) => (
             <blockquote key={a.id}>
@@ -136,8 +136,14 @@ export function IntegrityPanel({
                 {formatMinute(a.minute)} · {a.name}
               </strong>
               <p>
-                {a.modificationCount} zaobserwowanych modyfikacji ·{' '}
-                {a.endpointId}. Wymaga dochodzenia; nie potwierdza ataku.
+                {a.modificationCount}{' '}
+                {a.counting ? 'unikalnych dokumentów' : 'wystąpień dokumentów'}{' '}
+                w dostarczonych, dopuszczonych operacjach modify ·{' '}
+                {a.endpointId}. Okno {formatMinute(a.windowStartMinute)}–
+                {formatMinute(a.windowEndMinute)}; próg ≥
+                {a.threshold ?? view.edr!.coverage.detection.threshold}.
+                Źródłowe rekordy: {a.eventIds.join(', ')}. Wymaga dochodzenia;
+                nie potwierdza ataku.
               </p>
             </blockquote>
           ))}
@@ -284,10 +290,11 @@ export function IntegrityOperations({
           .map(button)}
       </div>
       <p className="source-note">
-        Izolacja odcina tylko tę stację i kosztuje 2 zamówienia wydajności na
-        turę. Nie naprawia plików ani nie usuwa kompromitacji. Aby podłączyć
-        stację: odizoluj ją, pozyskaj dowód z dziennika lub EDR i ogranicz
-        zapis. Legalny odczyt będzie mógł wrócić.
+        Izolacja odcina tylko tę stację i kosztuje{' '}
+        {view.endpoint.businessCapacity} zamówienia wydajności na turę. Nie
+        naprawia plików ani nie usuwa kompromitacji. Aby podłączyć stację:
+        odizoluj ją, pozyskaj dowód z dziennika lub EDR i ogranicz zapis.
+        Legalny odczyt będzie mógł wrócić.
       </p>
       <h3>Wybierz punkt odtworzenia</h3>
       {view.backupReadiness && (

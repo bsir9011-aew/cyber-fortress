@@ -1,3 +1,4 @@
+import { selectDetectionReview } from './selectDetectionReview';
 import type { SimulationState } from '../domain/simulation';
 import type { IntegrityMissionSummary } from '../domain/integrity';
 import { isFinished } from '../simulation/clock';
@@ -59,6 +60,7 @@ export function selectIntegrityReport(state: SimulationState) {
   };
   return {
     summary,
+    detectionReview: selectDetectionReview(state),
     investments: {
       edr: state.telemetry.endpoint
         ? {

@@ -52,6 +52,18 @@ export function validateIntegrityDefinition(d: IntegrityDefinition): boolean {
     unique(d.documentIds) &&
     unique(d.backups.map((b) => b.id)) &&
     d.documentIds.length === 100 &&
+    (!d.legitimateModifications ||
+      (!d.attack.compromised &&
+        Number.isSafeInteger(d.legitimateModifications.chunkSize) &&
+        d.legitimateModifications.chunkSize > 0 &&
+        d.legitimateModifications.chunkSize <= 100 &&
+        d.legitimateModifications.turns.every(
+          (t, i, turns) =>
+            Number.isSafeInteger(t) &&
+            t >= 1 &&
+            t <= 18 &&
+            t > (turns[i - 1] ?? 0),
+        ))) &&
     Number.isSafeInteger(d.initialDamage) &&
     d.initialDamage >= 0 &&
     d.initialDamage <= d.documentIds.length &&
@@ -89,6 +101,7 @@ export function resolveLocalFileOperation(
   operation: LocalOperation,
   ids: readonly string[],
   minute = currentMinute(state.clock),
+  effect: 'damage' | 'preserve' = 'damage',
 ) {
   const integrity = state.integrity;
   if (!integrity || endpointId !== integrity.endpoint.id || ids.length === 0)
@@ -109,7 +122,7 @@ export function resolveLocalFileOperation(
       operation,
     );
   const modifiedIds =
-    allowed && operation === 'modify'
+    allowed && operation === 'modify' && effect === 'damage'
       ? ids.filter((id) =>
           integrity.documents.some(
             (d) => d.id === id && d.status === 'correct',
@@ -127,14 +140,24 @@ export function resolveLocalFileOperation(
   const documents = integrity.documents.map((d) =>
     modifiedIds.includes(d.id)
       ? { ...d, status: 'damaged' as const, everDamaged: true }
-      : d,
+      : allowed &&
+          operation === 'modify' &&
+          effect === 'preserve' &&
+          ids.includes(d.id)
+        ? { ...d, generation: d.generation + 1 }
+        : d,
   );
   let next: SimulationState = {
     ...state,
     integrity: {
       ...integrity,
       documents,
-      revision: integrity.revision + (modifiedIds.length ? 1 : 0),
+      revision:
+        integrity.revision +
+        (modifiedIds.length ||
+        (allowed && operation === 'modify' && effect === 'preserve')
+          ? 1
+          : 0),
       verifiedRecoveryMinute: modifiedIds.length
         ? null
         : integrity.verifiedRecoveryMinute,
@@ -273,6 +296,20 @@ export function stepIntegrityThreat(state: SimulationState): SimulationState {
   const threat = state.hidden.integrityThreat;
   const d = state.hidden.scenario.integrity;
   if (!threat || !d || !state.integrity) return state;
+  const legal = d.legitimateModifications;
+  if (legal?.turns.includes(state.clock.turn)) {
+    const index = legal.turns.indexOf(state.clock.turn);
+    const offset = (index * legal.chunkSize) % d.documentIds.length;
+    const ids = d.documentIds.slice(offset, offset + legal.chunkSize);
+    return resolveLocalFileOperation(
+      state,
+      d.endpoint.id,
+      'modify',
+      ids,
+      currentMinute(state.clock),
+      'preserve',
+    ).state;
+  }
   const action = selectLocalThreatAction(threat, d.attack, state.clock.turn);
   if (!action) return state;
   // A repaired generation becomes eligible again; already damaged IDs are skipped.

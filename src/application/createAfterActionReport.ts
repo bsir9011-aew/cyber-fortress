@@ -18,7 +18,7 @@ import { validateGameSession, MAX_GAME_BYTES } from '../persistence/gameSave';
 import {
   isCurrentCampaignCommand,
   isCurrentRecordedCommand,
-} from '../persistence/gameSaveV4';
+} from '../persistence/gameSaveV5';
 import { sameJson, timestamp } from '../persistence/saveFormat';
 import { MissionTrace } from './aar/missionTrace';
 import { actualState, facts, timeAt } from './aar/facts';
@@ -90,6 +90,7 @@ function campaignContext(s: CampaignState): AarCampaignContext {
     work: s.work,
     investmentLedger: s.budget.ledger,
     posture: s.posture,
+    ...(s.detectionChanges ? { detectionChanges: s.detectionChanges } : {}),
   };
 }
 /** No wall-clock access, I/O, scoring or alternate simulation. All metadata is explicit. */
@@ -203,6 +204,11 @@ export function createAfterActionReport(
     if (!report || s.clock.turn !== 18 || s.clock.turnLimit !== 18)
       return fail('not-finished');
     const integrity = report.integrity;
+    const detectionEngineering =
+      s.telemetry.endpoint?.coverage.detection.counting ===
+        'unique-documents-v2' ||
+      (context?.detectionChanges?.length ?? 0) > 0 ||
+      s.hidden.scenario.familyId === 'nexus-integrity-detection-v1';
     const perTurn = s.history.flatMap((e) =>
       e.kind === 'business-report' ? [e.report] : [],
     );
@@ -214,8 +220,8 @@ export function createAfterActionReport(
       generatedAt,
       gameVersion: {
         application: '0.2.0',
-        engine: '9.0.0',
-        reportGenerator: '1.0.0',
+        engine: detectionEngineering ? '11.0.0' : '9.0.0',
+        reportGenerator: detectionEngineering ? '1.1.0' : '1.0.0',
       },
       fieldGuide: {
         format:
@@ -245,6 +251,9 @@ export function createAfterActionReport(
       organization: { name: 'NEXUS Logistics', employees: 120, computers: 94 },
       scenario: {
         id: report.scenario.id,
+        ...(s.hidden.scenario.familyId
+          ? { variantFamilyId: s.hidden.scenario.familyId }
+          : {}),
         family: integrity ? 'M02' : 'M01',
         name: report.scenario.name,
         kind: report.scenario.kind,
@@ -333,6 +342,9 @@ export function createAfterActionReport(
         exposedRecords: report.confidentiality.exposedRecords,
         containment: report.containment,
         integrity: integrity?.summary ?? null,
+        ...(detectionEngineering && integrity
+          ? { detectionReview: facts(integrity.detectionReview) }
+          : {}),
         investmentUse: facts(
           integrity?.investments ?? {
             mfaRefusals: s.telemetry.sourceEvents.filter(

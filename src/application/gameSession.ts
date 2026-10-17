@@ -98,7 +98,8 @@ export function currentOperation(game: GameSession): OperationSession | null {
   while (
     start >= 0 &&
     game.commands[start]?.type !== 'start-incident' &&
-    game.commands[start]?.type !== 'start-integrity-incident'
+    game.commands[start]?.type !== 'start-integrity-incident' &&
+    game.commands[start]?.type !== 'start-detection-incident'
   )
     start--;
   const commands = game.commands

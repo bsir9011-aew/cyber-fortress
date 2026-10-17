@@ -5,6 +5,7 @@ import type { AccessState, NetworkRule } from '../domain/access';
 import { selectScenario } from './scenarioSelectors';
 import { createScenario } from './createScenario';
 import { issueVpnSession } from '../simulation/access';
+import { selectDetectionScenario } from '../content/scenarios/detection';
 import { integrityScenario } from '../content/scenarios/integrity';
 
 /** Trwałe polityki nakładamy przed wszystkimi modelowanymi logowaniami. */
@@ -274,6 +275,32 @@ export function createIntegrityIncident(
 export function createCampaignIncident(seed: number, posture: SecurityPosture) {
   return createScenario(
     prepareCampaignDefinition(selectScenario('unknown', seed), posture),
+    { mode: 'unknown', seed },
+  );
+}
+
+export function createDetectionIncident(
+  seed: number,
+  posture: SecurityPosture,
+  familyId: string,
+) {
+  const coverage = posture.endpointCoverage;
+  return createScenario(
+    prepareCampaignDefinition(selectDetectionScenario(familyId, seed), {
+      ...posture,
+      ...(coverage
+        ? {
+            endpointCoverage: {
+              ...coverage,
+              detection: {
+                ...coverage.detection,
+                name: 'Unusual Document Modification Activity',
+                counting: 'unique-documents-v2',
+              },
+            },
+          }
+        : {}),
+    }),
     { mode: 'unknown', seed },
   );
 }

@@ -1,3 +1,4 @@
+import { DetectionReview } from './DetectionReview';
 import type { selectIntegrityReport } from '../application/selectIntegrityReport';
 import { formatMinute } from '../simulation/clock';
 import { actionLabel, backupTestLabels } from './simulationPresentation';
@@ -178,6 +179,9 @@ export function IntegrityReport({
           zapisu. Wynik zależy od wykonanych działań.
         </p>
       </section>
+      {report.detectionReview && (
+        <DetectionReview review={report.detectionReview} />
+      )}
       <h2>Decyzje: wiedza, założenie, zmiana</h2>
       <div className="integrity-decisions">
         {report.decisions.map((d) => (

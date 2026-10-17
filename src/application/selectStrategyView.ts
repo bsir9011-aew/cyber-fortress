@@ -44,9 +44,7 @@ export function selectStrategyView(state: CampaignState) {
       ...project,
     })),
     funding: state.funding ?? null,
-    eligibleForFunding: state.history.some(
-      (r) => r.scenarioId === 'nexus-last-clean-copy',
-    ),
+    eligibleForFunding: state.history.some((r) => r.integrity !== undefined),
     lastDecision: state.decisions.at(-1) ?? null,
     world,
     // Raporty tylko zakończonych misji wolno ujawnić w centrali.

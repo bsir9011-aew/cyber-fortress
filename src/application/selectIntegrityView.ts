@@ -36,6 +36,7 @@ export function selectIntegrityView(state: SimulationState) {
         ])),
   ];
   return {
+    briefing: state.hidden.scenario.briefing.message,
     endpoint: {
       id: i.endpoint.id,
       assetId: i.endpoint.assetId,
