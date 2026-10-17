@@ -45,6 +45,8 @@ import {
 } from '../persistence/resilienceGameStorage';
 import pendingV4 from '../persistence/fixtures/sprint9-restore-pending-v4.json?raw';
 import { selectStrategyView } from './selectStrategyView';
+import { selectDetectionReview } from './selectDetectionReview';
+import { selectIntegrityReport } from './selectIntegrityReport';
 const unknown: CampaignCommand = {
   type: 'start-detection-incident',
   familyId: DETECTION_FAMILY_ID,
@@ -340,6 +342,55 @@ describe('AAR separates decision-time signals from post-mission detection truth'
     expect(md).toContain('nie stanowi oceny racjonalności');
     expect(createAfterActionReport(s, undefined, reportDate).ok).toBe(false);
   });
+  it('keeps triggering events immutable and recognizes harmful continuations in the same detected series, including UI/AAR', () => {
+    const s = campaign(
+      prepare(
+        campaign(headquarters(slowModificationScenario.id), tuning(2, 20), {
+          type: 'advance-preparation',
+        }),
+      ),
+      unknown,
+    );
+    let g = advance(s, 3); // A: modify at 14:10, alert after delivery at 14:15.
+    const firstAlert = structuredClone(
+      simulation(g).telemetry.endpoint!.alerts[0]!,
+    );
+    expect(simulation(g).telemetry.endpoint!.alerts).toHaveLength(1);
+    g = advance(g, 2); // B: modify at 14:20, observed at 14:25 in the same series.
+    expect(simulation(g).telemetry.endpoint!.alerts).toHaveLength(1);
+    expect(simulation(g).telemetry.endpoint!.alerts[0]!.eventIds).toEqual(
+      firstAlert.eventIds,
+    );
+    const done = finish(g),
+      state = simulation(done);
+    const before = JSON.stringify(state);
+    const review = selectDetectionReview(state)!;
+    const a = review.sourceOperations.find((o) => o.minute === 850)!;
+    const b = review.sourceOperations.find((o) => o.minute === 860)!;
+    expect(a.detectionStatus).toBe('alert-trigger');
+    expect(a.alertIds).toEqual([firstAlert.id]);
+    expect(b.detectionStatus).toBe('detected-series');
+    expect(b.alertIds).toEqual([]);
+    expect(b.detectedSeriesAlertIds).toEqual([firstAlert.id]);
+    expect(b.missedReason).toBeNull();
+    expect(review.undetectedHarmfulOperationIds).not.toContain(b.id);
+    expect(review.undetectedHarmfulOperationIds).toHaveLength(0);
+    expect(review.alerts).toHaveLength(1);
+    expect(review.alerts[0]!.eventIds).toEqual(firstAlert.eventIds);
+    expect(review.alerts[0]!.continuationOperationIds).toContain(b.id);
+    const late = review.sourceOperations.find((o) => o.minute === 930)!;
+    expect(late.detectionStatus).toBe('not-delivered-in-time');
+    expect(late.detectedSeriesAlertIds).toEqual([]);
+    expect(review.notDeliveredInTimeOperationIds).toEqual([late.id]);
+    expect(review.outsideCoverageOperationIds).toEqual([]);
+    expect(selectIntegrityReport(state)!.detectionReview).toEqual(review);
+    const aar = createAfterActionReport(done, undefined, reportDate);
+    expect(aar.ok, aar.ok ? '' : aar.error).toBe(true);
+    if (!aar.ok) return;
+    expect(aar.value.securityConsequences.detectionReview).toEqual(review);
+    expect(renderAfterActionMarkdown(aar.value)).toContain('detected-series');
+    expect(JSON.stringify(state)).toBe(before);
+  });
   it('exports real harmful operations and missed signals independently from acquired evidence', () => {
     const s = campaign(
       prepare(
@@ -358,7 +409,7 @@ describe('AAR separates decision-time signals from post-mission detection truth'
       alerts: unknown[];
     };
     expect(review.alerts).toHaveLength(0);
-    expect(review.undetectedHarmfulOperationIds).toHaveLength(9);
+    expect(review.undetectedHarmfulOperationIds).toHaveLength(8);
     expect(aar.value.groundTruth.finalState.documents!.damaged).toBe(18);
     expect(simulation(done).hidden.scenario.id).toBe(
       slowModificationScenario.id,

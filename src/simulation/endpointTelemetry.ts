@@ -98,6 +98,30 @@ export function availableEndpointRecords(
       r.minute <= minute,
   );
 }
+/** Observable records eligible for the rule's source-time window. */
+export function endpointDetectionRecords(
+  records: readonly EndpointRecord[],
+  rule: EndpointCoverage['detection'],
+  minute: number,
+): readonly EndpointRecord[] {
+  return [...new Map(records.map((r) => [r.id, r])).values()].filter(
+    (r) =>
+      r.operation === rule.operation &&
+      r.outcome === 'allowed' &&
+      r.availableAtMinute <= minute &&
+      r.deliveredAtMinute <= minute &&
+      r.minute <= minute &&
+      r.minute >= minute - rule.windowMinutes,
+  );
+}
+/** Same series test for the live detector and its read-only debrief projection. */
+export function continuesEndpointSeries(
+  records: readonly EndpointRecord[],
+  cursor: number,
+  windowMinutes: number,
+): boolean {
+  return records.some((r) => r.minute <= cursor + windowMinutes);
+}
 /** Detector has no input for compromise, planner, actor origin or private world. */
 export function detectEndpointAlerts(
   records: readonly EndpointRecord[],
@@ -106,16 +130,7 @@ export function detectEndpointAlerts(
   existing: readonly EndpointAlert[],
 ): readonly EndpointAlert[] {
   const groups = new Map<string, EndpointRecord[]>();
-  for (const r of new Map(records.map((r) => [r.id, r])).values()) {
-    if (
-      r.operation !== rule.operation ||
-      r.outcome !== 'allowed' ||
-      r.availableAtMinute > minute ||
-      r.deliveredAtMinute > minute ||
-      r.minute > minute ||
-      r.minute < minute - rule.windowMinutes
-    )
-      continue;
+  for (const r of endpointDetectionRecords(records, rule, minute)) {
     const key = `${r.sensorId}:${r.endpointId}`;
     groups.set(key, [...(groups.get(key) ?? []), r]);
   }
@@ -144,7 +159,7 @@ export function detectEndpointAlerts(
         previous.lastSeriesActivityMinute ?? previous.windowEndMinute;
       // A new series needs a gap strictly greater than the declared window.
       // Keep its cursor separate from the original alert's triggering evidence.
-      if (group.some((r) => r.minute <= cursor + rule.windowMinutes)) {
+      if (continuesEndpointSeries(group, cursor, rule.windowMinutes)) {
         alerts[previousIndex] = {
           ...previous,
           lastSeriesActivityMinute: Math.max(cursor, lastActivity),

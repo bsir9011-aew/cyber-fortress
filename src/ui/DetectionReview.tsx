@@ -1,5 +1,13 @@
 import type { DetectionReview as Review } from '../application/selectDetectionReview';
 import { formatMinute } from '../simulation/clock';
+const detectionLabels = {
+  'alert-trigger': 'Zdarzenie wyzwalające alert',
+  'detected-series': 'Kontynuacja już wykrytej serii — bez nowego alertu',
+  undetected: 'Aktywność niewykryta przez regułę',
+  'outside-sensor-coverage': 'Poza pokryciem sensora',
+  'not-delivered-in-time': 'Niedostarczone na czas',
+  'operation-denied': 'Operacja zablokowana',
+};
 export function DetectionReview({ review: r }: { review: Review }) {
   return (
     <section className="detection-review" aria-label="Przegląd detekcji">
@@ -13,7 +21,11 @@ export function DetectionReview({ review: r }: { review: Review }) {
         Alerty: {r.alerts.length}. Dotyczące szkodliwej aktywności:{' '}
         {r.truePositiveAlertIds.length}. Dotyczące legalnej aktywności (FP):{' '}
         {r.falsePositiveAlertIds.length}. Szkodliwe, dopuszczone operacje
-        nieobjęte alertem (FN): {r.undetectedHarmfulOperationIds.length}.
+        niewykryte przez regułę (FN): {r.undetectedHarmfulOperationIds.length}.
+        Kontynuacje już wykrytych serii: {r.detectedSeriesOperationIds.length}.
+        Operacje poza pokryciem sensora: {r.outsideCoverageOperationIds.length};
+        niedostarczone na czas: {r.notDeliveredInTimeOperationIds.length}. Te
+        dwie ostatnie kategorie nie są liczone jako FN reguły.
       </p>
       {r.alerts.map((a) => (
         <p key={a.id}>
@@ -26,7 +38,8 @@ export function DetectionReview({ review: r }: { review: Review }) {
                 ? 'legalna i szkodliwa aktywność'
                 : 'nieustalona'}{' '}
           · {a.modificationCount} dokumentów. Rekordy źródłowe:{' '}
-          {a.eventIds.join(', ')}.
+          {a.eventIds.join(', ')}. Późniejsze operacje należące do tej serii:{' '}
+          {a.continuationOperationIds.join(', ') || 'brak'}.
         </p>
       ))}
       <p>
@@ -64,7 +77,11 @@ export function DetectionReview({ review: r }: { review: Review }) {
             {o.classification === 'legal'
               ? 'legalna aktualizacja'
               : 'szkodliwa próba'}{' '}
-            · {o.alertIds.join(', ') || o.missedReason}.
+            · {detectionLabels[o.detectionStatus]} ·{' '}
+            {o.alertIds.join(', ') ||
+              o.detectedSeriesAlertIds.join(', ') ||
+              o.missedReason}
+            .
           </p>
         ))}
       </details>

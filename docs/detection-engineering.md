@@ -36,8 +36,9 @@ czas dochodzenia zajmuje analityka, a izolacja odcina faktyczną pracę.
 
 Po 18. turze przegląd detekcji pokazuje źródłowe operacje, alerty legalnej
 aktywności (FP), alerty szkodliwej aktywności i dopuszczone szkodliwe operacje
-nieobjęte alertem (FN). Brak sygnału ma osobno wskazaną przyczynę: pokrycie,
-dostarczenie do końca misji lub próg/okno. Nie jest to uniwersalny pomiar
+niewykryte przez regułę (FN). Kontynuacje wykrytej serii są rozróżniane od
+zdarzeń wyzwalających alert i nie są osobnymi FN. Operacje poza pokryciem
+lub niedostarczone do końca misji są pokazywane osobno od FN reguły. Nie jest to uniwersalny pomiar
 skuteczności EDR. Raport pokazuje czasy pozyskania dowodów, reakcje i bilans
 biznesowy; nie wystawia ocen ani nie zakłada, że gracz przeczytał alert.
 

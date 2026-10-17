@@ -215,7 +215,7 @@ describe('new integrity cases use real effects and preserve historical cases', (
     expect(high.telemetry.endpoint!.alerts).toHaveLength(0);
     expect(
       selectDetectionReview(high)!.undetectedHarmfulOperationIds,
-    ).toHaveLength(9);
+    ).toHaveLength(8);
     expect(low.telemetry.endpoint!.alerts.length).toBeGreaterThan(0);
     expect(low.integrity!.documents).toEqual(high.integrity!.documents); // Detection alone never contains.
     expect(low.business).toEqual(high.business);
