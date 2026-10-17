@@ -7,7 +7,11 @@ import type {
 import {
   securityProjects,
   projectDefinition,
+  resilienceProjects,
 } from '../content/securityProjects';
+import { pilotEndpointCoverage } from '../content/endpointCoverage';
+import { integrityScenario } from '../content/scenarios/integrity';
+import { testBackupProcedure } from '../simulation/backupReadiness';
 import {
   createCampaignIncident,
   createIntegrityIncident,
@@ -270,6 +274,45 @@ export function campaignReducer(
   }
   if (state.phase !== 'preparation')
     return reject('Planowanie jest dostępne w centrali, poza incydentem.');
+  if (command.type === 'accept-resilience-funding') {
+    const report = state.history.find(
+      (r) => r.scenarioId === 'nexus-last-clean-copy',
+    );
+    if (!report)
+      return reject(
+        'Finansowanie Etapu II wymaga ukończenia Misji 02 i powrotu do centrali.',
+      );
+    if (state.funding)
+      return reject('Jednorazowa transza Etapu II została już przyjęta.');
+    return decide(
+      state,
+      {
+        ...state,
+        budget: { ...state.budget, total: state.budget.total + 25000 },
+        funding: {
+          initialAllocation: 80000,
+          allocations: [
+            {
+              id: 'board-resilience-ii',
+              source: 'integrity-risk-review',
+              amount: 25000,
+              window: state.preparation.number,
+              reportNumber: report.number,
+            },
+          ],
+        },
+        projects: [
+          ...state.projects,
+          ...resilienceProjects.map((p) => ({
+            id: p.id,
+            status: 'available' as const,
+            remaining: { ...p.hours },
+          })),
+        ],
+      },
+      command,
+    );
+  }
   if (
     command.type === 'start-incident' ||
     command.type === 'start-integrity-incident'
@@ -384,6 +427,18 @@ export function campaignReducer(
     );
     const completed = (id: ProjectId) =>
       projects.some((p) => p.id === id && p.status === 'completed');
+    const newlyTestedBackup =
+      completed('backup-resilience') &&
+      !state.projects.some(
+        (p) => p.id === 'backup-resilience' && p.status === 'completed',
+      );
+    const testWorld = {
+      ...integrityScenario.world,
+      assets: integrityScenario.world.assets.map((a) => ({
+        ...a,
+        status: state.posture.assetOverrides[a.id] ?? a.status,
+      })),
+    };
     return decide(
       state,
       {
@@ -396,6 +451,23 @@ export function campaignReducer(
           remoteAccess: completed('remote-access'),
           fileVisibility: completed('file-visibility'),
           segmentation: completed('segmentation'),
+          ...(completed('endpoint-edr')
+            ? {
+                endpointCoverage:
+                  state.posture.endpointCoverage ?? pilotEndpointCoverage,
+              }
+            : {}),
+          ...(newlyTestedBackup
+            ? {
+                backupReadiness: testBackupProcedure(
+                  integrityScenario.integrity!,
+                  testWorld,
+                  integrityScenario.process.erpAssetId,
+                  state.preparation.number,
+                  hour,
+                ),
+              }
+            : {}),
         },
       },
       command,

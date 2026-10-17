@@ -590,3 +590,46 @@
     font-size: 13px;
   }
 }
+
+.resilience-funding,
+.resilience-status,
+.investment-report {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  background: #101d2d;
+  overflow-wrap: anywhere;
+}
+.resilience-funding h2,
+.investment-report h2 {
+  font-size: 1.2rem;
+}
+.resilience-status p {
+  margin: 8px 0;
+}
+.edr-evidence {
+  border-left: 3px solid var(--accent);
+  padding-left: 16px;
+  margin: 24px 0;
+}
+.edr-evidence li {
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.backup-readiness {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+@media (max-width: 600px) {
+  .resilience-funding,
+  .resilience-status,
+  .investment-report {
+    padding: 14px;
+  }
+  .resilience-funding button {
+    width: 100%;
+    white-space: normal;
+  }
+}

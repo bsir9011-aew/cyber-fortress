@@ -55,6 +55,7 @@ export const taskSpecs: Record<
   TaskAction['type'],
   { readonly workerId: WorkerId; readonly turns: number }
 > = {
+  'inspect-edr-telemetry': { workerId: 'analyst', turns: 1 },
   'inspect-documents': { workerId: 'analyst', turns: 2 },
   'inspect-backups': { workerId: 'analyst', turns: 1 },
   'verify-backup': { workerId: 'analyst', turns: 2 },
@@ -98,6 +99,11 @@ export function taskRejection(
     return 'outside-time-window';
   if (isIntegrityAction(action)) return integrityTaskRejection(state, action);
   switch (action.type) {
+    case 'inspect-edr-telemetry':
+      return state.integrity &&
+        state.telemetry.endpoint?.coverage.collectorAvailable
+        ? null
+        : 'source-unavailable';
     case 'inspect-vpn-sessions':
       return state.telemetry.sessionSensor.enabled &&
         state.telemetry.sessionSensor.sourceAssetId ===

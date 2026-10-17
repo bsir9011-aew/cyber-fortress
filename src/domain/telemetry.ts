@@ -30,6 +30,7 @@ export interface AuthenticationSensor {
 }
 
 export interface TelemetryState {
+  readonly endpoint?: import('./resilience').EndpointTelemetry;
   readonly authenticationReasons?: true;
   readonly fileAudit?: FileAuditState;
   readonly authenticationSensor: AuthenticationSensor;

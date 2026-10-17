@@ -4,6 +4,7 @@ import type { BusinessProcess, SimulationClock } from './simulation';
 import type { TelemetryState } from './telemetry';
 import type { WorldState } from './world';
 import type { IntegrityDefinition } from './integrity';
+import type { BackupReadiness } from './resilience';
 
 export type ScenarioMode = 'training' | 'unknown';
 export interface RunIdentity {
@@ -34,6 +35,7 @@ export interface HistoricalAuthenticationAttempt {
 }
 
 export interface ScenarioDefinition {
+  readonly backupReadiness?: BackupReadiness;
   readonly integrity?: IntegrityDefinition;
   readonly id: string;
   /** Prywatny opis, ujawniany dopiero w raporcie. */

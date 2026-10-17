@@ -14,6 +14,11 @@ import type {
 } from '../domain/simulation';
 import { canUseLocalService, isAssetOnline, networkAllows } from './access';
 import { currentMinute } from './clock';
+import { matchingBackupTest, preparedRestoreTurns } from './backupReadiness';
+import {
+  captureEndpointOperation,
+  readEndpointTelemetry,
+} from './endpointTelemetry';
 
 export const integrityActionTypes = [
   'inspect-documents',
@@ -137,6 +142,20 @@ export function resolveLocalFileOperation(
     },
   };
   const audit = state.telemetry.fileAudit;
+  if (next.telemetry.endpoint)
+    next = {
+      ...next,
+      telemetry: {
+        ...next.telemetry,
+        endpoint: captureEndpointOperation(
+          next.telemetry.endpoint,
+          state.world,
+          endpoint,
+          record,
+          config.datasetAssetId,
+        ),
+      },
+    };
   const reached =
     !endpoint.isolated &&
     isAssetOnline(state.world, endpoint.assetId) &&
@@ -196,7 +215,13 @@ export function initializeIntegrity(state: SimulationState): SimulationState {
     revision: 0,
     backups: d.backups.map((b) => ({
       id: b.id,
-      verification: b.previouslyVerified ? 'clean' : 'unknown',
+      verification: matchingBackupTest(b, state.hidden.scenario.backupReadiness)
+        ? state.hidden.scenario.backupReadiness!.integrity === 'damaged'
+          ? 'damaged'
+          : 'clean'
+        : b.previouslyVerified
+          ? 'clean'
+          : 'unknown',
       verifiedAtMinute: b.previouslyVerified ? b.minute : null,
     })),
     backupInventoryMinute: null,
@@ -297,10 +322,14 @@ export function integrityTaskTurns(
   state: SimulationState,
   action: TaskAction,
 ): number | undefined {
-  if (action.type === 'restore-documents')
-    return state.hidden.scenario.integrity?.backups.find(
+  if (action.type === 'restore-documents') {
+    const backup = state.hidden.scenario.integrity?.backups.find(
       (b) => b.id === action.backupId,
-    )?.restoreTurns;
+    );
+    return backup
+      ? preparedRestoreTurns(backup, state.hidden.scenario.backupReadiness)
+      : undefined;
+  }
   if (action.type === 'reconcile-documents')
     return state.hidden.scenario.integrity?.reconcileTurns;
   return undefined;
@@ -320,7 +349,12 @@ export function integrityTaskRejection(
       action.type === 'restrict-endpoint-writes' &&
       (!i.endpoint.isolated ||
         i.endpoint.writesRestricted ||
-        !i.endpointObservations.some((o) => o.endpointId === action.endpointId))
+        (!i.endpointObservations.some(
+          (o) => o.endpointId === action.endpointId,
+        ) &&
+          !state.telemetry.endpoint?.observations.some((o) =>
+            o.records.some((r) => r.endpointId === action.endpointId),
+          )))
     )
       return 'invalid-state';
     if (
@@ -558,7 +592,28 @@ export function observeIntegrityTask(
           },
     ),
   };
-  return { ...state, integrity: next };
+  const observation =
+    action.type === 'inspect-edr-telemetry'
+      ? readEndpointTelemetry(state, task.id)
+      : null;
+  return {
+    ...state,
+    integrity: next,
+    ...(observation && state.telemetry.endpoint
+      ? {
+          telemetry: {
+            ...state.telemetry,
+            endpoint: {
+              ...state.telemetry.endpoint,
+              observations: [
+                ...state.telemetry.endpoint.observations,
+                observation,
+              ],
+            },
+          },
+        }
+      : {}),
+  };
 }
 export function rememberIntegrityDecision(
   state: SimulationState,
@@ -582,6 +637,7 @@ export function rememberIntegrityDecision(
           knownObservationIds: [
             ...i.observations.map((o) => o.id),
             ...i.endpointObservations.map((o) => o.id),
+            ...(state.telemetry.endpoint?.observations ?? []).map((o) => o.id),
             ...(state.knowledge.fileObservations ?? []).map((o) => o.id),
           ],
           backupInventoryMinute: i.backupInventoryMinute,

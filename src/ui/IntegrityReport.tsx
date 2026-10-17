@@ -1,6 +1,6 @@
 import type { selectIntegrityReport } from '../application/selectIntegrityReport';
 import { formatMinute } from '../simulation/clock';
-import { actionLabel } from './simulationPresentation';
+import { actionLabel, backupTestLabels } from './simulationPresentation';
 const assumptions = {
   'insufficient-evidence': 'Za mało danych',
   'local-modification': 'Modyfikacje z lokalnej stacji',
@@ -119,6 +119,65 @@ export function IntegrityReport({
           ))}
         </article>
       </div>
+      <section className="investment-report" aria-label="Wpływ inwestycji">
+        <h2>Inwestycje i ich faktyczne wykorzystanie</h2>
+        {report.investments.edr ? (
+          <>
+            <h3>EDR · agent obecny na pakowanie-03 (1/94)</h3>
+            <p>
+              Przechwycono {report.investments.edr.capturedEvents} operacji
+              read/modify; w retencji kolektora{' '}
+              {report.investments.edr.deliveredEvents}. Alerty:{' '}
+              {report.investments.edr.alerts.length}; pierwszy{' '}
+              {report.investments.edr.alerts[0]
+                ? formatMinute(report.investments.edr.alerts[0].minute)
+                : 'brak'}
+              . To obserwacje, nie klasyfikacja sprawcy.
+            </p>
+            <p>
+              Dowód modyfikacji faktycznie pozyskany przez EDR:{' '}
+              {report.investments.edr.firstEvidenceMinute === null
+                ? 'nie pozyskano — możliwości nie wykorzystano'
+                : formatMinute(report.investments.edr.firstEvidenceMinute)}
+              . Badanie lokalne z takim dowodem:{' '}
+              {report.investments.firstLocalEvidenceMinute === null
+                ? 'nie wykonano'
+                : formatMinute(report.investments.firstLocalEvidenceMinute)}
+              .
+            </p>
+            <p>
+              Liczba decyzji ograniczających źródło podjętych po pozyskaniu
+              dowodu EDR: {report.investments.edr.informedActions}. Badanie EDR
+              trwa 5 min, lokalne 10 min. Zysk czasu zależy od chwili zlecenia i
+              dostępności danych; zakup nie izoluje stacji.
+            </p>
+          </>
+        ) : (
+          <p>
+            Brak agenta EDR. Lokalny dziennik pozostawał dostępny do badania
+            przez analityka (10 min).
+          </p>
+        )}
+        <h3>Backup Resilience</h3>
+        <p>
+          {report.investments.backup
+            ? `Wynik testu ${report.investments.backup.backupId}: ${backupTestLabels[report.investments.backup.integrity]}; zakres ${report.investments.backup.checkedDocumentIds.length} dokumentów; próba odtworzenia ${report.investments.backup.restoreTestPassed ? 'zaliczona' : 'niezaliczona'}.`
+            : 'Brak wcześniejszego testu programu. Obowiązywały dotychczasowe procedury.'}
+        </p>
+        <p>
+          Wybrana kopia: {s.backupId ?? 'nie użyto'}. Faktyczne odtworzenie:{' '}
+          {report.investments.restoreMinutes === null
+            ? 'nie wykonano'
+            : `${report.investments.restoreMinutes} min`}
+          . RPO: {s.rpoMinutes ?? '—'} min. RTO od początku okna:{' '}
+          {s.rtoMinutes ?? 'niepotwierdzone'} min. Nadal do uzgodnienia:{' '}
+          {s.reconcile} dokumentów.
+        </p>
+        <p>
+          Samo przygotowanie kopii ani odtworzenie nie odbiera źródłu prawa
+          zapisu. Wynik zależy od wykonanych działań.
+        </p>
+      </section>
       <h2>Decyzje: wiedza, założenie, zmiana</h2>
       <div className="integrity-decisions">
         {report.decisions.map((d) => (

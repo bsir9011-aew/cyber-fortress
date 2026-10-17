@@ -73,6 +73,7 @@ export function MissionWorkspace({
     (view.integrity
       ? view.integrity.observations.length +
         view.integrity.endpointObservations.length +
+        (view.integrity.edr?.observations.length ?? 0) +
         (view.integrity.backupInventoryMinute === null ? 0 : 1)
       : 0) +
     view.authObservations.length +
@@ -412,6 +413,18 @@ export function MissionWorkspace({
                           </div>
                         )}
                         <InfrastructureMap
+                          resilience={
+                            view.integrity
+                              ? {
+                                  coverage: view.integrity.edr?.coverage,
+                                  agentOnline: view.integrity.edr?.agentOnline,
+                                  deliveryAvailable:
+                                    view.integrity.edr?.deliveryAvailable,
+                                  backup:
+                                    view.integrity.backupReadiness ?? undefined,
+                                }
+                              : undefined
+                          }
                           world={world}
                           connections={visibleConnections}
                           selection={selection}
@@ -459,6 +472,18 @@ export function MissionWorkspace({
                       onSelect={select}
                       networkRules={view.rules}
                       endpoint={view.integrity?.endpoint}
+                      resilience={
+                        view.integrity
+                          ? {
+                              coverage: view.integrity.edr?.coverage,
+                              agentOnline: view.integrity.edr?.agentOnline,
+                              deliveryAvailable:
+                                view.integrity.edr?.deliveryAvailable,
+                              backup:
+                                view.integrity.backupReadiness ?? undefined,
+                            }
+                          : undefined
+                      }
                     />
                   )}
                 </aside>

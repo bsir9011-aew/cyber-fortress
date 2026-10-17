@@ -2,7 +2,30 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — The Last Clean Copy (Sprint 8)
+## FORTRESS LAB — Defense Investment Program (Sprint 9)
+
+Po ukończeniu Misji 02 i powrocie do Centrali pojawia się **Przegląd odporności
+— Etap II**. Jawnie przyjmij jednorazowe **25 000 zł**: łączna pula rośnie do
+105 000 zł, a wydatki i rezerwacje pozostają zachowane. To finansowanie przeglądu
+ryzyka, również po nieudanej misji.
+
+| Nowy projekt | Koszt | Praca administratora / analityka | Efekt |
+| --- | ---: | --- | --- |
+| EDR — Pilotaż | 24 000 zł | 2 h / 2 h | Agent tylko na pakowanie-03 (1/94), detekcja obserwowanych modify, pobranie dowodu w 5 min |
+| Backup Resilience | 28 000 zł | 3 h / 2 h | Weryfikacja i test istniejącej FS-1350; zgodna dostępna kopia: restore 10 zamiast 15 min, RPO nadal 10 min |
+
+Zaplanuj i zarezerwuj projekt, przydziel pracowników i rozlicz godziny.
+Zabezpieczenie działa dopiero po pełnym wdrożeniu. Oba projekty wymagają 5 h
+administratora, więc część pracy przejdzie do następnego okna bez ponownej
+płatności. Możesz zachować rezerwę i powtórzyć Misję 02 bez kolejnej Misji 01.
+EDR nie izoluje stacji, a backup nie zatrzymuje źródła zmian. Raport pokazuje
+faktyczne wykorzystanie dowodów i odzyskiwania.
+
+[Mechaniki, finansowanie i diagram](docs/resilience-investments.md) ·
+[Strategie A–G, wyniki i screenshoty](docs/resilience-validation.md) ·
+[FortressSaveV4 oraz zachowane V1/V2/V3](docs/game-save-v4.md).
+
+### Misja 02 — Ostatnia czysta kopia
 
 Po jednym ukończonym incydencie Misji 01 w centrali odblokowuje się
 **Misja 02 — Ostatnia czysta kopia**. Rozlicz następne cztery godziny i wybierz
@@ -16,7 +39,7 @@ Masz 100 dokumentów, dwie kopie o różnym wieku i czasie odtworzenia,
 czasowe zadania obu pracowników oraz rzeczywisty bilans 360 zamówień.
 Kontrolowane podłączenie stacji wymaga izolacji, badania i ograniczenia zapisu;
 nie oznacza oczyszczenia hosta. Audyt FS-01 daje dodatkowy dowód tylko po
-wdrożeniu projektu. Nie ma nowego projektu zakupowego ani backendu.
+wdrożeniu projektu. Bez nowych inwestycji przebieg odpowiada Sprintowi 8. Nie ma backendu.
 
 [Modele, parametry i diagramy Misji 02](docs/mission-02-integrity.md) ·
 [Wyniki strategii i screenshoty](docs/mission-02-validation.md) ·
@@ -79,7 +102,7 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 - **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
   strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
   Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu. Nowe zapisy mają
-  format V3; poprzednie oryginały V1/V2 pozostają zachowane i możliwe do wyeksportowania.
+  format V4; poprzednie oryginały V1/V2/V3 pozostają zachowane i możliwe do wyeksportowania.
 - **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
   działalność, ograniczenie dostępu i działania samodzielnych misji. Wyniki strategii
   znajdziesz w Centrali w historii bieżącej kampanii. Powtórka tworzy nową próbę tego
@@ -102,8 +125,8 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 ### Wersja przeglądarkowa
 
 Docelowy adres: **https://bsir9011-aew.github.io/cyber-fortress/**.
-Repozytorium ma Pages w trybie GitHub Actions. Sprint 7 jest scalony na main.
-Sprint 8 wymaga review PR i nie jest publikowany z gałęzi funkcjonalnej.
+Repozytorium ma Pages w trybie GitHub Actions. Sprint 8 jest scalony na main.
+Sprint 9 wymaga review PR i nie jest publikowany z gałęzi funkcjonalnej.
 Workflow nadal wdraża wyłącznie `main`, po testach i produkcyjnym buildzie.
 
 ### Rozpoczęcie misji
@@ -258,13 +281,16 @@ src/
   application/  # inicjalizacja, reducer misji/kampanii, sesje gry, projekcje i raporty
   content/      # infrastruktura, trzy stabilne warianty VPN, odrębna Misja 02 i projekty
   ui/           # React, style i SVG
-  persistence/  # zapis V3, zgodność V1/V2, walidacja, localStorage i historia prób
+  persistence/  # zapis V4, zgodność V1/V2/V3, walidacja, localStorage i historia prób
 docs/           # architektura i GDD
 prototype/      # archiwalny prototyp HTML 0.1
 ```
 
 - [Kampania i budżet](docs/campaign.md)
 - [Misja 02: lokalny dostęp, integralność i recovery](docs/mission-02-integrity.md)
+- [Inwestycje Etapu II i diagram](docs/resilience-investments.md)
+- [Walidacja strategii A–G](docs/resilience-validation.md)
+- [Zapis V4 i zgodność V1–V4](docs/game-save-v4.md)
 - [Zapis V3 i zachowane oryginały](docs/game-save-v3.md)
 - [Walidacja i strategie Sprintu 8](docs/mission-02-validation.md)
 - [Semantyka silnika Sprintu 7](docs/strategic-engine.md)

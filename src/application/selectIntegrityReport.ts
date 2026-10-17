@@ -59,6 +59,53 @@ export function selectIntegrityReport(state: SimulationState) {
   };
   return {
     summary,
+    investments: {
+      edr: state.telemetry.endpoint
+        ? {
+            coverage: state.telemetry.endpoint.coverage,
+            capturedEvents: state.telemetry.endpoint.nextEventNumber - 1,
+            deliveredEvents: state.telemetry.endpoint.records.length,
+            alerts: state.telemetry.endpoint.alerts,
+            observations: state.telemetry.endpoint.observations,
+            informedActions: i.decisions.filter(
+              (decision) =>
+                decision.knownObservationIds.some((id) =>
+                  state.telemetry.endpoint!.observations.some(
+                    (o) =>
+                      o.id === id &&
+                      o.records.some(
+                        (r) =>
+                          r.operation === 'modify' && r.outcome === 'allowed',
+                      ),
+                  ),
+                ) &&
+                state.tasks.some(
+                  (t) =>
+                    t.id === decision.taskId &&
+                    ['isolate-endpoint', 'restrict-endpoint-writes'].includes(
+                      t.action.type,
+                    ),
+                ),
+            ).length,
+            firstEvidenceMinute:
+              state.telemetry.endpoint.observations.find((o) =>
+                o.records.some(
+                  (r) => r.operation === 'modify' && r.outcome === 'allowed',
+                ),
+              )?.observedAtMinute ?? null,
+          }
+        : null,
+      firstLocalEvidenceMinute:
+        i.endpointObservations.find((o) =>
+          o.records.some(
+            (r) => r.operation === 'modify' && r.outcome === 'allowed',
+          ),
+        )?.minute ?? null,
+      backup: state.hidden.scenario.backupReadiness ?? null,
+      restoreMinutes: lastRecovery
+        ? lastRecovery.completedAtMinute - lastRecovery.orderedAtMinute
+        : null,
+    },
     documents: i.documents,
     recoveries: i.recoveries,
     decisions: i.decisions.map((decision) => ({
@@ -79,6 +126,16 @@ export function selectIntegrityReport(state: SimulationState) {
             minute: endpoint.minute,
             source: 'Lokalny dziennik stacji',
             summary: `${endpoint.records.length} operacji; dopuszczone modify: ${endpoint.records.filter((r) => r.operation === 'modify' && r.outcome === 'allowed').length}.`,
+          };
+        const edr = state.telemetry.endpoint?.observations.find(
+          (o) => o.id === id,
+        );
+        if (edr)
+          return {
+            id,
+            minute: edr.observedAtMinute,
+            source: 'Kolektor EDR / fortress-endpoint-agent',
+            summary: `${edr.records.length} dostarczonych rekordów; zakres sensora ${edr.sensorId}, okno ${edr.windowStartMinute}–${edr.windowEndMinute}.`,
           };
         const file = state.knowledge.fileObservations?.find((o) => o.id === id);
         return {

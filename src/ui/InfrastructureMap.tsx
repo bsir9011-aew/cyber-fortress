@@ -1,3 +1,4 @@
+import type { ResilienceStatusProps } from './ResilienceStatus';
 import { useId } from 'react';
 import type { KeyboardEvent } from 'react';
 import { selectRelatedAssets } from '../application/infrastructureSelectors';
@@ -13,6 +14,7 @@ import type { MapSelection } from './infrastructurePresentation';
 import { connectionPath, createMapLayout, nodeSize } from './mapLayout';
 
 interface Props {
+  resilience?: ResilienceStatusProps | undefined;
   world: WorldState;
   connections: readonly InfrastructureConnection[];
   selection: MapSelection;
@@ -21,6 +23,7 @@ interface Props {
 
 export function InfrastructureMap({
   world,
+  resilience,
   connections,
   selection,
   onSelect,
@@ -217,7 +220,11 @@ export function InfrastructureMap({
                 {asset.name}
               </text>
               <text className="node-kind" x="49" y="44">
-                {assetLabels[asset.kind]}
+                {asset.id === 'workstations' && resilience?.coverage
+                  ? 'EDR: pakowanie-03 / 94'
+                  : asset.id === 'fs-01' && resilience?.backup
+                    ? `Kopia: ${resilience.backup.integrity === 'clean' ? 'sprawdzona' : resilience.backup.integrity === 'damaged' ? 'niezgodna' : 'niedostępna'}`
+                    : assetLabels[asset.kind]}
               </text>
               <circle
                 className={`status-dot status-${asset.status}`}

@@ -21,7 +21,7 @@ export function App() {
     return (
       !(operations.active || operations.hasSave) ||
       window.confirm(
-        'Nowa gra zastąpi bieżącą grę i zapis V3. Oryginały V1/V2 oraz historia prób pozostaną. Kontynuować?',
+        'Nowa gra zastąpi bieżącą grę i zapis V4. Oryginały V1/V2/V3 oraz historia prób pozostaną. Kontynuować?',
       )
     );
   }
@@ -60,13 +60,14 @@ export function App() {
           </div>
         </div>
         <span className="version">
-          DEV 0.2 <span>· The Last Clean Copy</span>
+          DEV 0.2 <span>· Defense Investment Program</span>
         </span>
       </header>
       <PersistenceToolbar
         game={game}
         legacyRaw={operations.legacyRaw}
         previousRaw={operations.previousRaw}
+        thirdRaw={operations.thirdRaw}
         canExport={operations.canResume}
         status={operations.saveStatus}
         error={operations.saveError}
@@ -75,7 +76,7 @@ export function App() {
         onImport={(save) => {
           if (
             !window.confirm(
-              'Import zastąpi bieżącą grę i zapis V3. Oryginały V1/V2 oraz historia pozostaną. Kontynuować?',
+              'Import zastąpi bieżącą grę i zapis V4. Oryginały V1/V2/V3 oraz historia pozostaną. Kontynuować?',
             )
           )
             return;
@@ -160,7 +161,7 @@ export function App() {
       <footer className="app-footer">
         <span>FORTRESS LAB / NEXUS Logistics</span>
         <span>
-          The Last Clean Copy <span className="footer-dot" /> Sprint 8
+          Defense Investment Program <span className="footer-dot" /> Sprint 9
         </span>
       </footer>
     </div>

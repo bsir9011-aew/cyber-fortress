@@ -1,4 +1,4 @@
-# Rzeczywiste pliki V1/V2
+# Rzeczywiste pliki V1/V2/V3
 
 Pliki wygenerowano niezmienionym kodem commita
 `d1c3d56e9293f78ac6cadeef4339b8e699341508` (PR #7, scalony na main).
@@ -32,3 +32,19 @@ po blokadzie w A, z zadaniem `unblock-account` w toku (tura 0, termin 1).
 Metadane eksportu: 2026-10-17T06:34:37.339Z. Test V3 wymaga identycznego
 odczytu całej sesji, w tym trwającego zadania i zachowanej blokady. Plik jest
 fikcyjnym zapisem gry; nie został wygenerowany silnikiem Sprintu 8.
+
+
+## V3 sprzed Sprintu 9
+
+Dwa oryginalne eksporty z Chromium wykonano kodem Sprintu 8 (`4511257`, PR #9),
+przed utworzeniem gałęzi `feat/resilience-investments`. Skopiowano je bez zmiany
+bajtów z zachowanych artefaktów walidacji Sprintu 8:
+
+- `sprint8-headquarters-v3.json`: 2026-10-17T08:13:52.370Z; po Misji 01,
+  projekt audytu FS-01 ukończony, cztery godziny rozliczone, przed pierwszą M02.
+- `sprint8-restore-pending-v3.json`: 2026-10-17T08:13:53.785Z; M02, FS-1320
+  w trakcie odtwarzania, izolowana stacja, badanie lokalne w toku.
+
+Nie generowano ich nowym silnikiem. Test V4 porównuje sesję ze starą migawką
+oraz odczytem V3. Chromium sprawdza eksport oryginału bajt w bajt, kontynuację,
+import i reload bez automatycznego finansowania/katalogu Etapu II.

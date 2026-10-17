@@ -62,5 +62,40 @@ export const securityProjects: readonly ProjectDefinition[] = [
     assetIds: ['vpn', 'erp', 'fs-01'],
   },
 ];
+/** Only the explicit stage-II command adds these definitions to a campaign. */
+export const resilienceProjects: readonly ProjectDefinition[] = [
+  {
+    id: 'endpoint-edr',
+    name: 'Endpoint Detection & Response — Pilotaż',
+    totalCost: 24000,
+    remainingCost: 24000,
+    hours: { administrator: 2, analyst: 2 },
+    scope:
+      'Wyłącznie pakowanie-03: jedna z 94 stacji. Agent i modelowany kolektor, read/modify SMB, retencja 120 min, opóźnienie 5 min.',
+    effect:
+      'Rejestruje rzeczywiste operacje. Detekcja: co najmniej 10 dopuszczonych modyfikacji dokumentów w 10 min. Analityk pobiera dowód z kolektora w 5 min.',
+    limitation:
+      'Alert to sygnał do zbadania. Nie izoluje i nie oczyszcza stacji. Izolacja przerywa nowe dostarczenia; lokalny dziennik nadal wymaga analizy 10 min.',
+    business:
+      'Szybsze rozpoznanie może ułatwić wcześniejszą decyzję. Niewykorzystane narzędzie nie zatrzymuje uszkadzania ani nie naprawia danych.',
+    assetIds: ['workstations'],
+  },
+  {
+    id: 'backup-resilience',
+    name: 'Backup Resilience — Weryfikacja i test odtwarzania',
+    totalCost: 28000,
+    remainingCost: 28000,
+    hours: { administrator: 3, analyst: 2 },
+    scope:
+      'Istniejący punkt FS-1350 i procedura odtworzenia FS-01. Nie tworzy nowych ani późniejszych dokumentów.',
+    effect:
+      'Po ukończeniu pracy obu osób wykonuje modelowany test zawartości i procedury. Zgodna, dostępna kopia otrzymuje udokumentowany wynik; przetestowany restore trwa 10 zamiast 15 min.',
+    limitation:
+      'Sam zakup nie sprawdza kopii. Kopia uszkodzona lub niedostępna nie staje się czysta. RPO pozostaje 10 min. Nadal trzeba ograniczyć źródło zmian.',
+    business:
+      'Oszczędza pracę weryfikacji podczas incydentu i czas administratora. Aktywne źródło może ponownie uszkodzić odtworzony zbiór.',
+    assetIds: ['fs-01'],
+  },
+];
 export const projectDefinition = (id: ProjectId) =>
-  securityProjects.find((p) => p.id === id)!;
+  [...securityProjects, ...resilienceProjects].find((p) => p.id === id)!;

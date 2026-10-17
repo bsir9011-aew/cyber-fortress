@@ -1,0 +1,73 @@
+{
+  "widths": [
+    1366,
+    375
+  ],
+  "timezone": "Europe/Warsaw",
+  "report": {
+    "integrity": {
+      "serviceOnline": true,
+      "dataAvailable": true,
+      "total": 100,
+      "correct": 100,
+      "damaged": 0,
+      "reconcile": 0,
+      "recovered": 12,
+      "everDamaged": 12,
+      "sourceHasWrite": false,
+      "endpointIsolated": false,
+      "writesRestricted": true,
+      "backupId": "FS-1350",
+      "rpoMinutes": 10,
+      "rtoMinutes": 30,
+      "missingChanges": 0,
+      "reconstructed": 0,
+      "verified": true,
+      "limitedDataMinutes": 20,
+      "peakBacklog": 4
+    },
+    "number": 4,
+    "seed": 3,
+    "scenarioId": "nexus-last-clean-copy",
+    "name": "Ostatnia czysta kopia",
+    "exposedRecords": 0,
+    "processed": 360,
+    "backlog": 0,
+    "containmentMet": true,
+    "spent": 64000,
+    "activeProjects": [
+      "endpoint-edr",
+      "backup-resilience"
+    ],
+    "mfaRefusals": 0,
+    "fileEvidenceRecords": 0,
+    "reducedCapacityTurns": 7,
+    "minimumCapacity": 18,
+    "fullCapacity": 22
+  },
+  "checks": [
+    "no overflow: HQ funding 1366",
+    "no overflow: HQ funding 375",
+    "no overflow: projects 375",
+    "no overflow: EDR Sprawy 375",
+    "no overflow: EDR Operacje 375",
+    "no overflow: EDR Architektura 375",
+    "no overflow: ignored EDR report 375",
+    "no overflow: both Sprawy 375",
+    "no overflow: both Operacje 375",
+    "no overflow: both Architektura 375",
+    "no overflow: both report 375",
+    "campaign M01 → M02 failure → explicit funding",
+    "funding remains once after reload/repeat",
+    "both projects paid once, admin work carries",
+    "deployment and EDR task resume",
+    "backup restore pending resume",
+    "EDR evidence provenance and active UI privacy",
+    "both investments used, RPO10/RTO30/360 processed",
+    "invalid import and cancellation leave game unchanged",
+    "genuine V3 boot, export byte-for-byte, import, reload; no hidden funding"
+  ],
+  "errors": [],
+  "badResponses": [],
+  "chromium": "154.0.8037.57"
+}

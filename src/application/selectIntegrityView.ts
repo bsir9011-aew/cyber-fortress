@@ -1,6 +1,11 @@
+import {
+  endpointAgentAvailable,
+  endpointChannelAvailable,
+} from '../simulation/endpointTelemetry';
 import type { SimulationState, TaskAction } from '../domain/simulation';
 import { isAssetOnline } from '../simulation/access';
 import { taskRejection, taskSpecs } from '../simulation/tasks';
+import { preparedRestoreTurns } from '../simulation/backupReadiness';
 import { integrityTaskTurns } from '../simulation/integrity';
 
 /** Allowlist projection: no document truth, backup contents, compromise or plan. */
@@ -9,6 +14,9 @@ export function selectIntegrityView(state: SimulationState) {
   const d = state.hidden.scenario.integrity;
   if (!i || !d) return null;
   const actions: TaskAction[] = [
+    ...(state.telemetry.endpoint
+      ? [{ type: 'inspect-edr-telemetry' as const }]
+      : []),
     { type: 'inspect-documents' },
     { type: 'inspect-backups' },
     { type: 'reconcile-documents' },
@@ -36,6 +44,24 @@ export function selectIntegrityView(state: SimulationState) {
       writesRestricted: i.endpoint.writesRestricted,
       businessCapacity: i.endpoint.businessCapacity,
     },
+    edr: state.telemetry.endpoint
+      ? {
+          coverage: state.telemetry.endpoint.coverage,
+          agentOnline: endpointAgentAvailable(
+            state.world,
+            i.endpoint,
+            state.telemetry.endpoint.coverage,
+          ),
+          deliveryAvailable: endpointChannelAvailable(
+            state.world,
+            i.endpoint,
+            state.telemetry.endpoint.coverage,
+          ),
+          alerts: state.telemetry.endpoint.alerts,
+          observations: state.telemetry.endpoint.observations,
+        }
+      : null,
+    backupReadiness: state.hidden.scenario.backupReadiness ?? null,
     datasetAssetId: d.datasetAssetId,
     documentedTotal: d.documentIds.length,
     fsOnline: isAssetOnline(state.world, d.datasetAssetId),
@@ -50,7 +76,10 @@ export function selectIntegrityView(state: SimulationState) {
             minute: b.minute,
             count: b.documentIds.length,
             available: b.available,
-            restoreTurns: b.restoreTurns,
+            restoreTurns: preparedRestoreTurns(
+              b,
+              state.hidden.scenario.backupReadiness,
+            ),
             verification: i.backups.find((v) => v.id === b.id)!.verification,
             verifiedAtMinute: i.backups.find((v) => v.id === b.id)!
               .verifiedAtMinute,

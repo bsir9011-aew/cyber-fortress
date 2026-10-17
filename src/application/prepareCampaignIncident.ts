@@ -13,6 +13,7 @@ export function prepareCampaignDefinition(
   posture: SecurityPosture,
 ): ScenarioDefinition {
   const changed =
+    (base.integrity && (posture.endpointCoverage || posture.backupReadiness)) ||
     (base.integrity && posture.endpointOverrides) ||
     posture.remoteAccess ||
     posture.fileVisibility ||
@@ -214,6 +215,19 @@ export function prepareCampaignDefinition(
       sourceEvents: events,
       processedSourceCount: 0,
       authenticationRecords: [],
+      ...(source.integrity && posture.endpointCoverage
+        ? {
+            endpoint: {
+              coverage: structuredClone(posture.endpointCoverage),
+              coverageFromMinute: source.clock.startMinute - 5,
+              nextEventNumber: 1,
+              localEvents: [],
+              records: [],
+              alerts: [],
+              observations: [],
+            },
+          }
+        : {}),
       ...(posture.fileVisibility
         ? {
             fileAudit: {
@@ -232,6 +246,9 @@ export function prepareCampaignDefinition(
           }
         : {}),
     },
+    ...(source.integrity && posture.backupReadiness
+      ? { backupReadiness: structuredClone(posture.backupReadiness) }
+      : {}),
     ...(source.integrity
       ? {
           integrity: {
