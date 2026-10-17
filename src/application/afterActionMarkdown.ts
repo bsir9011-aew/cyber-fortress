@@ -46,6 +46,9 @@ function stateSummary(s: AarActualState) {
     s.documents
       ? `Dokumenty: ${s.documents.correct} poprawnych / ${s.documents.damaged} uszkodzonych / ${s.documents.reconcile} do uzgodnienia; razem ${s.documents.total}. Odzyskane przynajmniej raz: ${s.documents.recovered}.`
       : '',
+    s.vendorAuthorization
+      ? `Autoryzacja dostawcy:\n\n${details(s.vendorAuthorization)}`
+      : '',
     s.endpoint ? `Endpoint:\n\n${details(s.endpoint)}` : '',
     `Konta (prawda po misji):\n\n${s.accounts.map((a) => `- ${text(a.id)}: ${a.loginStatus}, credentialVersion=${a.credentialVersion}, MFA=${a.mfaPolicy}.`).join('\n')}`,
     `Sesje (prawda po misji):\n\n${s.sessions.map((a) => `- ${text(a.id)} / ${text(a.accountId)}: ${a.status}, pochodzenie ${a.origin}; ${aarClock(a.startedAtMinute)}–${aarClock(a.expiresAtMinute)}.`).join('\n') || 'Brak.'}`,
@@ -76,7 +79,7 @@ export function renderAfterActionMarkdown(
     '## 2. Kontekst firmy',
     `${r.organization.name}: ${r.organization.employees} pracowników, ${r.organization.computers} komputerów.`,
     c
-      ? `Kampania: misja ${c.missionNumber}, okno przygotowania ${c.preparationWindow}. Budżet na starcie: ${c.budgetAtStart.total} PLN; wydano ${c.budgetAtStart.spent}; zarezerwowano ${c.budgetAtStart.reserved}; dostępne ${c.budgetAtStart.available}.\n\nFinansowanie:\n\n${details(c.funding as unknown as AarData)}\n\nProjekty:\n\n${c.projects.map((p) => `- **${text(p.name)}**: ${p.status}; koszt ${p.costPLN} PLN; pozostało admin ${p.remaining.administrator} h / analityk ${p.remaining.analyst} h. Mechanizm: ${text(p.mechanism)} Granica: ${text(p.limitation)}`).join('\n')}\n\nPraca przygotowawcza (godziny poza zegarem incydentu):\n\n${details(c.work as unknown as AarData)}${c.detectionChanges ? `\n\nZmiany reguły w Centrali (aktywnie po ukończeniu 1 h):\n\n${details(c.detectionChanges as unknown as AarData)}` : ''}\n\nRejestr inwestycji:\n\n${details(c.investmentLedger as unknown as AarData)}\n\nOdziedziczona konfiguracja:\n\n${details(c.posture as unknown as AarData)}`
+      ? `Kampania: misja ${c.missionNumber}, okno przygotowania ${c.preparationWindow}. Budżet na starcie: ${c.budgetAtStart.total} PLN; wydano ${c.budgetAtStart.spent}; zarezerwowano ${c.budgetAtStart.reserved}; dostępne ${c.budgetAtStart.available}.\n\nFinansowanie:\n\n${details(c.funding as unknown as AarData)}\n\nProjekty:\n\n${c.projects.map((p) => `- **${text(p.name)}**: ${p.status}; koszt ${p.costPLN} PLN; pozostało admin ${p.remaining.administrator} h / analityk ${p.remaining.analyst} h. Mechanizm: ${text(p.mechanism)} Granica: ${text(p.limitation)}`).join('\n')}\n\nPraca przygotowawcza (godziny poza zegarem incydentu):\n\n${details(c.work as unknown as AarData)}${c.detectionChanges ? `\n\nZmiany reguły w Centrali (aktywnie po ukończeniu 1 h):\n\n${details(c.detectionChanges as unknown as AarData)}` : ''}\n\nRejestr inwestycji:\n\n${details(c.investmentLedger as unknown as AarData)}\n\nOdziedziczona konfiguracja:\n\n${details(c.posture as unknown as AarData)}${c.vendorApprovals ? `\n\nZatwierdzenia CARGO-LINK w Centrali:\n\n${details(c.vendorApprovals as unknown as AarData)}` : ''}`
       : 'Samodzielna misja, bez budżetu i przygotowania kampanii.',
     '## 3. Cele misji',
     details(r.missionObjectives),
@@ -129,6 +132,12 @@ export function renderAfterActionMarkdown(
           '### Detection Engineering — wynik tego przebiegu',
           details(s.detectionReview),
           'Alert jest przesłanką do badania. Etykieta FP/FN jest dostępna dopiero po misji; nie stanowi oceny racjonalności decyzji. Następstwa i stany po decyzji opisano także w sekcjach 4 i 8.',
+        ]
+      : []),
+    ...(s.vendorAccess
+      ? [
+          '### Misja 03 — wyjątek CARGO-LINK i rzeczywiste operacje',
+          details(s.vendorAccess),
         ]
       : []),
     '## 8. Skutki biznesowe',

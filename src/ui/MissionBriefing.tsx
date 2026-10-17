@@ -16,7 +16,13 @@ export function MissionBriefing({
         </span>
         <span className="mission-tag">14:00 — 15:30 · 18 tur</span>
         <h1>
-          {view.integrity ? (
+          {view.vendor ? (
+            <>
+              Dostawca
+              <br />
+              <span className="accent">na godzinę.</span>
+            </>
+          ) : view.integrity ? (
             <>
               Ostatnia czysta
               <br />
@@ -48,7 +54,13 @@ export function MissionBriefing({
                 : 'Chroń dane operacyjne'}
             </h2>
             <p>
-              {view.integrity ? (
+              {view.vendor ? (
+                <>
+                  Dostawca
+                  <br />
+                  <span className="accent">na godzinę.</span>
+                </>
+              ) : view.integrity ? (
                 'Ogranicz źródło zmian, odtwórz lub uzgodnij dokumenty i sprawdź rezultat. Serwer online nie potwierdza integralności.'
               ) : (
                 <>
@@ -64,9 +76,11 @@ export function MissionBriefing({
             <p>
               Do 15:30 pozostaw najwyżej {view.maxFinalBacklog} zaległych
               zamówień.{' '}
-              {view.integrity
-                ? 'Wysyłki wymagają także poprawnych dokumentów FS-01. Izolacja odbiera legalną pracę stacji.'
-                : 'Zdalny zespół potrzebuje ERP przez VPN.'}
+              {view.vendor
+                ? 'CARGO-LINK wnosi 6 z 22 zamówień wydajności. Zbadaj potrzebne przepływy i pamiętaj o terminie wyjątku.'
+                : view.integrity
+                  ? 'Wysyłki wymagają także poprawnych dokumentów FS-01. Izolacja odbiera legalną pracę stacji.'
+                  : 'Zdalny zespół potrzebuje ERP przez VPN.'}
             </p>
           </article>
         </div>
@@ -100,9 +114,11 @@ export function MissionBriefing({
           <div>
             <h3>Bartek · administrator</h3>
             <p>
-              {view.integrity
-                ? 'Izoluje stację, ogranicza jej zapis i odtwarza dokumenty. Podłączenie wymaga spełnienia warunków bezpieczeństwa.'
-                : 'Kończy tunele, zmienia logowania i reguły dostępu. Każda zmiana wymaga czasu.'}
+              {view.vendor
+                ? 'Cofa, zawęża lub rozszerza ważny wyjątek dostawcy. Zmiany wymagają czasu i nie kończą sesji.'
+                : view.integrity
+                  ? 'Izoluje stację, ogranicza jej zapis i odtwarza dokumenty. Podłączenie wymaga spełnienia warunków bezpieczeństwa.'
+                  : 'Kończy tunele, zmienia logowania i reguły dostępu. Każda zmiana wymaga czasu.'}
             </p>
           </div>
         </article>

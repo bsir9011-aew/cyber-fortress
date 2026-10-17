@@ -1,3 +1,4 @@
+import type { VendorDefinition } from './vendor';
 import type { AccessState } from './access';
 import type { AttackDefinition } from './attack';
 import type { BusinessProcess, SimulationClock } from './simulation';
@@ -35,7 +36,8 @@ export interface HistoricalAuthenticationAttempt {
 }
 
 export interface ScenarioDefinition {
-  readonly familyId?: 'nexus-integrity-detection-v1';
+  readonly familyId?: 'nexus-integrity-detection-v1' | 'nexus-vendor-access-v1';
+  readonly vendor?: VendorDefinition;
   readonly backupReadiness?: BackupReadiness;
   readonly integrity?: IntegrityDefinition;
   readonly id: string;
@@ -45,7 +47,8 @@ export interface ScenarioDefinition {
     | 'unauthorized-session'
     | 'legitimate-session'
     | 'stolen-credential'
-    | 'local-integrity';
+    | 'local-integrity'
+    | 'third-party-access';
   readonly explanation: string;
   readonly world: WorldState;
   readonly clock: Omit<SimulationClock, 'turn'>;

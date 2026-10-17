@@ -35,6 +35,9 @@ export function actualState(state: SimulationState): AarActualState {
     d = state.hidden.scenario.integrity;
   return {
     threatAccess: assessThreatAccess(state),
+    ...(state.access.vendorAuthorization
+      ? { vendorAuthorization: facts(state.access.vendorAuthorization) }
+      : {}),
     accounts: state.access.accounts,
     sessions: state.access.sessions.map((s) => ({
       ...s,
@@ -114,6 +117,14 @@ export function knownAtDecision(
         status: a.status,
       })),
       networkRules: v.rules,
+      ...(v.vendor
+        ? {
+            vendorAuthorization: facts({
+              accountId: v.vendor.accountId,
+              exception: v.vendor.exception,
+            }),
+          }
+        : {}),
       knownAccounts: v.knownAccountIds.map((id) => ({
         id,
         blocked: v.blockedKnownAccountIds.includes(id),
@@ -170,6 +181,13 @@ export function actionTarget(
         hypothesis: string;
       },
 ) {
+  if ('approvalId' in action)
+    return {
+      kind: 'vendor-exception',
+      id: action.approvalId,
+      resourceIds: ['vpn', 'carrier-api', 'fs-01'],
+      flow: facts(state.access.vendorAuthorization),
+    };
   if ('ruleId' in action) {
     const r = state.access.rules.find((r) => r.id === action.ruleId);
     return {

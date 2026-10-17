@@ -2,7 +2,59 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
-## FORTRESS LAB — Detection Engineering (Sprint 11)
+## FORTRESS LAB — Misja 03: Dostawca na godzinę (Sprint 12)
+
+Po jednej ukończonej Misji 02 Centrala udostępnia **Dostęp zewnętrzny —
+CARGO-LINK**. Wybierz tylko `carrier-api / HTTPS` albo HTTPS i `FS-01 / SMB`,
+ze wspólnym terminem **14:30, 15:00 lub 15:30**. Przygotowanie zatwierdzenia
+zajmuje administratora przez **1 h** istniejącego okna; nie kosztuje pieniędzy,
+nie dodaje inwestycji ani finansowania. Zatwierdzenie działa dopiero po pracy,
+dotyczy jednej Misji 03 w tym oknie i jest zużywane przy jej starcie.
+Można rozpocząć także bez wyjątku, ponosząc koszt braku dostępu.
+
+Nowa rodzina `nexus-vendor-access-v1` wybiera deterministycznie standardową
+integrację, legalną dokumentację przewozową lub nadużycie poświadczenia
+dostawcy. Nie zmienia katalogów ani seedów M01/M02. Wspólny briefing nie
+ujawnia wariantu. Standard wymaga 6 partii HTTPS; dokumentacja 12 partii
+HTTPS i SMB. Każda partia jest wykonywana przez rzeczywiste predykaty
+usługowe. Integracja wnosi 6 z maksymalnie 22 zamówień wydajności (pozostałe
+8 lokalnie + 8 zdalnie). Zakończone zlecenie uwalnia dalsze wysyłki bez
+stałego połączenia — dłuższy dostęp nie daje automatycznej premii.
+
+Autoryzacja wymaga jednocześnie ścieżki Dostawca → VPN → usługa, dostępności,
+właściwego konta, aktywnej sesji, ACL, uprawnienia i wyjątku. Obowiązuje
+przedział **[14:00, termin)** czasu świata. Obowiązkowa bramka autoryzacji
+konta dostawcy nie pozwala obejść terminu przez ogólną regułę `allow`.
+Cofnięcie i wygaśnięcie nie kończą tuneli ani nie zmieniają konta, hasła czy
+MFA; uniemożliwiają użycie usługi. Dotychczasowe reguły bez terminu zachowują
+semantykę. Wdrożone MFA obejmuje legalne nowe logowania CARGO-LINK; sprawca
+posiada tylko wersję 1 poświadczenia, bez drugiego składnika.
+
+**Sprawdź operacje CARGO-LINK** zajmuje analityka przez 5 min. Monitor bramy
+pokazuje faktyczne próby, konto, sesję, usługę, wynik oraz spełnione warunki
+(bez etykiety sprawcy); retencja 120 min, bez opóźnienia. Wdrożony audyt
+FS-01 zachowuje własne opóźnienie i zakres, a EDR na pakowanie-03 nie widzi
+urządzenia dostawcy. Administrator może **cofnąć wyjątek (5 min)**,
+**zawęzić do HTTPS (10 min)** lub **rozszerzyć o SMB (10 min)**. Zmiany
+wymagają nadal ważnego zatwierdzenia i czasu przed jego terminem; rozszerzenie
+nie przedłuża terminu. Po cofnięciu lub wygaśnięciu potrzebna jest nowa decyzja
+w Centrali. Jedna osoba nie może wykonywać dwóch prac jednocześnie.
+
+Raport po 18. turze i AAR JSON/Markdown rozpoznają rodzinę **M03**. Pokazują
+zatwierdzenie, okresy autoryzacji, znane przed decyzją dowody, rzeczywiste
+legalne i nieuprawnione operacje, stan sesji, odcięcie dostępu i bilans
+zamówień. Nie oceniają szerokiego zakresu w oderwaniu od potrzeb i nie
+wyliczają nieprzeprowadzonych alternatyw.
+
+Aktywny **FortressSaveV6**: silnik `12.0.0`, treść `nexus-vendor-1`, klucz
+`fortress-lab.game.v6`. Odczyt/replay **V1–V5** oraz stare raporty pozostają
+obsługiwane. Nowe komendy są walidowane ściśle, a migawka musi zgadzać się
+z pełnym dziennikiem. Stare klucze i oryginalne bajty pozostają do eksportu;
+uszkodzony nowszy zapis nie powoduje cichego cofnięcia do starszego. Samo
+otwarcie gry nie zapisuje migracji. Bez backendu, z jednym kontem dostawcy
+i trzema zdefiniowanymi wariantami; brak dowolnego edytora sieci.
+
+### Detection Engineering (Sprint 11)
 
 Po wdrożeniu EDR skonfiguruj w Centrali próg 2–30 dokumentów oraz ruchome
 okno 5/10/20 minut. Zmiana zajmuje 1 h analityka. Rozegraj **Misję 02 —
@@ -135,7 +187,7 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 - **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
   strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
   Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu. Nowe zapisy mają
-  format V5; poprzednie oryginały V1/V2/V3/V4 pozostają zachowane i możliwe do wyeksportowania.
+  format V6; poprzednie oryginały V1/V2/V3/V4/V5 pozostają zachowane i możliwe do wyeksportowania.
 - **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
   działalność, ograniczenie dostępu i działania samodzielnych misji. Wyniki strategii
   znajdziesz w Centrali w historii bieżącej kampanii. Powtórka tworzy nową próbę tego
@@ -314,7 +366,7 @@ src/
   application/  # inicjalizacja, reducer misji/kampanii, sesje gry, projekcje i raporty
   content/      # infrastruktura, trzy stabilne warianty VPN, odrębna Misja 02 i projekty
   ui/           # React, style i SVG
-  persistence/  # zapis V5, zgodność V1/V2/V3/V4, walidacja, localStorage i historia prób
+  persistence/  # zapis V6, zgodność V1–V5, walidacja, localStorage i historia prób
 docs/           # architektura i GDD
 prototype/      # archiwalny prototyp HTML 0.1
 ```

@@ -1,3 +1,4 @@
+import { CURRENT_GAME_SAVE_KEY } from '../persistence/gameSaveV6';
 import { describe, expect, it } from 'vitest';
 import { createStrategicSession, currentOperation } from './gameSession';
 import type { StrategicSession } from './gameSession';
@@ -33,7 +34,6 @@ import {
   readCurrentGameSave,
   serializeCurrentGameSave,
   isCurrentCampaignCommand,
-  CURRENT_GAME_SAVE_KEY,
 } from '../persistence/gameSaveV5';
 import {
   readCurrentGameSave as readV4,
@@ -275,7 +275,7 @@ describe('V5 exact command replay and existing V1–V4 readers', () => {
     save.session.campaign.posture.endpointCoverage.detection.threshold = 30;
     expect(readCurrentGameSave(JSON.stringify(save)).ok).toBe(false);
   });
-  it('V5 storage preserves original V4 bytes and does not fall back from a corrupt newer save', () => {
+  it('current storage preserves original V4 bytes and does not fall back from a corrupt newer save', () => {
     const data = new Map([[V4_KEY, pendingV4]]);
     const storage = {
       getItem: (k: string) => data.get(k) ?? null,

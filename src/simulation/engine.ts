@@ -1,3 +1,9 @@
+import {
+  applyVendorTask,
+  recordLegalVendorActivity,
+  expireVendorException,
+} from './vendor';
+import { observeVendorOperations } from './vendorTelemetry';
 import type {
   EmployeeTask,
   SimulationCommand,
@@ -125,6 +131,7 @@ function applyTaskEffect(
     case 'contact-account-owner':
       return state;
   }
+  if ('approvalId' in action) return applyVendorTask(state, task);
   return applyIntegrityTask(state, task);
 }
 
@@ -164,6 +171,8 @@ function observeCompletedResearch(
   state: SimulationState,
   task: EmployeeTask,
 ): SimulationState {
+  if (task.action.type === 'inspect-vendor-operations')
+    return observeVendorOperations(state, task.id);
   if (task.action.type === 'inspect-vpn-sessions')
     return observeVpnSessions(state);
   if (task.action.type === 'inspect-file-access') {
@@ -226,7 +235,7 @@ function observeCompletedResearch(
 function advanceTurn(state: SimulationState): SimulationState {
   // 1. Rozliczenie zakończonego przedziału na STAREJ konfiguracji.
   const business = settleBusiness(state);
-  state = recordLegalFileActivity(state);
+  state = recordLegalVendorActivity(recordLegalFileActivity(state));
   let next = record(
     {
       ...state,
@@ -235,6 +244,7 @@ function advanceTurn(state: SimulationState): SimulationState {
     },
     { kind: 'business-report', report: business.lastReport! },
   );
+  next = expireVendorException(next);
   // 2. Zakończenie prac: czas, priorytet (administrator przed badaniem), stabilny ID.
   const due = state.tasks
     .filter(

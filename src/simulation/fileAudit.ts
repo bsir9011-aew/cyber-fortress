@@ -1,3 +1,4 @@
+import { recordVendorOperation } from './vendorTelemetry';
 import type { SimulationState } from '../domain/simulation';
 import type {
   FileAccessEvent,
@@ -29,6 +30,15 @@ export function attemptFileAccess(
     targetAssetId,
     'SMB',
     currentMinute(state.clock),
+  );
+  state = recordVendorOperation(
+    state,
+    sessionId,
+    targetAssetId,
+    'SMB',
+    operation,
+    volume,
+    allowed,
   );
   const audit = state.telemetry.fileAudit;
   const session = state.access.sessions.find((s) => s.id === sessionId);
@@ -86,6 +96,7 @@ export function recordLegalFileActivity(
   if (!state.telemetry.fileAudit) return state;
   let next = state;
   for (const work of state.process.additionalWork ?? []) {
+    if (state.vendor && work.id === 'cargo-link-integration') continue;
     for (const service of work.services.filter((s) => s.protocol === 'SMB')) {
       const session = state.access.sessions.find(
         (s) =>

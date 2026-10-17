@@ -217,7 +217,7 @@ export function InfrastructureMap({
                 <AssetIcon kind={asset.kind} />
               </svg>
               <text className="node-name" x="49" y="27">
-                {asset.name}
+                {asset.id === 'carrier-api' ? 'CARGO-LINK Gateway' : asset.name}
               </text>
               <text className="node-kind" x="49" y="44">
                 {asset.id === 'workstations' && resilience?.coverage

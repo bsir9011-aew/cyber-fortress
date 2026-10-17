@@ -1,3 +1,4 @@
+import type { VendorState, VendorTaskAction } from './vendor';
 import type { AccessState, NetworkRule } from './access';
 import type { WorldState } from './world';
 import type {
@@ -83,6 +84,7 @@ export interface BusinessState {
 
 export type WorkerId = 'analyst' | 'administrator';
 export type TaskAction =
+  | VendorTaskAction
   | { readonly type: 'inspect-edr-telemetry' }
   | IntegrityTaskAction
   | { readonly type: 'inspect-vpn-sessions' }
@@ -182,6 +184,7 @@ export type SimulationEventData =
 export type SimulationEvent = EventBase & SimulationEventData;
 
 export interface SimulationState {
+  readonly vendor?: VendorState;
   readonly integrity?: IntegrityState;
   readonly run: RunIdentity;
   readonly world: WorldState;

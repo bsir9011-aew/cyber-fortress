@@ -114,6 +114,26 @@ export function canUseService(
 ): boolean {
   const session = access.sessions.find((item) => item.id === sessionId);
   if (!session || !isSessionActive(session, minute)) return false;
+  if (
+    !vendorExceptionAllows(
+      access,
+      session.accountId,
+      targetAssetId,
+      protocol,
+      minute,
+    )
+  )
+    return false;
+  if (
+    access.vendorAuthorization?.accountId === session.accountId &&
+    !networkAllows(world, access, {
+      sourceAssetId: 'cargo-link',
+      targetAssetId: access.vpnAssetId,
+      protocol: 'VPN',
+      accountId: session.accountId,
+    })
+  )
+    return false;
   if (!access.accounts.some((account) => account.id === session.accountId))
     return false;
   if (
@@ -180,6 +200,13 @@ export function issueVpnSession(
       connection.targetAssetId === access.identityAssetId,
   );
   if (
+    (access.vendorAuthorization?.accountId === account.id &&
+      !networkAllows(world, access, {
+        sourceAssetId: 'cargo-link',
+        targetAssetId: access.vpnAssetId,
+        protocol: 'VPN',
+        accountId: account.id,
+      })) ||
     !authPath ||
     !isAssetOnline(world, access.vpnAssetId) ||
     !isAssetOnline(world, access.identityAssetId)
@@ -210,4 +237,28 @@ export function issueVpnSession(
     session,
     access: { ...access, sessions: [...access.sessions, session] },
   };
+}
+
+/** Untimed legacy ACLs keep their meaning. A supplier always needs this explicit grant. */
+export function vendorExceptionAllows(
+  access: AccessState,
+  accountId: string,
+  targetAssetId: string,
+  protocol: string,
+  minute: number,
+): boolean {
+  const authorization = access.vendorAuthorization;
+  if (accountId !== 'cargo-link-operator') return true;
+  if (!authorization || authorization.accountId !== accountId) return false;
+  const e = authorization.exception;
+  return (
+    !!e &&
+    e.status === 'active' &&
+    e.validFromMinute <= minute &&
+    minute < e.expiresAtMinute &&
+    ((targetAssetId === 'carrier-api' && protocol === 'HTTPS') ||
+      (e.scope === 'api-and-files' &&
+        targetAssetId === 'fs-01' &&
+        protocol === 'SMB'))
+  );
 }

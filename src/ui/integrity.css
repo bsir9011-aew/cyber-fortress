@@ -258,3 +258,52 @@
     display: grid;
   }
 }
+
+.vendor-card {
+  margin: 22px 0;
+  padding: 22px;
+  border: 1px solid #385064;
+  border-radius: 6px;
+  background: #122333;
+  overflow-wrap: anywhere;
+}
+.vendor-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+}
+.vendor-fields label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+.vendor-fields select {
+  max-width: 100%;
+  padding: 10px;
+  background: #0b1926;
+  color: #e2eaf0;
+  border: 1px solid #5c7f8c;
+  border-radius: 4px;
+}
+.vendor-architecture {
+  margin: 16px 0;
+}
+.vendor-architecture .map-scroll {
+  max-height: 320px;
+}
+.vendor-architecture summary {
+  cursor: pointer;
+}
+.vendor-report details {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  .vendor-card {
+    padding: 18px;
+  }
+  .vendor-fields {
+    display: grid;
+  }
+}

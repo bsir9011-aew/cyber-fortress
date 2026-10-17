@@ -278,6 +278,44 @@ export class MissionTrace {
           );
       });
     }
+    for (const operation of s.vendor?.operations ?? [])
+      this.once(`vendor-operation:${operation.id}`, () =>
+        this.emit(
+          'vendor-operation',
+          s,
+          operation.origin === 'legitimate'
+            ? 'interval-settlement'
+            : 'actor-resolution',
+          operation.source,
+          operation.outcome,
+          operation,
+          {},
+          operation.minute,
+        ),
+      );
+    for (const change of s.vendor?.accessChanges ?? [])
+      this.once(`vendor-change:${change.kind}:${change.minute}`, () =>
+        this.emit(
+          'vendor-authorization-changed',
+          s,
+          'task-completion',
+          'vendor-authorization',
+          change.kind,
+          change,
+          { taskId: change.taskId },
+          change.minute,
+        ),
+      );
+    for (const observation of s.vendor?.observations ?? [])
+      this.addEvidence(
+        s,
+        `${observation.id}-vendor`,
+        'vendor-observation',
+        observation.source,
+        observation,
+        'observation',
+        observation.id,
+      );
     for (const a of s.incident.alerts)
       this.addEvidence(
         s,

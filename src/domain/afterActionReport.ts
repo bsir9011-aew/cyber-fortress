@@ -73,6 +73,7 @@ export interface KnownAtDecision {
     readonly sensors: AarData;
     readonly endpoint: AarData;
     readonly backupReadiness: AarData;
+    readonly vendorAuthorization?: AarData;
   };
   readonly business: BusinessState;
   readonly pendingTasks: readonly EmployeeTask[];
@@ -80,6 +81,7 @@ export interface KnownAtDecision {
   readonly unknowns: readonly string[];
 }
 export interface AarActualState {
+  readonly vendorAuthorization?: AarData;
   readonly threatAccess: ThreatAccessAssessment;
   readonly accounts: readonly Account[];
   readonly sessions: readonly (VpnSession & {
@@ -181,6 +183,7 @@ export interface AarCampaignContext {
   readonly work: readonly PreparationWork[];
   readonly investmentLedger: readonly BudgetOperation[];
   readonly posture: SecurityPosture;
+  readonly vendorApprovals?: readonly import('./vendor').VendorApproval[];
   readonly detectionChanges?: readonly import('./resilience').DetectionConfigurationWork[];
 }
 export interface FortressAfterActionReportV1 {
@@ -191,8 +194,8 @@ export interface FortressAfterActionReportV1 {
   readonly generatedAt: string;
   readonly gameVersion: {
     readonly application: '0.2.0';
-    readonly engine: '9.0.0' | '11.0.0';
-    readonly reportGenerator: '1.0.0' | '1.1.0';
+    readonly engine: '9.0.0' | '11.0.0' | '12.0.0';
+    readonly reportGenerator: '1.0.0' | '1.1.0' | '1.2.0';
   };
   readonly fieldGuide: Readonly<Record<string, string>>;
   readonly organization: {
@@ -202,8 +205,10 @@ export interface FortressAfterActionReportV1 {
   };
   readonly scenario: {
     readonly id: string;
-    readonly family: 'M01' | 'M02';
-    readonly variantFamilyId?: 'nexus-integrity-detection-v1';
+    readonly family: 'M01' | 'M02' | 'M03';
+    readonly variantFamilyId?:
+      | 'nexus-integrity-detection-v1'
+      | 'nexus-vendor-access-v1';
     readonly name: string;
     readonly kind: string;
     readonly mode: string;
@@ -220,6 +225,7 @@ export interface FortressAfterActionReportV1 {
     readonly continuityMet: boolean;
     readonly containmentMet: boolean | null;
     readonly integrityMet: boolean | null;
+    readonly vendorWorkMet?: boolean;
     readonly allObjectivesMet: boolean;
   };
   readonly timeline: readonly AarTimelineEntry[];
@@ -248,6 +254,7 @@ export interface FortressAfterActionReportV1 {
     readonly integrity: IntegrityMissionSummary | null;
     readonly investmentUse: AarData;
     readonly detectionReview?: AarData;
+    readonly vendorAccess?: AarData;
   };
   readonly businessConsequences: {
     readonly ordersReceived: number;

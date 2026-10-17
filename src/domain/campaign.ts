@@ -1,3 +1,4 @@
+import type { VendorApproval, VendorExpiry, VendorScope } from './vendor';
 import type { Account } from './access';
 import type { IntegrityMissionSummary } from './integrity';
 import type { AssetStatus } from './infrastructure';
@@ -72,6 +73,14 @@ export interface PreparationWork {
   readonly status: 'running' | 'completed' | 'paused';
 }
 export interface CampaignMissionReport {
+  readonly vendor?: {
+    readonly approvalId: string | null;
+    readonly approvedScope: VendorScope | null;
+    readonly expiresAtMinute: number | null;
+    readonly completedBatches: number;
+    readonly requiredBatches: number;
+    readonly exposedRecords: number;
+  };
   readonly integrity?: IntegrityMissionSummary;
   readonly number: number;
   readonly seed: number;
@@ -90,6 +99,7 @@ export interface CampaignMissionReport {
   readonly fullCapacity: number;
 }
 export interface CampaignState {
+  readonly vendorApprovals?: readonly VendorApproval[];
   readonly detectionChanges?: readonly DetectionConfigurationWork[];
   readonly funding?: CampaignFunding;
   readonly phase: 'preparation' | 'incident' | 'report';
@@ -115,6 +125,15 @@ export interface CampaignState {
   }[];
 }
 export type CampaignCommand =
+  | {
+      readonly type: 'prepare-vendor-exception';
+      readonly scope: VendorScope;
+      readonly expiresAtMinute: VendorExpiry;
+    }
+  | {
+      readonly type: 'start-vendor-incident';
+      readonly familyId: 'nexus-vendor-access-v1';
+    }
   | {
       readonly type: 'configure-endpoint-detection';
       readonly endpointId: 'pakowanie-03';

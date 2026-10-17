@@ -6,6 +6,15 @@ import type {
 
 export function actionLabel(action: TaskAction): string {
   switch (action.type) {
+    case 'inspect-vendor-operations':
+      return 'Sprawdź operacje CARGO-LINK';
+    case 'revoke-vendor-exception':
+      return 'Cofnij wyjątek dostawcy';
+    case 'narrow-vendor-exception':
+      return 'Ogranicz wyjątek do carrier-api / HTTPS';
+    case 'expand-vendor-exception':
+      return 'Rozszerz wyjątek o FS-01 / SMB';
+
     case 'inspect-documents':
       return 'Porównanie dokumentów z ERP';
     case 'inspect-backups':

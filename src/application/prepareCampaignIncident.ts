@@ -5,6 +5,8 @@ import type { AccessState, NetworkRule } from '../domain/access';
 import { selectScenario } from './scenarioSelectors';
 import { createScenario } from './createScenario';
 import { issueVpnSession } from '../simulation/access';
+import type { VendorApproval } from '../domain/vendor';
+import { selectVendorScenario } from '../content/scenarios/vendor';
 import { selectDetectionScenario } from '../content/scenarios/detection';
 import { integrityScenario } from '../content/scenarios/integrity';
 
@@ -301,6 +303,39 @@ export function createDetectionIncident(
           }
         : {}),
     }),
+    { mode: 'unknown', seed },
+  );
+}
+
+export function createVendorIncident(
+  seed: number,
+  posture: SecurityPosture,
+  familyId: string,
+  approval: VendorApproval | undefined,
+) {
+  const base = selectVendorScenario(familyId, seed);
+  return createScenario(
+    prepareCampaignDefinition(
+      {
+        ...base,
+        access: {
+          ...base.access,
+          vendorAuthorization: {
+            accountId: 'cargo-link-operator',
+            exception: approval
+              ? {
+                  approvalId: approval.id,
+                  scope: approval.scope,
+                  validFromMinute: base.clock.startMinute,
+                  expiresAtMinute: approval.expiresAtMinute,
+                  status: 'active',
+                }
+              : null,
+          },
+        },
+      },
+      posture,
+    ),
     { mode: 'unknown', seed },
   );
 }
