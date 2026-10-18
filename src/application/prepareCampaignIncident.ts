@@ -1,3 +1,4 @@
+import { selectFinaleScenario } from '../content/scenarios/finale';
 import type { SecurityPosture } from '../domain/campaign';
 import type { ScenarioDefinition } from '../domain/scenario';
 import type { AuthenticationEvent } from '../domain/telemetry';
@@ -364,6 +365,37 @@ export function createBranchIncident(
     prepareCampaignDefinition(
       selectBranchScenario(familyId, seed, architecture),
       posture,
+    ),
+    { mode: 'unknown', seed },
+  );
+}
+
+export function createFinaleIncident(
+  seed: number,
+  posture: SecurityPosture,
+  familyId: string,
+  architecture: BranchArchitecture,
+  approval?: VendorApproval,
+) {
+  const coverage = posture.endpointCoverage;
+  return createScenario(
+    prepareCampaignDefinition(
+      selectFinaleScenario(familyId, seed, architecture, approval),
+      {
+        ...posture,
+        ...(coverage
+          ? {
+              endpointCoverage: {
+                ...coverage,
+                detection: {
+                  ...coverage.detection,
+                  counting: 'unique-documents-v2',
+                  name: 'Unusual Document Modification Activity',
+                },
+              },
+            }
+          : {}),
+      },
     ),
     { mode: 'unknown', seed },
   );

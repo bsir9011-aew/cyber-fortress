@@ -19,6 +19,13 @@ export function OperationsPanel({
   view: PlayerView;
   onCommand: (command: SimulationCommand) => void;
 }) {
+  const [emergencyScope, setEmergencyScope] = useState<
+    'api-only' | 'api-and-files'
+  >('api-only');
+  const [emergencyExpiry, setEmergencyExpiry] = useState<870 | 900 | 930>(930);
+  const [justification, setJustification] = useState(
+    'Awaryjne przewozy w oknie kryzysowym M06.',
+  );
   const [ruleId, setRuleId] = useState('');
   const [sessionId, setSessionId] = useState('');
   const [accountId, setAccountId] = useState('');
@@ -134,17 +141,107 @@ export function OperationsPanel({
           Pobierz audyt FS-01 · 5 min
         </button>
       )}
-      {view.branch && (
-        <BranchOperations view={view.branch} onCommand={onCommand} />
-      )}
-      {view.recovery && (
-        <RecoveryOperations view={view.recovery} onCommand={onCommand} />
-      )}
-      {view.vendor && (
-        <VendorOperations view={view.vendor} onCommand={onCommand} />
-      )}
-      {view.integrity && (
-        <IntegrityOperations view={view.integrity} onCommand={onCommand} />
+      {view.branch &&
+        (view.finale ? (
+          <details className="finale-action-group">
+            <summary>EAST — łącza i zakres</summary>
+            <BranchOperations view={view.branch} onCommand={onCommand} />
+          </details>
+        ) : (
+          <BranchOperations view={view.branch} onCommand={onCommand} />
+        ))}
+      {view.recovery &&
+        (view.finale ? (
+          <details className="finale-action-group">
+            <summary>ERP — diagnoza i ciągłość</summary>
+            <RecoveryOperations view={view.recovery} onCommand={onCommand} />
+          </details>
+        ) : (
+          <RecoveryOperations view={view.recovery} onCommand={onCommand} />
+        ))}
+      {view.vendor &&
+        (view.finale ? (
+          <details className="finale-action-group">
+            <summary>CARGO-LINK — operacje i wyjątek</summary>
+            <VendorOperations view={view.vendor} onCommand={onCommand} />
+          </details>
+        ) : (
+          <VendorOperations view={view.vendor} onCommand={onCommand} />
+        ))}
+      {view.integrity &&
+        (view.finale ? (
+          <details className="finale-action-group">
+            <summary>FS-01 i pakowanie-03</summary>
+            <IntegrityOperations view={view.integrity} onCommand={onCommand} />
+          </details>
+        ) : (
+          <IntegrityOperations view={view.integrity} onCommand={onCommand} />
+        ))}
+      {view.finale && (
+        <details className="finale-action-group">
+          <summary>Awaryjne zatwierdzenie dostawcy · 10 min</summary>
+          <label>
+            Zakres
+            <select
+              value={emergencyScope}
+              onChange={(e) =>
+                setEmergencyScope(e.target.value as typeof emergencyScope)
+              }
+            >
+              <option value="api-only">Tylko HTTPS / API</option>
+              <option value="api-and-files">API i dokumenty SMB</option>
+            </select>
+          </label>
+          <label>
+            Termin
+            <select
+              value={emergencyExpiry}
+              onChange={(e) =>
+                setEmergencyExpiry(
+                  Number(e.target.value) as typeof emergencyExpiry,
+                )
+              }
+            >
+              <option value={870}>14:30</option>
+              <option value={900}>15:00</option>
+              <option value={930}>15:30</option>
+            </select>
+          </label>
+          <label>
+            Uzasadnienie
+            <input
+              value={justification}
+              maxLength={200}
+              onChange={(e) => setJustification(e.target.value)}
+            />
+          </label>
+          <button
+            disabled={
+              view.finished ||
+              justification.trim().length < 10 ||
+              !!view.finale.emergencyActions.find(
+                (a) =>
+                  a.scope === emergencyScope &&
+                  a.expiresAtMinute === emergencyExpiry,
+              )?.rejection
+            }
+            onClick={() =>
+              schedule({
+                type: 'approve-emergency-vendor-access',
+                scope: emergencyScope,
+                expiresAtMinute: emergencyExpiry,
+                justification,
+              })
+            }
+          >
+            Zatwierdź po ukończeniu zadania · 10 min
+          </button>
+          <p>
+            Wymaga wolnego administratora i braku aktywnego wyjątku. Nie omija
+            MFA, sesji, ACL ani uprawnień. Legalne logowanie nastąpi po
+            zatwierdzeniu.
+          </p>
+        </details>
       )}
       <details
         className="legacy-operations"

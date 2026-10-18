@@ -1,4 +1,10 @@
 import {
+  applyFinaleTask,
+  stepFinale,
+  rememberFinaleObservations,
+} from './finale';
+import { selectFinaleTimeline } from './finaleTimeline';
+import {
   applyVendorTask,
   recordLegalVendorActivity,
   expireVendorException,
@@ -65,6 +71,8 @@ function applyTaskEffect(
   task: EmployeeTask,
 ): SimulationState {
   const { action } = task;
+  if (action.type === 'approve-emergency-vendor-access')
+    return applyFinaleTask(state, task);
   if (isBranchAction(action))
     return task.workerId === 'administrator'
       ? applyBranchTask(state, task)
@@ -311,7 +319,7 @@ function advanceTurn(state: SimulationState): SimulationState {
   // 3. Wygaśnięcia oraz legalny zespół i przeciwnik po zmianach konfiguracji.
   next = resumeLegitimateWork(next);
   next = stepAttacker(next);
-  next = stepBranch(next);
+  next = stepBranch(stepFinale(next));
   next = trackRecoveryAvailability(updateTelemetry(next));
   // 4. Tylko ukończone badanie ujawnia dozwoloną obserwację.
   for (const task of due)
@@ -322,7 +330,7 @@ function advanceTurn(state: SimulationState): SimulationState {
       ),
       task,
     );
-  next = trackBranchAvailability(next);
+  next = rememberFinaleObservations(trackBranchAvailability(next));
   // 5. Ocena celu; brak nowych tur po terminie.
   if (isFinished(next.clock))
     next = record(next, {
@@ -347,6 +355,35 @@ export function applySimulationCommand(
       kind: 'command-rejected',
       reason: 'invalid-command',
     });
+  if (command.type === 'set-crisis-hypothesis' && state.finale) {
+    if (
+      ![
+        'operational-failure',
+        'security-incident',
+        'multiple-independent-events',
+        'insufficient-evidence',
+      ].includes(command.hypothesis)
+    )
+      return record(state, {
+        kind: 'command-rejected',
+        reason: 'invalid-command',
+      });
+    return {
+      ...state,
+      finale: {
+        ...state.finale,
+        hypothesis: command.hypothesis,
+        hypotheses: [
+          ...state.finale.hypotheses,
+          {
+            minute: currentMinute(state.clock),
+            hypothesis: command.hypothesis,
+            observationIds: selectFinaleTimeline(state).map((o) => o.id),
+          },
+        ],
+      },
+    };
+  }
   if (command.type === 'advance-turn') return advanceTurn(state);
   if (
     command.type === 'set-integrity-hypothesis' &&

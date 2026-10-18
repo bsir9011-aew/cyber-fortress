@@ -33,7 +33,8 @@
             "11.0.0",
             "12.0.0",
             "13.0.0",
-            "14.0.0"
+            "14.0.0",
+            "15.0.0"
           ]
         },
         "reportGenerator": {
@@ -42,7 +43,8 @@
             "1.1.0",
             "1.2.0",
             "1.3.0",
-            "1.4.0"
+            "1.4.0",
+            "1.5.0"
           ]
         }
       },
@@ -92,7 +94,8 @@
             "M02",
             "M03",
             "M04",
-            "M05"
+            "M05",
+            "M06"
           ]
         },
         "name": {
@@ -106,7 +109,8 @@
             "local-integrity",
             "third-party-access",
             "erp-recovery",
-            "branch-architecture"
+            "branch-architecture",
+            "campaign-finale"
           ]
         },
         "mode": {
@@ -135,7 +139,8 @@
             "nexus-integrity-detection-v1",
             "nexus-vendor-access-v1",
             "nexus-erp-recovery-v1",
-            "nexus-east-branch-v1"
+            "nexus-east-branch-v1",
+            "nexus-campaign-finale-v1"
           ]
         }
       },
@@ -589,6 +594,9 @@
           "$ref": "#/$defs/data"
         },
         "branchAccess": {
+          "$ref": "#/$defs/data"
+        },
+        "campaignFinale": {
           "$ref": "#/$defs/data"
         }
       },
@@ -1149,6 +1157,9 @@
         },
         "branchAccess": {
           "$ref": "#/$defs/data"
+        },
+        "campaignFinale": {
+          "$ref": "#/$defs/data"
         }
       },
       "required": [
@@ -1295,6 +1306,9 @@
                   "type": "null"
                 }
               ]
+            },
+            "crisis": {
+              "type": "string"
             }
           },
           "required": [
@@ -1412,6 +1426,9 @@
               "$ref": "#/$defs/data"
             },
             "branchAccess": {
+              "$ref": "#/$defs/data"
+            },
+            "campaignFinale": {
               "$ref": "#/$defs/data"
             }
           },
@@ -1817,7 +1834,7 @@
           "type": "null"
         },
         "intentRecorded": {
-          "const": false
+          "type": "boolean"
         },
         "actualEffect": {
           "anyOf": [

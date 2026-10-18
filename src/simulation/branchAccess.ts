@@ -1,3 +1,4 @@
+import { assessErpAvailability } from './recoveryAccess';
 import type { BranchAccessChecks, BranchRoute } from '../domain/branch';
 import type { SimulationState } from '../domain/simulation';
 import { isAssetOnline, networkAllows, selectNetworkRule } from './access';
@@ -7,15 +8,17 @@ export const branchContextDefinitions = [
 ] as const;
 function routeLegs(route: BranchRoute, target: string, protocol: string) {
   if (route === 'backup')
-    return target === 'erp' && protocol === 'HTTPS'
+    return (target === 'erp' || target === 'erp-standby') &&
+      protocol === 'HTTPS'
       ? [
           ['east-workstations', 'east-backup-gateway', 'HTTPS'],
-          ['east-backup-gateway', 'erp', 'HTTPS'],
+          ['east-backup-gateway', target, 'HTTPS'],
         ]
       : [];
   if (
     !(
-      (target === 'erp' && protocol === 'HTTPS') ||
+      ((target === 'erp' || target === 'erp-standby') &&
+        protocol === 'HTTPS') ||
       (target === 'fs-01' && protocol === 'SMB')
     )
   )
@@ -123,6 +126,46 @@ export function assessBranchAccess(
 export function branchWorkAvailability(s: SimulationState) {
   const b = s.branch!,
     d = s.hidden.scenario.branch!;
+  if (s.finale && s.recovery && s.integrity) {
+    const a = assessErpAvailability(s),
+      functional =
+        a.host &&
+        a.processRunning &&
+        a.database &&
+        a.storage &&
+        a.databasePath &&
+        a.consistent;
+    const erp = assessBranchAccess(s, 'EAST-OP', a.target, 'HTTPS').allowed,
+      documentErp = assessBranchAccess(
+        s,
+        'EAST-DOC',
+        a.target,
+        'HTTPS',
+      ).allowed,
+      documents = assessBranchAccess(s, 'EAST-DOC', 'fs-01', 'SMB').allowed;
+    const ratio =
+        s.integrity.documents.filter((d) => d.status === 'correct').length /
+        s.integrity.documents.length,
+      coverage =
+        (s.hidden.scenario.recovery!.records.length -
+          a.missingRecordIds.length) /
+        s.hidden.scenario.recovery!.records.length;
+    const capacity = functional
+      ? Math.min(
+          (erp ? 1 : 0) +
+            (documentErp && documents ? Math.floor(2 * ratio) : 0),
+          Math.floor(3 * coverage),
+        )
+      : 0;
+    return {
+      capacity,
+      erp,
+      documentErp,
+      documents,
+      requiresDocuments: true,
+      ready: capacity === 3,
+    };
+  }
   const erp = assessBranchAccess(s, 'EAST-OP', 'erp', 'HTTPS').allowed;
   const documentErp = assessBranchAccess(s, 'EAST-DOC', 'erp', 'HTTPS').allowed;
   const documents = assessBranchAccess(s, 'EAST-DOC', 'fs-01', 'SMB').allowed;

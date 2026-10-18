@@ -33,6 +33,7 @@ export function selectRecoveryView(state: SimulationState) {
       turns: recoveryTaskTurns(state, action) ?? taskSpecs[action.type].turns,
       rejection: taskRejection(state, taskSpecs[action.type].workerId, action),
     })),
+    ...(state.finale ? { finale: true } : {}),
     activeInstance: r.activeInstance,
     manualActive: r.manualActive,
     observations: r.observations,

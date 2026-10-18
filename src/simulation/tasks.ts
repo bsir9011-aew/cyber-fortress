@@ -1,3 +1,4 @@
+import { emergencyVendorRejection } from './finale';
 import { branchTaskSpecs, isBranchAction, branchTaskRejection } from './branch';
 import type {
   CommandRejection,
@@ -70,6 +71,7 @@ export const taskSpecs: Record<
   TaskAction['type'],
   { readonly workerId: WorkerId; readonly turns: number }
 > = {
+  'approve-emergency-vendor-access': { workerId: 'administrator', turns: 2 },
   ...branchTaskSpecs,
   ...recoveryTaskSpecs,
   'inspect-vendor-operations': { workerId: 'analyst', turns: 1 },
@@ -125,6 +127,26 @@ export function taskRejection(
     state.clock.turnLimit
   )
     return 'outside-time-window';
+  if (state.finale) {
+    const erpChanges = [
+      'restore-erp-backup',
+      'switch-erp-standby',
+      'restart-erp-service',
+    ];
+    if (
+      state.tasks.some(
+        (t) =>
+          t.status === 'running' &&
+          ((erpChanges.includes(action.type) &&
+            t.action.type === 'reconcile-documents') ||
+            (action.type === 'reconcile-documents' &&
+              erpChanges.includes(t.action.type))),
+      )
+    )
+      return 'invalid-state';
+  }
+  if (action.type === 'approve-emergency-vendor-access')
+    return emergencyVendorRejection(state, action);
   if (isBranchAction(action)) return branchTaskRejection(state, action);
   if (isRecoveryAction(action)) return recoveryTaskRejection(state, action);
   if (isIntegrityAction(action)) return integrityTaskRejection(state, action);

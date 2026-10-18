@@ -1,3 +1,4 @@
+import { selectFinaleReport } from './selectFinaleReport';
 import { selectBranchReport } from './selectBranchReport';
 import { selectRecoveryReport } from './selectRecoveryReport';
 import { selectVendorReport } from './selectVendorReport';
@@ -17,6 +18,7 @@ export function selectMissionReport(state: SimulationState) {
     attacker?.status === 'blocked' &&
     attacker.consecutiveFailures >= attacker.definition.maxConsecutiveFailures;
   return {
+    ...(state.finale ? { finale: selectFinaleReport(state) } : {}),
     ...(state.branch ? { branch: selectBranchReport(state) } : {}),
     ...(state.recovery ? { recovery: selectRecoveryReport(state) } : {}),
     ...(state.vendor ? { vendor: selectVendorReport(state) } : {}),
@@ -30,12 +32,16 @@ export function selectMissionReport(state: SimulationState) {
       seed: state.run.seed,
     },
     confidentiality: {
-      exposedRecords:
-        branch?.exposedRecords ?? attacker?.transfer.exposedRecords ?? 0,
+      exposedRecords: state.finale
+        ? (attacker?.transfer.exposedRecords ?? 0)
+        : (branch?.exposedRecords ?? attacker?.transfer.exposedRecords ?? 0),
       recordLimit: state.hidden.scenario.goals.recordPool,
       goalMet:
-        (branch?.exposedRecords ?? attacker?.transfer.exposedRecords ?? 0) <=
-        state.hidden.scenario.goals.maxExposedRecords,
+        (state.finale
+          ? (attacker?.transfer.exposedRecords ?? 0)
+          : (branch?.exposedRecords ??
+            attacker?.transfer.exposedRecords ??
+            0)) <= state.hidden.scenario.goals.maxExposedRecords,
       attackerStatus: attacker?.status ?? null,
       events: (attacker?.privateHistory ?? []).map((event) => ({
         minute: event.minute,

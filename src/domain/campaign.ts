@@ -78,6 +78,7 @@ export interface PreparationWork {
   readonly status: 'running' | 'completed' | 'paused';
 }
 export interface CampaignMissionReport {
+  readonly finale?: { readonly outcome: string; readonly goalMet: boolean };
   readonly branch?: {
     readonly ready: boolean;
     readonly exposedRecords: number;
@@ -116,6 +117,7 @@ export interface CampaignMissionReport {
   readonly fullCapacity: number;
 }
 export interface CampaignState {
+  readonly chapterOneCompleted?: boolean;
   readonly branchArchitecture?: BranchArchitecture;
   readonly branchWork?: readonly BranchPreparationWork[];
   readonly vendorApprovals?: readonly VendorApproval[];
@@ -144,6 +146,10 @@ export interface CampaignState {
   }[];
 }
 export type CampaignCommand =
+  | {
+      readonly type: 'start-finale-incident';
+      readonly familyId: 'nexus-campaign-finale-v1';
+    }
   | {
       readonly type: 'start-branch-incident';
       readonly familyId: 'nexus-east-branch-v1';

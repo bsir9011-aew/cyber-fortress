@@ -26,6 +26,8 @@ export function actionLabel(action: TaskAction): string {
       ('backupId' in action ? ` · ${action.backupId}` : '')
     );
   switch (action.type) {
+    case 'approve-emergency-vendor-access':
+      return 'Awaryjnie zatwierdź CARGO-LINK';
     case 'inspect-vendor-operations':
       return 'Sprawdź operacje CARGO-LINK';
     case 'revoke-vendor-exception':

@@ -120,8 +120,12 @@ export function RecoveryOperations({
       </div>
       <p className="source-note">
         Efekt po zakończeniu. Niezweryfikowana kopia może zawierać błędy.
-        Starsza może utracić późniejsze zapisy. Tryb ręczny zastępuje ERP i
-        wymaga zamknięcia oraz uzgodnienia. Jedna osoba wykonuje jedno zadanie.
+        Starsza może utracić późniejsze zapisy.{' '}
+        {v.finale
+          ? 'Tryb ręczny zastępuje tylko lokalną część pracy ERP (do 8/turę)'
+          : 'Tryb ręczny zastępuje ERP'}{' '}
+        i wymaga zamknięcia oraz uzgodnienia. Jedna osoba wykonuje jedno
+        zadanie.
       </p>
     </section>
   );

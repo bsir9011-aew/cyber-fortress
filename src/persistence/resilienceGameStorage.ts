@@ -1,3 +1,4 @@
+import { CURRENT_GAME_SAVE_KEY as V8_KEY } from './gameSaveV8';
 import { CURRENT_GAME_SAVE_KEY as V7_KEY } from './gameSaveV7';
 import { CURRENT_GAME_SAVE_KEY as V6_KEY } from './gameSaveV6';
 import { CURRENT_GAME_SAVE_KEY as V5_KEY } from './gameSaveV5';
@@ -12,7 +13,7 @@ import {
   CURRENT_GAME_SAVE_KEY,
   readCurrentGameSave,
   serializeCurrentGameSave,
-} from './gameSaveV8';
+} from './gameSaveV9';
 import type { Result } from './saveFormat';
 /** Original bytes stay exportable even when replay validation rejects them. */
 export function loadCurrentGameState(storage: StorageAdapter) {
@@ -22,6 +23,7 @@ export function loadCurrentGameState(storage: StorageAdapter) {
   let fourthRaw: string | null = null;
   let fifthRaw: string | null = null;
   let sixthRaw: string | null = null;
+  let eighthRaw: string | null = null;
   let seventhRaw: string | null = null;
   let result: Result<GameSession | null>;
   try {
@@ -31,10 +33,12 @@ export function loadCurrentGameState(storage: StorageAdapter) {
     fourthRaw = storage.getItem(V4_KEY);
     fifthRaw = storage.getItem(V5_KEY);
     sixthRaw = storage.getItem(V6_KEY);
+    eighthRaw = storage.getItem(V8_KEY);
     seventhRaw = storage.getItem(V7_KEY);
     const current = storage.getItem(CURRENT_GAME_SAVE_KEY);
     const text =
       current ??
+      eighthRaw ??
       seventhRaw ??
       sixthRaw ??
       fifthRaw ??
@@ -64,6 +68,7 @@ export function loadCurrentGameState(storage: StorageAdapter) {
     fifthRaw,
     sixthRaw,
     seventhRaw,
+    eighthRaw,
   };
 }
 export function storeCurrentGameState(

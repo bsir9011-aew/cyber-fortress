@@ -9,7 +9,7 @@ import pendingV4 from '../persistence/fixtures/sprint9-restore-pending-v4.json?r
 import {
   readCurrentGameSave,
   createCurrentGameSave,
-} from '../persistence/gameSaveV8';
+} from '../persistence/gameSaveV9';
 import { createAfterActionReport } from './createAfterActionReport';
 import { currentOperation, applyCampaignSession } from './gameSession';
 import { applyOperationCommand } from './operationSession';

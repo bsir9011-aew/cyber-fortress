@@ -24,7 +24,18 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
       </div>
       <details className="business-dependencies">
         <summary>Od czego zależy wydajność firmy?</summary>
-        {view.branch && (
+        {view.finale && (
+          <p>
+            Centrala 8 (w tym dokumenty i 2 z pakowanie-03), zdalni 8 przez VPN,
+            EAST 3 (1 ERP i 2 z dokumentami), CARGO-LINK 3 przez sesję i API.
+            Każdy składnik wymaga rzeczywiście działającego ERP z poprawną bazą
+            i dostępnej drogi. Starsze dane ograniczają wydajność. Tryb ręczny
+            zastępuje do 8 lokalnych zleceń z przygotowanych manifestów, nigdy
+            nie dodaje do 22. Wysyłki są rejestrowane raz i wymagają
+            uzgodnienia.
+          </p>
+        )}
+        {view.branch && !view.finale && (
           <p>
             NEXUS EAST wnosi do 6/turę: site-to-site lub przygotowany backup
             HTTPS (do 3). Wymagana praca dokumentowa potrzebuje także SMB i
@@ -32,7 +43,7 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
             firmie nadal najwyżej 22/turę.
           </p>
         )}
-        {view.recovery && (
+        {view.recovery && !view.finale && (
           <p>
             ERP wymaga sprawnego hosta, procesu, bazy, storage, poprawnych
             danych i drogi użytkownika. Brakujące zapisy ograniczają wydajność
@@ -42,7 +53,7 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
             wymagają uzgodnienia potwierdzeń.
           </p>
         )}
-        {view.integrity && (
+        {view.integrity && !view.finale && (
           <p>
             W tej misji 14 zamówień wydajności zdalnej zależy także od
             dostępnego FS-01 i udziału poprawnych dokumentów: floor(14 ×

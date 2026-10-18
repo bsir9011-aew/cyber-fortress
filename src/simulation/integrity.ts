@@ -1,3 +1,4 @@
+import { assessErpAvailability } from './recoveryAccess';
 import type {
   IntegrityDefinition,
   IntegrityState,
@@ -371,6 +372,12 @@ export function integrityTaskTurns(
     return state.hidden.scenario.integrity?.reconcileTurns;
   return undefined;
 }
+/** In the finale FS comparison/reconstruction queries the real, complete active ERP through the local analyst path. */
+function erpDocumentSourceAvailable(state: SimulationState) {
+  if (!state.finale) return true;
+  const a = assessErpAvailability(state);
+  return a.localAvailable && a.missingRecordIds.length === 0;
+}
 export function integrityTaskRejection(
   state: SimulationState,
   action: IntegrityTaskAction,
@@ -378,6 +385,12 @@ export function integrityTaskRejection(
   const i = state.integrity;
   const d = state.hidden.scenario.integrity;
   if (!i || !d) return 'unknown-target';
+  if (
+    state.finale &&
+    ['inspect-documents', 'reconcile-documents'].includes(action.type) &&
+    !erpDocumentSourceAvailable(state)
+  )
+    return 'source-unavailable';
   if ('endpointId' in action) {
     if (action.endpointId !== i.endpoint.id) return 'unknown-target';
     if (action.type === 'isolate-endpoint' && i.endpoint.isolated)
@@ -417,7 +430,7 @@ export function integrityTaskRejection(
       action.type,
     ) &&
     (!isAssetOnline(state.world, d.datasetAssetId) ||
-      !isAssetOnline(state.world, state.process.erpAssetId))
+      (!state.finale && !isAssetOnline(state.world, state.process.erpAssetId)))
   )
     return 'source-unavailable';
   if (
@@ -450,6 +463,12 @@ export function applyIntegrityTask(
   const d = state.hidden.scenario.integrity;
   if (!i || !d) return state;
   const action = task.action;
+  if (
+    state.finale &&
+    action.type === 'reconcile-documents' &&
+    !erpDocumentSourceAvailable(state)
+  )
+    return state;
   if (
     action.type === 'isolate-endpoint' ||
     action.type === 'restrict-endpoint-writes' ||
@@ -513,7 +532,8 @@ export function applyIntegrityTask(
   }
   if (action.type === 'reconcile-documents') {
     if (
-      !isAssetOnline(state.world, state.process.erpAssetId) ||
+      (!state.finale &&
+        !isAssetOnline(state.world, state.process.erpAssetId)) ||
       !isAssetOnline(state.world, d.datasetAssetId)
     )
       return state;
@@ -559,8 +579,9 @@ export function observeIntegrityTask(
   let next = i;
   if (
     action.type === 'inspect-documents' &&
+    erpDocumentSourceAvailable(state) &&
     isAssetOnline(state.world, d.datasetAssetId) &&
-    isAssetOnline(state.world, state.process.erpAssetId)
+    (state.finale || isAssetOnline(state.world, state.process.erpAssetId))
   ) {
     const counts = documentCounts(i.documents);
     next = {

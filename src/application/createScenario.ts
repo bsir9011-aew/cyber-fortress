@@ -1,3 +1,4 @@
+import { initializeFinale } from '../simulation/finale';
 import { initializeBranch } from '../simulation/branch';
 import { initializeRecovery } from '../simulation/recovery';
 import { initializeVendor } from '../simulation/vendor';
@@ -274,7 +275,9 @@ export function validateScenario(
   );
   check(
     goals.requireThreatContainment ===
-      (definition.attacker !== null || definition.integrity !== undefined),
+      (definition.attacker !== null ||
+        (definition.integrity !== undefined &&
+          (!definition.finale || definition.integrity.attack.compromised))),
     'Containment goal disagrees with threat presence',
   );
   if (definition.attacker) {
@@ -311,8 +314,26 @@ export function validateScenario(
     }
   }
   check(
-    definition.integrity
-      ? definition.kind === 'local-integrity' &&
+    definition.finale
+      ? definition.kind === 'campaign-finale' &&
+          definition.familyId === 'nexus-campaign-finale-v1' &&
+          definition.finale.familyId === definition.familyId &&
+          ['crossfire', 'false-lead', 'cascade'].includes(
+            definition.finale.variant,
+          ) &&
+          Boolean(
+            definition.integrity &&
+              validateIntegrityDefinition(definition.integrity) &&
+              definition.recovery &&
+              definition.vendor &&
+              definition.branch,
+          ) &&
+          process.localCapacity === 8 &&
+          process.remoteCapacity === 8 &&
+          (process.additionalWork ?? []).reduce((n, w) => n + w.capacity, 0) ===
+            6
+      : definition.integrity
+        ? definition.kind === 'local-integrity' &&
           definition.attacker === null &&
           validateIntegrityDefinition(definition.integrity) &&
           Boolean(asset(definition.integrity.endpoint.assetId)) &&
@@ -324,60 +345,60 @@ export function validateScenario(
           ) &&
           definition.integrity.endpoint.businessCapacity <=
             process.localCapacity
-      : definition.vendor
-        ? definition.kind === 'third-party-access' &&
-          definition.vendor.familyId === 'nexus-vendor-access-v1' &&
-          access.vendorAuthorization?.accountId === 'cargo-link-operator' &&
-          [6, 12].includes(definition.vendor.requiredBatches) &&
-          Boolean(account('cargo-link-operator')) &&
-          service('carrier-api', 'HTTPS')
-        : definition.branch
-          ? definition.kind === 'branch-architecture' &&
-            definition.attacker === null &&
-            definition.familyId === 'nexus-east-branch-v1' &&
-            definition.branch.familyId === definition.familyId &&
-            [
-              'east-workstations',
-              'east-gateway',
-              'east-primary-link',
-              'east-backup-gateway',
-            ].every((id) => Boolean(asset(id))) &&
-            definition.branch.documentAccountIds.every((id) =>
-              Boolean(account(id)),
-            )
-          : definition.recovery
-            ? definition.kind === 'erp-recovery' &&
+        : definition.vendor
+          ? definition.kind === 'third-party-access' &&
+            definition.vendor.familyId === 'nexus-vendor-access-v1' &&
+            access.vendorAuthorization?.accountId === 'cargo-link-operator' &&
+            [6, 12].includes(definition.vendor.requiredBatches) &&
+            Boolean(account('cargo-link-operator')) &&
+            service('carrier-api', 'HTTPS')
+          : definition.branch
+            ? definition.kind === 'branch-architecture' &&
               definition.attacker === null &&
-              definition.familyId === 'nexus-erp-recovery-v1' &&
-              definition.recovery.familyId === definition.familyId &&
-              definition.recovery.records.length === 24 &&
-              definition.recovery.records.every(
-                (r) => integer(r.minute) && r.minute < clock.startMinute,
-              ) &&
-              new Set(definition.recovery.records.map((r) => r.id)).size ===
-                24 &&
-              definition.recovery.backups.every(
-                (b) =>
-                  b.recordIds.every((id) =>
-                    definition.recovery!.records.some((r) => r.id === id),
-                  ) &&
-                  integer(b.restoreTurns, 1) &&
-                  Boolean(asset(b.repositoryAssetId)) &&
-                  Boolean(asset(b.storageAssetId)),
-              ) &&
+              definition.familyId === 'nexus-east-branch-v1' &&
+              definition.branch.familyId === definition.familyId &&
               [
-                'erp-db',
-                'erp-storage',
-                'erp-backups',
-                'erp-standby',
-                'standby-storage',
-              ].every((id) => Boolean(asset(id)))
-            : definition.kind === 'legitimate-session'
-              ? definition.attacker === null &&
-                Object.values(definition.initialSessionOrigins).every(
-                  (origin) => origin === 'legitimate',
-                )
-              : definition.attacker !== null,
+                'east-workstations',
+                'east-gateway',
+                'east-primary-link',
+                'east-backup-gateway',
+              ].every((id) => Boolean(asset(id))) &&
+              definition.branch.documentAccountIds.every((id) =>
+                Boolean(account(id)),
+              )
+            : definition.recovery
+              ? definition.kind === 'erp-recovery' &&
+                definition.attacker === null &&
+                definition.familyId === 'nexus-erp-recovery-v1' &&
+                definition.recovery.familyId === definition.familyId &&
+                definition.recovery.records.length === 24 &&
+                definition.recovery.records.every(
+                  (r) => integer(r.minute) && r.minute < clock.startMinute,
+                ) &&
+                new Set(definition.recovery.records.map((r) => r.id)).size ===
+                  24 &&
+                definition.recovery.backups.every(
+                  (b) =>
+                    b.recordIds.every((id) =>
+                      definition.recovery!.records.some((r) => r.id === id),
+                    ) &&
+                    integer(b.restoreTurns, 1) &&
+                    Boolean(asset(b.repositoryAssetId)) &&
+                    Boolean(asset(b.storageAssetId)),
+                ) &&
+                [
+                  'erp-db',
+                  'erp-storage',
+                  'erp-backups',
+                  'erp-standby',
+                  'standby-storage',
+                ].every((id) => Boolean(asset(id)))
+              : definition.kind === 'legitimate-session'
+                ? definition.attacker === null &&
+                  Object.values(definition.initialSessionOrigins).every(
+                    (origin) => origin === 'legitimate',
+                  )
+                : definition.attacker !== null,
     'Scenario truth disagrees with actors',
   );
   return errors;
@@ -479,8 +500,10 @@ export function createScenario(
       };
   }
   return updateTelemetry(
-    initializeBranch(
-      initializeRecovery(initializeVendor(initializeIntegrity(state))),
+    initializeFinale(
+      initializeBranch(
+        initializeRecovery(initializeVendor(initializeIntegrity(state))),
+      ),
     ),
   );
 }

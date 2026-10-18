@@ -18,7 +18,7 @@ import { validateGameSession, MAX_GAME_BYTES } from '../persistence/gameSave';
 import {
   isCurrentCampaignCommand,
   isCurrentRecordedCommand,
-} from '../persistence/gameSaveV8';
+} from '../persistence/gameSaveV9';
 import { sameJson, timestamp } from '../persistence/saveFormat';
 import { MissionTrace } from './aar/missionTrace';
 import { actualState, facts, timeAt } from './aar/facts';
@@ -211,6 +211,7 @@ export function createAfterActionReport(
     const integrity = report.integrity;
     const recovery = report.recovery;
     const branch = report.branch;
+    const finale = report.finale;
     const detectionEngineering =
       s.telemetry.endpoint?.coverage.detection.counting ===
         'unique-documents-v2' ||
@@ -227,24 +228,28 @@ export function createAfterActionReport(
       generatedAt,
       gameVersion: {
         application: '0.2.0',
-        engine: branch
-          ? '14.0.0'
-          : recovery
-            ? '13.0.0'
-            : s.vendor
-              ? '12.0.0'
-              : detectionEngineering
-                ? '11.0.0'
-                : '9.0.0',
-        reportGenerator: branch
-          ? '1.4.0'
-          : recovery
-            ? '1.3.0'
-            : s.vendor
-              ? '1.2.0'
-              : detectionEngineering
-                ? '1.1.0'
-                : '1.0.0',
+        engine: finale
+          ? '15.0.0'
+          : branch
+            ? '14.0.0'
+            : recovery
+              ? '13.0.0'
+              : s.vendor
+                ? '12.0.0'
+                : detectionEngineering
+                  ? '11.0.0'
+                  : '9.0.0',
+        reportGenerator: finale
+          ? '1.5.0'
+          : branch
+            ? '1.4.0'
+            : recovery
+              ? '1.3.0'
+              : s.vendor
+                ? '1.2.0'
+                : detectionEngineering
+                  ? '1.1.0'
+                  : '1.0.0',
       },
       fieldGuide: {
         format:
@@ -264,8 +269,9 @@ export function createAfterActionReport(
           'immediateAccessImpact pochodzi z istniejącego śladu before/after efektu zadania. boundaryState obejmuje CAŁĄ granicę zakończenia, również inne zadania i działania aktorów. Nie przypisuj całej zmiany jednej decyzji.',
         subsequentConsequences:
           'Zakres osi czasu po wydaniu decyzji, obejmujący także inne przyczyny. To sekwencja zdarzeń, nie eksperyment kontrfaktyczny ani automatyczne przypisanie przyczynowości.',
-        intent:
-          'expectedEffect=null i intentRecorded=false: gra nie rejestrowała uzasadnienia. Hipotezy są deklaracjami gracza. Nie da się ustalić zamierzonych i niezamierzonych skutków z samego wyniku.',
+        intent: finale
+          ? 'expectedEffect=null: silnik nie zakłada zamierzonego skutku. Uzasadnienie awaryjnego dostępu znajduje się w action.justification; tylko ta decyzja ma intentRecorded=true. Hipotezy są niezweryfikowanymi deklaracjami gracza.'
+          : 'expectedEffect=null i intentRecorded=false: gra nie rejestrowała uzasadnienia. Hipotezy są deklaracjami gracza. Nie da się ustalić zamierzonych i niezamierzonych skutków z samego wyniku.',
         telemetry:
           'sensor-record-eligible to zarejestrowany czas gotowości rekordu, nie wiedza gracza. evidence-obtained oznacza ukończone badanie lub informację udostępnioną w UI. Obowiązuje dostępność źródła.',
         objectives:
@@ -277,15 +283,17 @@ export function createAfterActionReport(
         ...(s.hidden.scenario.familyId
           ? { variantFamilyId: s.hidden.scenario.familyId }
           : {}),
-        family: branch
-          ? 'M05'
-          : recovery
-            ? 'M04'
-            : s.vendor
-              ? 'M03'
-              : integrity
-                ? 'M02'
-                : 'M01',
+        family: finale
+          ? 'M06'
+          : branch
+            ? 'M05'
+            : recovery
+              ? 'M04'
+              : s.vendor
+                ? 'M03'
+                : integrity
+                  ? 'M02'
+                  : 'M01',
         name: report.scenario.name,
         kind: report.scenario.kind,
         mode: s.run.mode,
@@ -297,87 +305,114 @@ export function createAfterActionReport(
         turnLimit: s.clock.turnLimit,
       },
       campaignContext: context,
-      missionObjectives: facts({
-        ...(branch
+      missionObjectives: facts(
+        finale
           ? {
-              branchFullCapacity: 6,
-              requireBranchReadiness: true,
-              maxUnauthorizedBranchRecords: 0,
-            }
-          : {}),
-        ...(recovery
-          ? {
-              rtoTargetMinutes: s.hidden.scenario.recovery!.rtoMinutes,
-              rpoTargetMinutes: s.hidden.scenario.recovery!.rpoMinutes,
-              verifiedRecoveryRequired: true,
-              manualReconciliationRequired: true,
-            }
-          : {}),
-        maxExposedRecords:
-          recovery || integrity
-            ? null
-            : s.hidden.scenario.goals.maxExposedRecords,
-        maxFinalBacklog: s.process.maxFinalBacklog,
-        ...(s.vendor
-          ? { requiredVendorBatches: s.hidden.scenario.vendor!.requiredBatches }
-          : {}),
-        requireThreatContainment:
-          !recovery &&
-          !integrity &&
-          s.hidden.scenario.goals.requireThreatContainment,
-        ...(integrity
-          ? {
+              maxExposedRecords: 0,
+              maxFinalBacklog: 40,
+              requireThreatContainment:
+                s.hidden.scenario.goals.requireThreatContainment,
               correctDocuments: 100,
-              verifiedRecoveryRequired: true,
-              sourceWriteRestrictedRequired: true,
+              maxCapacity: 22,
+              manualReconciliationRequired: true,
+              requireUsefulProcesses: true,
             }
-          : {}),
-      }),
-      finalOutcome: {
-        ...(branch ? { branchWorkMet: branch.ready } : {}),
-        ...(recovery
-          ? {
-              serviceRecoveryMet: recovery.useful,
-              operationalConfidenceMet: recovery.operationalConfidence.verified,
-              manualClosedMet: !recovery.businessContinuity.manualActive,
-            }
-          : {}),
-        ...(report.vendor
-          ? {
-              vendorWorkMet:
-                report.vendor.summary.completedBatches ===
-                report.vendor.summary.requiredBatches,
-            }
-          : {}),
-        confidentialityMet:
-          recovery || integrity ? null : report.confidentiality.goalMet,
-        continuityMet: report.continuity.goalMet,
-        containmentMet: branch
-          ? branch.kind === 'compromised-context'
-            ? !branch.remainingAccess
-            : null
-          : integrity
-            ? !integrity.summary.sourceHasWrite
-            : report.containment.goalMet,
-        integrityMet: recovery
-          ? recovery.dataRecovery.met
-          : integrity
-            ? integrity.summary.correct === integrity.summary.total &&
-              integrity.summary.verified &&
-              integrity.summary.dataAvailable
-            : null,
-        allObjectivesMet: branch
-          ? branch.goalMet
-          : recovery
-            ? recovery.goalMet
-            : report.vendor
-              ? report.vendor.goalMet
+          : {
+              ...(branch
+                ? {
+                    branchFullCapacity: 6,
+                    requireBranchReadiness: true,
+                    maxUnauthorizedBranchRecords: 0,
+                  }
+                : {}),
+              ...(recovery
+                ? {
+                    rtoTargetMinutes: s.hidden.scenario.recovery!.rtoMinutes,
+                    rpoTargetMinutes: s.hidden.scenario.recovery!.rpoMinutes,
+                    verifiedRecoveryRequired: true,
+                    manualReconciliationRequired: true,
+                  }
+                : {}),
+              maxExposedRecords:
+                recovery || integrity
+                  ? null
+                  : s.hidden.scenario.goals.maxExposedRecords,
+              maxFinalBacklog: s.process.maxFinalBacklog,
+              ...(s.vendor
+                ? {
+                    requiredVendorBatches:
+                      s.hidden.scenario.vendor!.requiredBatches,
+                  }
+                : {}),
+              requireThreatContainment:
+                !recovery &&
+                !integrity &&
+                s.hidden.scenario.goals.requireThreatContainment,
+              ...(integrity
+                ? {
+                    correctDocuments: 100,
+                    verifiedRecoveryRequired: true,
+                    sourceWriteRestrictedRequired: true,
+                  }
+                : {}),
+            },
+      ),
+      finalOutcome: finale
+        ? {
+            confidentialityMet: finale.confidentialityMet,
+            continuityMet: finale.continuityMet,
+            containmentMet: finale.containmentMet,
+            integrityMet: finale.integrityMet,
+            serviceRecoveryMet: finale.servicesMet,
+            manualClosedMet: finale.reconciliationMet,
+            allObjectivesMet: finale.goalMet,
+          }
+        : {
+            ...(branch ? { branchWorkMet: branch.ready } : {}),
+            ...(recovery
+              ? {
+                  serviceRecoveryMet: recovery.useful,
+                  operationalConfidenceMet:
+                    recovery.operationalConfidence.verified,
+                  manualClosedMet: !recovery.businessContinuity.manualActive,
+                }
+              : {}),
+            ...(report.vendor
+              ? {
+                  vendorWorkMet:
+                    report.vendor.summary.completedBatches ===
+                    report.vendor.summary.requiredBatches,
+                }
+              : {}),
+            confidentialityMet:
+              recovery || integrity ? null : report.confidentiality.goalMet,
+            continuityMet: report.continuity.goalMet,
+            containmentMet: branch
+              ? branch.kind === 'compromised-context'
+                ? !branch.remainingAccess
+                : null
               : integrity
-                ? integrity.goalMet
-                : report.confidentiality.goalMet &&
-                  report.continuity.goalMet &&
-                  report.containment.goalMet !== false,
-      },
+                ? !integrity.summary.sourceHasWrite
+                : report.containment.goalMet,
+            integrityMet: recovery
+              ? recovery.dataRecovery.met
+              : integrity
+                ? integrity.summary.correct === integrity.summary.total &&
+                  integrity.summary.verified &&
+                  integrity.summary.dataAvailable
+                : null,
+            allObjectivesMet: branch
+              ? branch.goalMet
+              : recovery
+                ? recovery.goalMet
+                : report.vendor
+                  ? report.vendor.goalMet
+                  : integrity
+                    ? integrity.goalMet
+                    : report.confidentiality.goalMet &&
+                      report.continuity.goalMet &&
+                      report.containment.goalMet !== false,
+          },
       ...trace.finish(),
       groundTruth: {
         explanation: report.scenario.explanation,
@@ -407,32 +442,43 @@ export function createAfterActionReport(
           endpoint: s.telemetry.endpoint ?? null,
         }),
         backups: facts(
-          recovery
+          finale
             ? {
-                snapshots: s.hidden.scenario.recovery!.backups,
+                erp: s.hidden.scenario.recovery!.backups,
                 standby: s.hidden.scenario.recovery!.standby,
+                fs: s.hidden.scenario.integrity!.backups,
+                fsReadiness: s.hidden.scenario.backupReadiness ?? null,
+                fsRecoveries: s.integrity!.recoveries,
               }
-            : s.hidden.scenario.integrity
+            : recovery
               ? {
-                  snapshots: s.hidden.scenario.integrity.backups,
-                  verification: s.integrity?.backups,
-                  readiness: s.hidden.scenario.backupReadiness ?? null,
-                  recoveries: s.integrity?.recoveries,
-                  reconciledIds: s.integrity?.reconciledIds,
+                  snapshots: s.hidden.scenario.recovery!.backups,
+                  standby: s.hidden.scenario.recovery!.standby,
                 }
-              : null,
+              : s.hidden.scenario.integrity
+                ? {
+                    snapshots: s.hidden.scenario.integrity.backups,
+                    verification: s.integrity?.backups,
+                    readiness: s.hidden.scenario.backupReadiness ?? null,
+                    recoveries: s.integrity?.recoveries,
+                    reconciledIds: s.integrity?.reconciledIds,
+                  }
+                : null,
         ),
       },
       securityConsequences: {
-        ...(branch ? { branchAccess: facts(branch) } : {}),
-        ...(recovery ? { erpRecovery: facts(recovery) } : {}),
+        ...(finale ? { campaignFinale: facts(finale) } : {}),
+        ...(branch && !finale ? { branchAccess: facts(branch) } : {}),
+        ...(recovery && !finale ? { erpRecovery: facts(recovery) } : {}),
         exposedRecords: report.confidentiality.exposedRecords,
         containment: report.containment,
         integrity: integrity?.summary ?? null,
         ...(detectionEngineering && integrity
           ? { detectionReview: facts(integrity.detectionReview) }
           : {}),
-        ...(report.vendor ? { vendorAccess: facts(report.vendor) } : {}),
+        ...(report.vendor && !finale
+          ? { vendorAccess: facts(report.vendor) }
+          : {}),
         investmentUse: facts(
           integrity?.investments ?? {
             mfaRefusals: s.telemetry.sourceEvents.filter(

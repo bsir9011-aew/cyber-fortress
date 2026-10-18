@@ -1,8 +1,9 @@
 # Zapis i odczyt
 
-- `gameSaveV8.ts`: aktywna koperta V8 (silnik 14.0.0, nexus-east-1), przygotowanie architektury i komendy M05, odczyt V1–V7 oraz ścisły replay stanu.
+- `gameSaveV9.ts`: aktywna koperta V9 (silnik 15.0.0, nexus-finale-1), M06 i jawne zatwierdzenie awaryjne; odczyt V1–V8 oraz ścisły replay całego wspólnego stanu.
+- `gameSaveV8.ts`: zachowany czytnik V8 i historycznych komend M05.
 - `gameSaveV7.ts`: historyczna koperta M04 i zgodny odczyt V1–V6.
-- `resilienceGameStorage.ts`: aktywny adapter UI; zapisuje wyłącznie klucz V8, zachowuje oryginalne bajty V1–V7 do eksportu i nie ukrywa uszkodzonego nowszego zapisu przez fallback.
+- `resilienceGameStorage.ts`: aktywny adapter UI; zapisuje wyłącznie klucz V9, zachowuje oryginalne bajty V1–V8 do eksportu i nie ukrywa uszkodzonego nowszego zapisu przez fallback.
 
 Historyczne czytniki i adaptery:
 

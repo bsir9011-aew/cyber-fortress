@@ -1,3 +1,4 @@
+import type { FinaleDefinition } from './finale';
 import type { BranchDefinition } from './branch';
 import type { RecoveryDefinition } from './recovery';
 import type { VendorDefinition } from './vendor';
@@ -42,7 +43,9 @@ export interface ScenarioDefinition {
     | 'nexus-integrity-detection-v1'
     | 'nexus-vendor-access-v1'
     | 'nexus-erp-recovery-v1'
-    | 'nexus-east-branch-v1';
+    | 'nexus-east-branch-v1'
+    | 'nexus-campaign-finale-v1';
+  readonly finale?: FinaleDefinition;
   readonly branch?: BranchDefinition;
   readonly recovery?: RecoveryDefinition;
   readonly vendor?: VendorDefinition;
@@ -58,7 +61,8 @@ export interface ScenarioDefinition {
     | 'local-integrity'
     | 'third-party-access'
     | 'erp-recovery'
-    | 'branch-architecture';
+    | 'branch-architecture'
+    | 'campaign-finale';
   readonly explanation: string;
   readonly world: WorldState;
   readonly clock: Omit<SimulationClock, 'turn'>;

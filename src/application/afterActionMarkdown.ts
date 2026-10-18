@@ -144,6 +144,13 @@ export function renderAfterActionMarkdown(
           'Alert jest przesłanką do badania. Etykieta FP/FN jest dostępna dopiero po misji; nie stanowi oceny racjonalności decyzji. Następstwa i stany po decyzji opisano także w sekcjach 4 i 8.',
         ]
       : []),
+    ...(s.campaignFinale
+      ? [
+          '### Misja 06 — NEXUS LOGISTICS — CAMPAIGN DEBRIEF',
+          details(s.campaignFinale),
+          'Jedna symulacja i jedna kolejka zamówień. Hipotezy nie są potwierdzeniem przyczyny. Niewykorzystanych możliwości nie symulowano jako alternatywnych wyników.',
+        ]
+      : []),
     ...(s.branchAccess
       ? [
           '### Misja 05 — architektura, przepływy i ryzyko',

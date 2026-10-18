@@ -1,3 +1,6 @@
+import { taskRejection } from '../simulation/tasks';
+import type { VendorExpiry, VendorScope } from '../domain/vendor';
+import { selectFinaleTimeline } from '../simulation/finaleTimeline';
 import { selectBranchView, selectKnownBranchWorld } from './selectBranchView';
 import {
   selectRecoveryView,
@@ -19,6 +22,31 @@ import { selectIntegrityView } from './selectIntegrityView';
 /** Jawna projekcja: nigdy spread SimulationState/access/hidden do komponentów. */
 export function selectPlayerView(state: SimulationState) {
   return {
+    ...(state.finale
+      ? {
+          finale: {
+            hypothesis: state.finale.hypothesis,
+            timeline: selectFinaleTimeline(state),
+            approvals: state.finale.approvals,
+            emergencyActions: ([870, 900, 930] as VendorExpiry[]).flatMap(
+              (expiresAtMinute) =>
+                (['api-only', 'api-and-files'] as VendorScope[]).map(
+                  (scope) => ({
+                    scope,
+                    expiresAtMinute,
+                    rejection: taskRejection(state, 'administrator', {
+                      type: 'approve-emergency-vendor-access',
+                      scope,
+                      expiresAtMinute,
+                      justification:
+                        'Awaryjne przewozy w oknie kryzysowym M06.',
+                    }),
+                  }),
+                ),
+            ),
+          },
+        }
+      : {}),
     ...(state.branch ? { branch: selectBranchView(state) } : {}),
     ...(state.recovery ? { recovery: selectRecoveryView(state) } : {}),
     ...(state.vendor ? { vendor: selectVendorView(state) } : {}),
@@ -27,7 +55,10 @@ export function selectPlayerView(state: SimulationState) {
     briefing: { ...state.hidden.scenario.briefing },
     recordPool: state.hidden.scenario.goals.recordPool,
     world: state.branch
-      ? selectKnownBranchWorld(state)
+      ? selectKnownBranchWorld({
+          ...state,
+          world: selectKnownRecoveryWorld(state) as SimulationState['world'],
+        })
       : selectKnownRecoveryWorld(state),
     clock: state.clock,
     minute: currentMinute(state.clock),
