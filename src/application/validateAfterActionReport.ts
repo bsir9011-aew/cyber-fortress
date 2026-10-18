@@ -61,6 +61,25 @@ export function validateAfterActionReport(
         : null)
     )
       return bad();
+  } else if (r.scenario.family === 'M05') {
+    const branch = r.securityConsequences.branchAccess;
+    if (
+      !branch ||
+      !isObject(branch) ||
+      branch.goalMet !== r.finalOutcome.allObjectivesMet ||
+      branch.ready !== r.finalOutcome.branchWorkMet ||
+      branch.exposedRecords !== r.securityConsequences.exposedRecords ||
+      r.finalOutcome.integrityMet !== null
+    )
+      return bad();
+    if (
+      r.finalOutcome.confidentialityMet !==
+        (typeof branch.exposedRecords === 'number' &&
+          branch.exposedRecords === 0) ||
+      r.finalOutcome.containmentMet !==
+        (branch.kind === 'compromised-context' ? !branch.remainingAccess : null)
+    )
+      return bad();
   } else if (r.scenario.family === 'M04') {
     const erp = r.securityConsequences.erpRecovery;
     if (
@@ -108,6 +127,7 @@ export function validateAfterActionReport(
       r.finalOutcome.containmentMet,
       r.finalOutcome.integrityMet,
       r.finalOutcome.vendorWorkMet ?? true,
+      r.finalOutcome.branchWorkMet ?? true,
       r.finalOutcome.serviceRecoveryMet ?? true,
       r.finalOutcome.operationalConfidenceMet ?? true,
       r.finalOutcome.manualClosedMet ?? true,

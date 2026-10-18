@@ -13,7 +13,7 @@ import {
 import type { GameSession, HeadquartersTab } from '../application/gameSession';
 import type { ScenarioMode } from '../domain/scenario';
 import type { CampaignCommand } from '../domain/campaign';
-import type { FortressSaveV7 } from '../persistence/gameSaveV7';
+import type { FortressSaveV8 } from '../persistence/gameSaveV8';
 import {
   loadCurrentGameState as loadGameState,
   storeCurrentGameState as storeGameState,
@@ -134,7 +134,7 @@ export function usePersistentOperations() {
       g.kind === 'campaign' ? { ...g, headquartersTab: tab } : g,
     );
   }
-  function restore(save: FortressSaveV7) {
+  function restore(save: FortressSaveV8) {
     setGame(save.session);
     setActive(true);
     setHistoryVisible(false);
@@ -175,6 +175,7 @@ export function usePersistentOperations() {
     fourthRaw: boot.game.fourthRaw,
     fifthRaw: boot.game.fifthRaw,
     sixthRaw: boot.game.sixthRaw,
+    seventhRaw: boot.game.seventhRaw,
     canResume: active || Boolean(loaded),
     saveStatus,
     saveError,

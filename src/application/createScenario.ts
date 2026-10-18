@@ -1,3 +1,4 @@
+import { initializeBranch } from '../simulation/branch';
 import { initializeRecovery } from '../simulation/recovery';
 import { initializeVendor } from '../simulation/vendor';
 import type { RunIdentity, ScenarioDefinition } from '../domain/scenario';
@@ -182,7 +183,12 @@ export function validateScenario(
         ),
       `Invalid business dependency: ${work.id}`,
     );
-    requiredAccounts.push(work.accountId);
+    if (work.accessMode === 'branch-context')
+      check(
+        Boolean(definition.branch) && work.id === 'east-branch',
+        'Invalid branch context contribution',
+      );
+    else requiredAccounts.push(work.accountId);
   }
   for (const behavior of definition.legitimateBehaviors)
     check(
@@ -325,38 +331,53 @@ export function validateScenario(
           [6, 12].includes(definition.vendor.requiredBatches) &&
           Boolean(account('cargo-link-operator')) &&
           service('carrier-api', 'HTTPS')
-        : definition.recovery
-          ? definition.kind === 'erp-recovery' &&
+        : definition.branch
+          ? definition.kind === 'branch-architecture' &&
             definition.attacker === null &&
-            definition.familyId === 'nexus-erp-recovery-v1' &&
-            definition.recovery.familyId === definition.familyId &&
-            definition.recovery.records.length === 24 &&
-            definition.recovery.records.every(
-              (r) => integer(r.minute) && r.minute < clock.startMinute,
-            ) &&
-            new Set(definition.recovery.records.map((r) => r.id)).size === 24 &&
-            definition.recovery.backups.every(
-              (b) =>
-                b.recordIds.every((id) =>
-                  definition.recovery!.records.some((r) => r.id === id),
-                ) &&
-                integer(b.restoreTurns, 1) &&
-                Boolean(asset(b.repositoryAssetId)) &&
-                Boolean(asset(b.storageAssetId)),
-            ) &&
+            definition.familyId === 'nexus-east-branch-v1' &&
+            definition.branch.familyId === definition.familyId &&
             [
-              'erp-db',
-              'erp-storage',
-              'erp-backups',
-              'erp-standby',
-              'standby-storage',
-            ].every((id) => Boolean(asset(id)))
-          : definition.kind === 'legitimate-session'
-            ? definition.attacker === null &&
-              Object.values(definition.initialSessionOrigins).every(
-                (origin) => origin === 'legitimate',
-              )
-            : definition.attacker !== null,
+              'east-workstations',
+              'east-gateway',
+              'east-primary-link',
+              'east-backup-gateway',
+            ].every((id) => Boolean(asset(id))) &&
+            definition.branch.documentAccountIds.every((id) =>
+              Boolean(account(id)),
+            )
+          : definition.recovery
+            ? definition.kind === 'erp-recovery' &&
+              definition.attacker === null &&
+              definition.familyId === 'nexus-erp-recovery-v1' &&
+              definition.recovery.familyId === definition.familyId &&
+              definition.recovery.records.length === 24 &&
+              definition.recovery.records.every(
+                (r) => integer(r.minute) && r.minute < clock.startMinute,
+              ) &&
+              new Set(definition.recovery.records.map((r) => r.id)).size ===
+                24 &&
+              definition.recovery.backups.every(
+                (b) =>
+                  b.recordIds.every((id) =>
+                    definition.recovery!.records.some((r) => r.id === id),
+                  ) &&
+                  integer(b.restoreTurns, 1) &&
+                  Boolean(asset(b.repositoryAssetId)) &&
+                  Boolean(asset(b.storageAssetId)),
+              ) &&
+              [
+                'erp-db',
+                'erp-storage',
+                'erp-backups',
+                'erp-standby',
+                'standby-storage',
+              ].every((id) => Boolean(asset(id)))
+            : definition.kind === 'legitimate-session'
+              ? definition.attacker === null &&
+                Object.values(definition.initialSessionOrigins).every(
+                  (origin) => origin === 'legitimate',
+                )
+              : definition.attacker !== null,
     'Scenario truth disagrees with actors',
   );
   return errors;
@@ -458,6 +479,8 @@ export function createScenario(
       };
   }
   return updateTelemetry(
-    initializeRecovery(initializeVendor(initializeIntegrity(state))),
+    initializeBranch(
+      initializeRecovery(initializeVendor(initializeIntegrity(state))),
+    ),
   );
 }

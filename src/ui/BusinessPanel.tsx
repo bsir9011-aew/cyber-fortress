@@ -24,6 +24,14 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
       </div>
       <details className="business-dependencies">
         <summary>Od czego zależy wydajność firmy?</summary>
+        {view.branch && (
+          <p>
+            NEXUS EAST wnosi do 6/turę: site-to-site lub przygotowany backup
+            HTTPS (do 3). Wymagana praca dokumentowa potrzebuje także SMB i
+            nadania konta. Zapasowa droga HTTPS nie obsługuje plików. W całej
+            firmie nadal najwyżej 22/turę.
+          </p>
+        )}
         {view.recovery && (
           <p>
             ERP wymaga sprawnego hosta, procesu, bazy, storage, poprawnych
@@ -57,7 +65,10 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
               <strong>
                 {work.capacity} zamówień / turę: {work.name}.
               </strong>{' '}
-              Konto {work.accountId} potrzebuje własnej aktywnej sesji oraz{' '}
+              Konto {work.accountId}{' '}
+              {work.accessMode === 'branch-context'
+                ? 'potrzebuje lokalnego uwierzytelnionego kontekstu, drogi site-to-site lub backup oraz'
+                : 'potrzebuje własnej aktywnej sesji oraz'}{' '}
               {work.services
                 .map(
                   (service) => `${service.targetAssetId} / ${service.protocol}`,

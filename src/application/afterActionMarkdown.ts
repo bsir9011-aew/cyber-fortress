@@ -84,6 +84,13 @@ export function renderAfterActionMarkdown(
       : 'Samodzielna misja, bez budżetu i przygotowania kampanii.',
     '## 3. Cele misji',
     details(r.missionObjectives),
+    ...(c?.branchArchitecture
+      ? [
+          'Przygotowanie architektury EAST:',
+          details(c.branchArchitecture as unknown as AarData),
+          details((c.branchWork ?? []) as unknown as AarData),
+        ]
+      : []),
     '## 4. Najważniejsze decyzje',
     'Zachowano wszystkie zlecenia, odmowy i zmiany hipotez. Przesunięcie zegara jest na osi czasu. Brak zapisanej intencji oznacza, że nie przypisujemy graczowi uzasadnienia ani oczekiwanego skutku.',
     ...r.playerDecisions.map((d) =>
@@ -135,6 +142,13 @@ export function renderAfterActionMarkdown(
           '### Detection Engineering — wynik tego przebiegu',
           details(s.detectionReview),
           'Alert jest przesłanką do badania. Etykieta FP/FN jest dostępna dopiero po misji; nie stanowi oceny racjonalności decyzji. Następstwa i stany po decyzji opisano także w sekcjach 4 i 8.',
+        ]
+      : []),
+    ...(s.branchAccess
+      ? [
+          '### Misja 05 — architektura, przepływy i ryzyko',
+          details(s.branchAccess),
+          'Sprawdzone możliwości nieaktywnej trasy są oceną bieżących predykatów, nie wykonanym przełączeniem ani wynikiem alternatywnej rozgrywki.',
         ]
       : []),
     ...(s.erpRecovery

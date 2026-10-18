@@ -32,7 +32,8 @@
             "9.0.0",
             "11.0.0",
             "12.0.0",
-            "13.0.0"
+            "13.0.0",
+            "14.0.0"
           ]
         },
         "reportGenerator": {
@@ -40,7 +41,8 @@
             "1.0.0",
             "1.1.0",
             "1.2.0",
-            "1.3.0"
+            "1.3.0",
+            "1.4.0"
           ]
         }
       },
@@ -89,7 +91,8 @@
             "M01",
             "M02",
             "M03",
-            "M04"
+            "M04",
+            "M05"
           ]
         },
         "name": {
@@ -102,7 +105,8 @@
             "stolen-credential",
             "local-integrity",
             "third-party-access",
-            "erp-recovery"
+            "erp-recovery",
+            "branch-architecture"
           ]
         },
         "mode": {
@@ -130,7 +134,8 @@
           "enum": [
             "nexus-integrity-detection-v1",
             "nexus-vendor-access-v1",
-            "nexus-erp-recovery-v1"
+            "nexus-erp-recovery-v1",
+            "nexus-east-branch-v1"
           ]
         }
       },
@@ -221,6 +226,12 @@
               "items": {
                 "$ref": "#/$defs/data"
               }
+            },
+            "branchArchitecture": {
+              "$ref": "#/$defs/data"
+            },
+            "branchWork": {
+              "$ref": "#/$defs/data"
             }
           },
           "required": [
@@ -292,6 +303,9 @@
           "type": "boolean"
         },
         "manualClosedMet": {
+          "type": "boolean"
+        },
+        "branchWorkMet": {
           "type": "boolean"
         }
       },
@@ -572,6 +586,9 @@
           "$ref": "#/$defs/data"
         },
         "erpRecovery": {
+          "$ref": "#/$defs/data"
+        },
+        "branchAccess": {
           "$ref": "#/$defs/data"
         }
       },
@@ -1129,6 +1146,9 @@
         },
         "erpRecovery": {
           "$ref": "#/$defs/data"
+        },
+        "branchAccess": {
+          "$ref": "#/$defs/data"
         }
       },
       "required": [
@@ -1389,6 +1409,9 @@
               "$ref": "#/$defs/data"
             },
             "erpRecovery": {
+              "$ref": "#/$defs/data"
+            },
+            "branchAccess": {
               "$ref": "#/$defs/data"
             }
           },

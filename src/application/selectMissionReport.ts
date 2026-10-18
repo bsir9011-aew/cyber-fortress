@@ -1,3 +1,4 @@
+import { selectBranchReport } from './selectBranchReport';
 import { selectRecoveryReport } from './selectRecoveryReport';
 import { selectVendorReport } from './selectVendorReport';
 import type { SimulationState } from '../domain/simulation';
@@ -10,11 +11,13 @@ import { selectIntegrityReport } from './selectIntegrityReport';
 export function selectMissionReport(state: SimulationState) {
   if (!isFinished(state.clock)) return null;
   const attacker = state.hidden.attacker;
+  const branch = selectBranchReport(state);
   const access = assessThreatAccess(state);
   const retryBudgetExhausted =
     attacker?.status === 'blocked' &&
     attacker.consecutiveFailures >= attacker.definition.maxConsecutiveFailures;
   return {
+    ...(state.branch ? { branch: selectBranchReport(state) } : {}),
     ...(state.recovery ? { recovery: selectRecoveryReport(state) } : {}),
     ...(state.vendor ? { vendor: selectVendorReport(state) } : {}),
     ...(state.integrity ? { integrity: selectIntegrityReport(state) } : {}),
@@ -27,10 +30,11 @@ export function selectMissionReport(state: SimulationState) {
       seed: state.run.seed,
     },
     confidentiality: {
-      exposedRecords: attacker?.transfer.exposedRecords ?? 0,
+      exposedRecords:
+        branch?.exposedRecords ?? attacker?.transfer.exposedRecords ?? 0,
       recordLimit: state.hidden.scenario.goals.recordPool,
       goalMet:
-        (attacker?.transfer.exposedRecords ?? 0) <=
+        (branch?.exposedRecords ?? attacker?.transfer.exposedRecords ?? 0) <=
         state.hidden.scenario.goals.maxExposedRecords,
       attackerStatus: attacker?.status ?? null,
       events: (attacker?.privateHistory ?? []).map((event) => ({

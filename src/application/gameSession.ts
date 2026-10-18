@@ -101,7 +101,8 @@ export function currentOperation(game: GameSession): OperationSession | null {
     game.commands[start]?.type !== 'start-integrity-incident' &&
     game.commands[start]?.type !== 'start-detection-incident' &&
     game.commands[start]?.type !== 'start-vendor-incident' &&
-    game.commands[start]?.type !== 'start-recovery-incident'
+    game.commands[start]?.type !== 'start-recovery-incident' &&
+    game.commands[start]?.type !== 'start-branch-incident'
   )
     start--;
   const commands = game.commands

@@ -316,6 +316,71 @@ export class MissionTrace {
         'observation',
         observation.id,
       );
+    for (const o of s.branch?.operations ?? [])
+      this.once(`branch-operation:${o.id}`, () =>
+        this.emit(
+          'branch-operation',
+          s,
+          o.origin === 'legitimate'
+            ? 'interval-settlement'
+            : 'actor-resolution',
+          'branch-access-resolver',
+          o.checks.allowed ? 'allowed' : 'denied',
+          o,
+          {},
+          o.minute,
+        ),
+      );
+    for (const [index, e] of (s.branch?.events ?? []).entries())
+      this.once(`branch-event:${index}`, () =>
+        this.emit(
+          'branch-' + e.kind,
+          s,
+          e.taskId ? 'task-completion' : 'actor-resolution',
+          'branch-infrastructure',
+          'effective',
+          e,
+          { taskId: e.taskId },
+          e.minute,
+        ),
+      );
+    for (const o of s.branch?.observations ?? [])
+      this.addEvidence(
+        s,
+        o.id,
+        'branch-observation',
+        o.source,
+        o,
+        o.assertion,
+        o.taskId,
+      );
+    for (const result of s.branch?.results ?? []) {
+      this.once(`branch-result:${result.taskId}`, () =>
+        this.emit(
+          'branch-task-result',
+          s,
+          result.action.type.startsWith('inspect-') ||
+            result.action.type === 'confirm-branch-requirements'
+            ? 'observation'
+            : 'task-completion',
+          'branch-task-resolver',
+          result.outcome,
+          result,
+          { taskId: result.taskId },
+          result.minute,
+        ),
+      );
+      if (!s.branch?.observations.some((o) => o.taskId === result.taskId))
+        this.addEvidence(
+          s,
+          `branch-result-${result.taskId}`,
+          'branch-task-result',
+          'branch-task-console',
+          result,
+          'observation',
+          result.taskId,
+        );
+    }
     for (const o of s.recovery?.observations ?? [])
       this.addEvidence(
         s,

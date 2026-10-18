@@ -1,3 +1,8 @@
+import type {
+  BranchArchitecture,
+  BranchArchitectureChange,
+  BranchPreparationWork,
+} from './branch';
 import type { VendorApproval, VendorExpiry, VendorScope } from './vendor';
 import type { Account } from './access';
 import type { IntegrityMissionSummary } from './integrity';
@@ -73,6 +78,12 @@ export interface PreparationWork {
   readonly status: 'running' | 'completed' | 'paused';
 }
 export interface CampaignMissionReport {
+  readonly branch?: {
+    readonly ready: boolean;
+    readonly exposedRecords: number;
+    readonly remainingAccess: boolean;
+    readonly goalMet: boolean;
+  };
   readonly recovery?: {
     readonly useful: boolean;
     readonly missingRecordIds: readonly string[];
@@ -105,6 +116,8 @@ export interface CampaignMissionReport {
   readonly fullCapacity: number;
 }
 export interface CampaignState {
+  readonly branchArchitecture?: BranchArchitecture;
+  readonly branchWork?: readonly BranchPreparationWork[];
   readonly vendorApprovals?: readonly VendorApproval[];
   readonly detectionChanges?: readonly DetectionConfigurationWork[];
   readonly funding?: CampaignFunding;
@@ -131,6 +144,14 @@ export interface CampaignState {
   }[];
 }
 export type CampaignCommand =
+  | {
+      readonly type: 'start-branch-incident';
+      readonly familyId: 'nexus-east-branch-v1';
+    }
+  | {
+      readonly type: 'prepare-branch-architecture';
+      readonly change: BranchArchitectureChange;
+    }
   | {
       readonly type: 'start-recovery-incident';
       readonly familyId: 'nexus-erp-recovery-v1';

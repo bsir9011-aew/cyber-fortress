@@ -1,3 +1,4 @@
+import type { BranchDefinition } from './branch';
 import type { RecoveryDefinition } from './recovery';
 import type { VendorDefinition } from './vendor';
 import type { AccessState } from './access';
@@ -40,7 +41,9 @@ export interface ScenarioDefinition {
   readonly familyId?:
     | 'nexus-integrity-detection-v1'
     | 'nexus-vendor-access-v1'
-    | 'nexus-erp-recovery-v1';
+    | 'nexus-erp-recovery-v1'
+    | 'nexus-east-branch-v1';
+  readonly branch?: BranchDefinition;
   readonly recovery?: RecoveryDefinition;
   readonly vendor?: VendorDefinition;
   readonly backupReadiness?: BackupReadiness;
@@ -54,7 +57,8 @@ export interface ScenarioDefinition {
     | 'stolen-credential'
     | 'local-integrity'
     | 'third-party-access'
-    | 'erp-recovery';
+    | 'erp-recovery'
+    | 'branch-architecture';
   readonly explanation: string;
   readonly world: WorldState;
   readonly clock: Omit<SimulationClock, 'turn'>;

@@ -16,7 +16,9 @@ export function MissionBriefing({
         </span>
         <span className="mission-tag">14:00 — 15:30 · 18 tur</span>
         <h1>
-          {view.recovery ? (
+          {view.branch ? (
+            'Oddział na granicy.'
+          ) : view.recovery ? (
             'ERP nie odpowiada.'
           ) : view.vendor ? (
             <>
@@ -39,7 +41,9 @@ export function MissionBriefing({
           )}
         </h1>
         <p className="briefing-role">
-          Pierwszy dzień w roli Security Engineer.
+          {view.branch
+            ? 'Security Engineer · architektura dostępu NEXUS EAST.'
+            : 'Pierwszy dzień w roli Security Engineer.'}
         </p>
         <blockquote>
           <span className="speaker-tag">Ewa · kierowniczka operacji</span>
@@ -49,21 +53,27 @@ export function MissionBriefing({
           <article>
             <span className="eyebrow">
               Cel 01 /{' '}
-              {view.recovery
-                ? 'Odzyskiwanie'
-                : view.integrity
-                  ? 'Integralność'
-                  : 'Poufność'}
+              {view.branch
+                ? 'Architektura'
+                : view.recovery
+                  ? 'Odzyskiwanie'
+                  : view.integrity
+                    ? 'Integralność'
+                    : 'Poufność'}
             </span>
             <h2>
-              {view.recovery
-                ? 'Odzyskaj usługę i poprawne dane'
-                : view.integrity
-                  ? 'Odzyskaj poprawne dokumenty'
-                  : 'Chroń dane operacyjne'}
+              {view.branch
+                ? 'Zapewnij właściwy dostęp EAST'
+                : view.recovery
+                  ? 'Odzyskaj usługę i poprawne dane'
+                  : view.integrity
+                    ? 'Odzyskaj poprawne dokumenty'
+                    : 'Chroń dane operacyjne'}
             </h2>
             <p>
-              {view.recovery ? (
+              {view.branch ? (
+                'Zaprojektuj i sprawdź drogę ERP oraz uzasadniony dostęp do FS-01. Transport, ACL, tożsamość i nadanie to osobne warunki.'
+              ) : view.recovery ? (
                 'Przywróć użyteczny ERP, uzgodnij brakujące zapisy i wykonane wysyłki. Sprawdź wynik na podstawie niezależnego dziennika.'
               ) : view.vendor ? (
                 <>
@@ -87,13 +97,15 @@ export function MissionBriefing({
             <p>
               Do 15:30 pozostaw najwyżej {view.maxFinalBacklog} zaległych
               zamówień.{' '}
-              {view.recovery
-                ? 'Zamknij i uzgodnij tryb ręczny. Potwierdź spójność danych po odtworzeniu.'
-                : view.vendor
-                  ? 'CARGO-LINK wnosi 6 z 22 zamówień wydajności. Zbadaj potrzebne przepływy i pamiętaj o terminie wyjątku.'
-                  : view.integrity
-                    ? 'Wysyłki wymagają także poprawnych dokumentów FS-01. Izolacja odbiera legalną pracę stacji.'
-                    : 'Zdalny zespół potrzebuje ERP przez VPN.'}
+              {view.branch
+                ? 'EAST wnosi do 6 z 22 zamówień/turę. Backup zapewnia najwyżej 3 i nie przenosi SMB.'
+                : view.recovery
+                  ? 'Zamknij i uzgodnij tryb ręczny. Potwierdź spójność danych po odtworzeniu.'
+                  : view.vendor
+                    ? 'CARGO-LINK wnosi 6 z 22 zamówień wydajności. Zbadaj potrzebne przepływy i pamiętaj o terminie wyjątku.'
+                    : view.integrity
+                      ? 'Wysyłki wymagają także poprawnych dokumentów FS-01. Izolacja odbiera legalną pracę stacji.'
+                      : 'Zdalny zespół potrzebuje ERP przez VPN.'}
             </p>
           </article>
         </div>
@@ -127,13 +139,15 @@ export function MissionBriefing({
           <div>
             <h3>Bartek · administrator</h3>
             <p>
-              {view.recovery
-                ? 'Restartuje ERP, odtwarza wybraną kopię, przełącza ruch na standby i zarządza obsługą ręczną. Każde zadanie wymaga czasu.'
-                : view.vendor
-                  ? 'Cofa, zawęża lub rozszerza ważny wyjątek dostawcy. Zmiany wymagają czasu i nie kończą sesji.'
-                  : view.integrity
-                    ? 'Izoluje stację, ogranicza jej zapis i odtwarza dokumenty. Podłączenie wymaga spełnienia warunków bezpieczeństwa.'
-                    : 'Kończy tunele, zmienia logowania i reguły dostępu. Każda zmiana wymaga czasu.'}
+              {view.branch
+                ? 'Przełącza przygotowane trasy, naprawia łącze, zmienia zakres SMB i bieżącą autoryzację kont oddziału. Efekt po ukończeniu pracy.'
+                : view.recovery
+                  ? 'Restartuje ERP, odtwarza wybraną kopię, przełącza ruch na standby i zarządza obsługą ręczną. Każde zadanie wymaga czasu.'
+                  : view.vendor
+                    ? 'Cofa, zawęża lub rozszerza ważny wyjątek dostawcy. Zmiany wymagają czasu i nie kończą sesji.'
+                    : view.integrity
+                      ? 'Izoluje stację, ogranicza jej zapis i odtwarza dokumenty. Podłączenie wymaga spełnienia warunków bezpieczeństwa.'
+                      : 'Kończy tunele, zmienia logowania i reguły dostępu. Każda zmiana wymaga czasu.'}
             </p>
           </div>
         </article>
