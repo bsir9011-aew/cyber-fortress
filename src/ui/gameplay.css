@@ -1,0 +1,397 @@
+/* Shared decision surfaces. Colors reflect knowledge and availability, never actor truth. */
+.situation-summary,
+.command-center,
+.mission-conclusion,
+.gameplay-help,
+.decision-cockpit,
+.process-contributions {
+  border: 1px solid #2b3c46;
+  border-radius: 12px;
+  background: #101b23;
+  color: #e1e9ee;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.command-center h2,
+.mission-conclusion h2,
+.gameplay-help h2 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  margin: 0.4rem 0 1rem;
+}
+.campaign-command-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(0, 1.1fr);
+  gap: 1.5rem;
+}
+.mission-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+.mission-list button {
+  display: flex;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.85rem;
+  background: #15232d;
+  border: 1px solid #304550;
+  border-radius: 8px;
+}
+.mission-list button[aria-pressed='true'] {
+  border-color: #70d8c4;
+  background: #19332f;
+}
+.mission-list small,
+.situation-strip small {
+  display: block;
+  color: #aebfc9;
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.7;
+}
+.readiness {
+  background: #0d1720;
+  border-left: 3px solid #70d8c4;
+  padding: 0.75rem 1rem;
+}
+.command-center li,
+.mission-conclusion li {
+  line-height: 1.65;
+}
+.preparation-team,
+.intro-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.intro-columns {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.preparation-team article,
+.action-card {
+  border: 1px solid #344854;
+  border-radius: 8px;
+  padding: 0.85rem;
+  min-width: 0;
+}
+.preparation-team article p,
+.work-preview p {
+  margin: 0.5rem 0;
+}
+.preparation-command {
+  margin-top: 1rem;
+  border-top: 1px solid #344854;
+  padding-top: 1rem;
+}
+.work-preview {
+  border-left: 2px solid #87b2ca;
+  background: #0e1b24;
+  padding: 0.7rem;
+  margin: 0.7rem 0;
+}
+.work-preview small,
+.action-card small,
+.inspector-section small {
+  display: block;
+  color: #b2c2cc;
+  line-height: 1.5;
+}
+.action-reason {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: #c0ced7;
+  margin: 0.6rem 0;
+}
+.gameplay-help {
+  margin: 0.8rem 1.5rem;
+}
+.gameplay-help button {
+  margin: 0.3rem 0.7rem 0.3rem 0;
+}
+.decision-cockpit {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  box-shadow: 0 8px 20px #0005;
+  padding: 0.7rem 1rem;
+}
+.situation-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.3rem;
+  font-size: 0.85rem;
+}
+.situation-strip b {
+  display: inline-block;
+  color: #8ee1cf;
+  margin-left: 0.3rem;
+  font-size: 1.1rem;
+}
+.situation-strip > strong {
+  font-size: 1.2rem;
+}
+.team-operations h2 {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: #9ebac7;
+  margin: 0.7rem 0 0.35rem;
+}
+.team-operations > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.team-operations article {
+  min-width: 0;
+  font-size: 0.85rem;
+}
+.team-operations article p {
+  margin: 0.2rem 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.turn-recap {
+  border-top: 1px solid #344854;
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  font-size: 0.84rem;
+  max-height: 210px;
+  overflow: auto;
+}
+.turn-recap summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+.turn-recap p {
+  margin: 0.45rem 0;
+  line-height: 1.4;
+}
+.turn-recap small {
+  color: #a9bdc9;
+}
+.fact-kind {
+  font-size: 0.68rem;
+  border: 1px solid #567180;
+  border-radius: 4px;
+  padding: 0.1rem 0.3rem;
+}
+.action-group-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin: 1rem 0;
+}
+.action-group-tabs button {
+  font-size: 0.7rem;
+  padding: 0.6rem 0.4rem;
+  line-height: 1.5;
+  text-align: left;
+}
+.action-group-tabs button[aria-pressed='true'] {
+  border-color: #70d8c4;
+  background: #1a3531;
+}
+.decision-actions label {
+  display: block;
+  line-height: 1.5;
+  font-size: 0.84rem;
+  margin: 0.5rem 0;
+}
+.decision-actions select,
+.decision-actions input,
+.attempt-comparison select {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.6rem;
+  background: #0d1720;
+  color: #dce8ee;
+  border: 1px solid #48606d;
+  border-radius: 6px;
+}
+.action-card {
+  margin: 0.7rem 0;
+  overflow-wrap: anywhere;
+}
+.action-card h3 {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+.action-card button {
+  width: 100%;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: left;
+  margin-top: 0.65rem;
+}
+.action-card button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.action-card details {
+  font-size: 0.8rem;
+  color: #b3c3cd;
+}
+.action-cost {
+  font-size: 0.85rem;
+  color: #b9dfd5;
+}
+.context-terms {
+  margin: 1rem 0;
+  padding: 0.7rem;
+  border: 1px solid #344854;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.context-terms details {
+  padding: 0.4rem 0;
+}
+.context-terms p {
+  line-height: 1.6;
+  color: #b6c7d0;
+}
+.process-contributions {
+  padding: 0.8rem;
+  background: #0e1922;
+}
+.process-contributions > details {
+  border-top: 1px solid #344854;
+  padding: 0.7rem 0;
+  font-size: 0.86rem;
+}
+.process-contributions summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  cursor: pointer;
+}
+.process-contributions summary strong {
+  white-space: nowrap;
+  color: #8ee1cf;
+}
+.process-contributions p {
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.mission-conclusion article {
+  border-left: 2px solid #799aac;
+  padding: 0.5rem 0.8rem;
+  margin: 0.8rem 0;
+  font-size: 0.9rem;
+}
+.goal-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.6rem;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+.deferred-details {
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #344854;
+  border-radius: 10px;
+}
+.deferred-details > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.campaign-history pre {
+  max-height: 240px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+}
+.campaign-history article {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #344854;
+  border-radius: 8px;
+}
+.campaign-history h3 small {
+  display: block;
+  color: #a4bac7;
+  font-size: 0.8rem;
+}
+.attempt-comparison {
+  padding: 1rem 0;
+}
+.attempt-comparison label {
+  display: block;
+  margin: 0.6rem 0;
+}
+.attempt-comparison table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.attempt-comparison th,
+.attempt-comparison td {
+  text-align: left;
+  border: 1px solid #344854;
+  padding: 0.5rem;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid #94e9d9;
+  outline-offset: 3px;
+}
+@media (max-width: 900px) {
+  .campaign-command-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .decision-cockpit {
+    position: static;
+  }
+  .intro-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gameplay-help {
+    margin: 0.6rem;
+  }
+  .mission-conclusion,
+  .command-center {
+    padding: 0.8rem;
+  }
+}
+@media (max-width: 450px) {
+  .preparation-team {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .team-operations > div {
+    gap: 0.5rem;
+  }
+  .situation-strip {
+    gap: 0.4rem 0.8rem;
+  }
+  .situation-strip span {
+    font-size: 0.8rem;
+  }
+  .mission-list button {
+    padding: 0.65rem;
+  }
+  .attempt-comparison {
+    font-size: 0.8rem;
+  }
+}
+
+.situation-summary {
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #344854;
+  border-radius: 10px;
+  line-height: 1.65;
+}

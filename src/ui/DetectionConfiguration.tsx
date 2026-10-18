@@ -1,3 +1,4 @@
+import { PreparationPreview } from './PreparationPreview';
 import { preparationWorkerBusy } from '../application/branchPreparation';
 import { useState } from 'react';
 import type { CampaignCommand, CampaignState } from '../domain/campaign';
@@ -94,6 +95,15 @@ export function DetectionConfiguration({
           Zleć konfigurację — 1 h analityka
         </button>
       </div>
+      <PreparationPreview
+        campaign={campaign}
+        command={{
+          type: 'configure-endpoint-detection',
+          endpointId: 'pakowanie-03',
+          threshold,
+          windowMinutes,
+        }}
+      />
       <p>
         {pending
           ? `Analityk konfiguruje ${pending.threshold} dokumentów / ${pending.windowMinutes} min. Rozlicz godzinę pracy, aby aktywować zmianę. Dotychczasowa reguła nadal obowiązuje.`

@@ -1,520 +1,177 @@
-import { BranchOperations } from './BranchPanel';
-import { RecoveryOperations } from './RecoveryPanel';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { PlayerView } from '../application/selectPlayerView';
+import type { SimulationCommand } from '../domain/simulation';
+import { actionGroups } from '../application/gameplay/actionExperience';
 import type {
-  SimulationCommand,
-  TaskAction,
-  WorkerId,
-} from '../domain/simulation';
-import { taskSpecs } from '../simulation/tasks';
-import { actionLabel } from './simulationPresentation';
-import { VendorOperations } from './VendorPanel';
-import { IntegrityOperations } from './IntegrityPanel';
-
+  ActionGroup,
+  DecisionAction,
+} from '../application/gameplay/actionExperience';
+import { Terms } from './GameplayHelp';
 export function OperationsPanel({
   view,
+  actions,
   onCommand,
+  focusAssetId,
 }: {
   view: PlayerView;
-  onCommand: (command: SimulationCommand) => void;
+  actions: readonly DecisionAction[];
+  onCommand: (c: SimulationCommand) => void;
+  focusAssetId?: string | undefined;
 }) {
-  const [emergencyScope, setEmergencyScope] = useState<
-    'api-only' | 'api-and-files'
-  >('api-only');
-  const [emergencyExpiry, setEmergencyExpiry] = useState<870 | 900 | 930>(930);
-  const [justification, setJustification] = useState(
-    'Awaryjne przewozy w oknie kryzysowym M06.',
-  );
-  const [ruleId, setRuleId] = useState('');
-  const [sessionId, setSessionId] = useState('');
-  const [accountId, setAccountId] = useState('');
-  const rule = view.rules.find((item) => item.id === ruleId) ?? view.rules[0];
-  const knownSessions = [
-    ...new Map([
-      ...(view.vendor?.observations ?? []).flatMap((o) =>
-        o.records.map(
-          (r) =>
-            [r.sessionId, { id: r.sessionId, accountId: r.accountId }] as const,
-        ),
-      ),
-      ...(view.sessionObservation?.sessions ?? []).map(
-        (session) =>
-          [
-            session.id,
-            { id: session.id, accountId: session.accountId },
-          ] as const,
-      ),
-      ...view.fileObservations.flatMap((o) =>
-        o.records.flatMap((r) =>
-          r.sessionId
-            ? [
-                [
-                  r.sessionId,
-                  { id: r.sessionId, accountId: r.accountId },
-                ] as const,
-              ]
-            : [],
-        ),
-      ),
-      ...view.authObservations.flatMap((observation) =>
-        observation.records.flatMap((record) =>
-          record.sessionId
-            ? [
-                [
-                  record.sessionId,
-                  { id: record.sessionId, accountId: record.accountId },
-                ] as const,
-              ]
-            : [],
-        ),
-      ),
-    ]).values(),
-  ];
-  const session =
-    knownSessions.find((item) => item.id === sessionId) ?? knownSessions[0];
-  const account = view.knownAccountIds.includes(accountId)
-    ? accountId
-    : view.knownAccountIds[0];
-  const busy = (workerId: WorkerId) =>
-    view.tasks.find(
-      (task) => task.workerId === workerId && task.status === 'running',
+  const [group, setGroup] = useState<ActionGroup>('investigate'),
+    [target, setTarget] = useState('all'),
+    [choice, setChoice] = useState<Record<string, string>>({}),
+    [justification, setJustification] = useState(
+      'Awaryjne przewozy w oknie kryzysowym M06.',
     );
-  const disabled = (type: TaskAction['type']) =>
-    view.finished ||
-    Boolean(busy(taskSpecs[type].workerId)) ||
-    view.clock.turn + taskSpecs[type].turns > view.clock.turnLimit;
-  const schedule = (action: TaskAction) =>
+  useEffect(() => {
+    if (focusAssetId) {
+      setTarget(focusAssetId);
+      setGroup('investigate');
+    }
+  }, [focusAssetId]);
+  const ids = [...new Set(actions.flatMap((a) => a.assets))];
+  const grouped = actions.filter(
+    (a) => a.group === group && (target === 'all' || a.assets.includes(target)),
+  );
+  const families = new Map<string, DecisionAction[]>();
+  for (const a of grouped) {
+    const list = families.get(a.action.type) ?? [];
+    families.set(a.action.type, [...list, a]);
+  }
+  const send = (a: DecisionAction) =>
     onCommand({
       type: 'schedule-task',
-      workerId: taskSpecs[action.type].workerId,
-      action,
+      workerId: a.workerId,
+      action:
+        a.action.type === 'approve-emergency-vendor-access'
+          ? { ...a.action, justification }
+          : a.action,
     });
-
   return (
     <section
       id="team-actions"
+      className="operations-panel decision-actions"
       tabIndex={-1}
-      className="operations-panel"
-      aria-label="Zespół operacyjny"
+      aria-label="Decyzje i działania"
     >
-      <p className="eyebrow">Twoje zasoby</p>
-      <h2>
-        {view.integrity
-          ? 'Rozpoznaj. Ogranicz. Odtwórz.'
-          : 'Zbadać czy ograniczyć?'}
-      </h2>
-      {(['analyst', 'administrator'] as const).map((workerId) => {
-        const task = busy(workerId);
-        return (
-          <div
-            className="worker-status"
-            key={workerId}
-            data-worker-id={workerId}
+      <p className="eyebrow">CO MOŻESZ ZROBIĆ?</p>
+      <h2>Następna decyzja</h2>
+      <nav className="action-group-tabs" aria-label="Grupy działań">
+        {Object.entries(actionGroups).map(([id, label]) => (
+          <button
+            key={id}
+            aria-pressed={group === id}
+            onClick={() => setGroup(id as ActionGroup)}
           >
-            <span className="worker-icon" aria-hidden="true">
-              {workerId === 'analyst' ? '◎' : '⌘'}
-            </span>
-            <div>
+            {label}
+            <small>{actions.filter((a) => a.group === id).length} opcji</small>
+          </button>
+        ))}
+      </nav>
+      <label htmlFor="action-resource">Zakres zasobu</label>
+      <select
+        id="action-resource"
+        value={target}
+        onChange={(e) => setTarget(e.target.value)}
+      >
+        <option value="all">Wszystkie obsługiwane zasoby</option>
+        {ids.map((id) => (
+          <option key={id} value={id}>
+            {view.world.assets.find((a) => a.id === id)?.name ?? id}
+          </option>
+        ))}
+      </select>
+      {[...families].map(([type, entries]) => {
+        const selected =
+          entries.find((a) => a.id === choice[type]) ?? entries[0]!;
+        const invalid =
+          type === 'approve-emergency-vendor-access' &&
+          justification.trim().length < 10;
+        return (
+          <article className="action-card" key={type} id={`decision-${type}`}>
+            <h3>
+              {entries.length === 1
+                ? selected.label
+                : selected.label.split(' · ')[0]}
+            </h3>
+            {entries.length > 1 && (
+              <label>
+                Wskaż zakres
+                <select
+                  value={selected.id}
+                  onChange={(e) =>
+                    setChoice((c) => ({ ...c, [type]: e.target.value }))
+                  }
+                >
+                  {entries.map((a) => (
+                    <option value={a.id} key={a.id}>
+                      {a.label}
+                      {a.action.type === 'approve-emergency-vendor-access'
+                        ? ` · ${a.action.scope} do ${Math.floor(a.action.expiresAtMinute / 60)}:${String(a.action.expiresAtMinute % 60).padStart(2, '0')}`
+                        : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <p className="action-cost">
               <strong>
-                {workerId === 'analyst' ? 'Analityk' : 'Bartek · administrator'}
-              </strong>
-              <p>
-                {task
-                  ? `${actionLabel(task.action)} · pozostało ${(task.dueTurn - view.clock.turn) * view.clock.turnMinutes} min`
-                  : view.finished
-                    ? 'Misja zakończona'
-                    : 'Gotowy do pracy'}
-              </p>
-            </div>
-            <span className={task ? 'worker-busy' : 'worker-ready'}>
-              {task ? 'Zajęty' : 'Wolny'}
-            </span>
-          </div>
+                {selected.workerId === 'administrator'
+                  ? 'Administrator'
+                  : 'Analityk'}
+              </strong>{' '}
+              · {selected.turns * view.clock.turnMinutes} min
+            </p>
+            <details>
+              <summary>Zakres i warunki techniczne</summary>
+              <p>{selected.scope}</p>
+              <p>{selected.requirement}</p>
+              <code>{selected.action.type}</code>
+            </details>
+            {type === 'approve-emergency-vendor-access' && (
+              <label>
+                Uzasadnienie dostępu
+                <input
+                  value={justification}
+                  maxLength={200}
+                  onChange={(e) => setJustification(e.target.value)}
+                />
+              </label>
+            )}
+            <button
+              disabled={!!selected.rejection || invalid}
+              onClick={() => send(selected)}
+            >
+              Zleć: {selected.label} · {selected.turns * view.clock.turnMinutes}{' '}
+              min
+            </button>
+            <p className="action-reason" aria-live="polite">
+              {invalid
+                ? 'Uzasadnienie musi zawierać 10–200 znaków.'
+                : (selected.reason ??
+                  'Wykonawca i czas dostępne. Efekt po ukończeniu zadania.')}
+            </p>
+          </article>
         );
       })}
-      {view.integrity && view.fileSensor && (
-        <button
-          disabled={disabled('inspect-file-access')}
-          onClick={() => schedule({ type: 'inspect-file-access' })}
-        >
-          Pobierz audyt FS-01 · 5 min
-        </button>
-      )}
-      {view.branch &&
-        (view.finale ? (
-          <details className="finale-action-group">
-            <summary>EAST — łącza i zakres</summary>
-            <BranchOperations view={view.branch} onCommand={onCommand} />
-          </details>
-        ) : (
-          <BranchOperations view={view.branch} onCommand={onCommand} />
-        ))}
-      {view.recovery &&
-        (view.finale ? (
-          <details className="finale-action-group">
-            <summary>ERP — diagnoza i ciągłość</summary>
-            <RecoveryOperations view={view.recovery} onCommand={onCommand} />
-          </details>
-        ) : (
-          <RecoveryOperations view={view.recovery} onCommand={onCommand} />
-        ))}
-      {view.vendor &&
-        (view.finale ? (
-          <details className="finale-action-group">
-            <summary>CARGO-LINK — operacje i wyjątek</summary>
-            <VendorOperations view={view.vendor} onCommand={onCommand} />
-          </details>
-        ) : (
-          <VendorOperations view={view.vendor} onCommand={onCommand} />
-        ))}
-      {view.integrity &&
-        (view.finale ? (
-          <details className="finale-action-group">
-            <summary>FS-01 i pakowanie-03</summary>
-            <IntegrityOperations view={view.integrity} onCommand={onCommand} />
-          </details>
-        ) : (
-          <IntegrityOperations view={view.integrity} onCommand={onCommand} />
-        ))}
-      {view.finale && (
-        <details className="finale-action-group">
-          <summary>Awaryjne zatwierdzenie dostawcy · 10 min</summary>
-          <label>
-            Zakres
-            <select
-              value={emergencyScope}
-              onChange={(e) =>
-                setEmergencyScope(e.target.value as typeof emergencyScope)
-              }
-            >
-              <option value="api-only">Tylko HTTPS / API</option>
-              <option value="api-and-files">API i dokumenty SMB</option>
-            </select>
-          </label>
-          <label>
-            Termin
-            <select
-              value={emergencyExpiry}
-              onChange={(e) =>
-                setEmergencyExpiry(
-                  Number(e.target.value) as typeof emergencyExpiry,
-                )
-              }
-            >
-              <option value={870}>14:30</option>
-              <option value={900}>15:00</option>
-              <option value={930}>15:30</option>
-            </select>
-          </label>
-          <label>
-            Uzasadnienie
-            <input
-              value={justification}
-              maxLength={200}
-              onChange={(e) => setJustification(e.target.value)}
-            />
-          </label>
-          <button
-            disabled={
-              view.finished ||
-              justification.trim().length < 10 ||
-              !!view.finale.emergencyActions.find(
-                (a) =>
-                  a.scope === emergencyScope &&
-                  a.expiresAtMinute === emergencyExpiry,
-              )?.rejection
-            }
-            onClick={() =>
-              schedule({
-                type: 'approve-emergency-vendor-access',
-                scope: emergencyScope,
-                expiresAtMinute: emergencyExpiry,
-                justification,
-              })
-            }
-          >
-            Zatwierdź po ukończeniu zadania · 10 min
-          </button>
-          <p>
-            Wymaga wolnego administratora i braku aktywnego wyjątku. Nie omija
-            MFA, sesji, ACL ani uprawnień. Legalne logowanie nastąpi po
-            zatwierdzeniu.
-          </p>
-        </details>
-      )}
-      <details
-        className="legacy-operations"
-        open={!view.integrity && !view.vendor && !view.recovery && !view.branch}
-      >
-        <summary
-          hidden={
-            !view.integrity && !view.vendor && !view.recovery && !view.branch
-          }
-        >
-          Narzędzia dostępu VPN i reguły sieciowe
-        </summary>
-        <h3 className="action-group-title">
-          Pozyskaj dowód <span>analityk</span>
-        </h3>
-        <div className="operation-actions">
-          <button
-            disabled={
-              disabled('inspect-auth-logs') ||
-              !view.vpnOnline ||
-              !view.sensors.authentication.enabled
-            }
-            onClick={() => schedule({ type: 'inspect-auth-logs' })}
-          >
-            Zbadaj logi uwierzytelnienia · 5 min
-          </button>
-          <button
-            disabled={
-              disabled('inspect-vpn-sessions') ||
-              !view.vpnOnline ||
-              !view.sensors.sessions.enabled
-            }
-            onClick={() => schedule({ type: 'inspect-vpn-sessions' })}
-          >
-            Sprawdź sesje VPN · 5 min
-          </button>
-          <button
-            disabled={
-              disabled('contact-account-owner') ||
-              !view.knownAccountIds.includes('magazyn-07')
-            }
-            onClick={() =>
-              schedule({
-                type: 'contact-account-owner',
-                accountId: 'magazyn-07',
-              })
-            }
-          >
-            Porozmawiaj z Martą · 5 min
-          </button>
-        </div>
-        {view.fileSensor && !view.integrity && (
-          <button
-            className="file-research-button"
-            disabled={
-              disabled('inspect-file-access') || !view.fileSensor.enabled
-            }
-            onClick={() => schedule({ type: 'inspect-file-access' })}
-          >
-            Pobierz audyt FS-01 · 5 min
-          </button>
-        )}
-        <p className="source-note">
-          Wynik po zakończeniu zadania. Czytanie dowodów nie zajmuje czasu.
+      {!families.size && (
+        <p>
+          Ta grupa nie ma operacji dla wybranego zasobu. Zmień filtr; pozostałe
+          działania są dostępne w innych grupach.
         </p>
-        {!view.vpnOnline && (
-          <p className="decision-warning">
-            VPN jest wyłączony: odczyt lokalnych sensorów bramy jest
-            niedostępny. Pozyskane wcześniej dowody pozostają w sprawie.
-          </p>
-        )}
-        <h3 className="action-group-title">
-          Zmień dostęp <span>administrator</span>
-        </h3>
-        <details className="policy-controls">
-          <summary>Polityka komunikacji · 10 min</summary>
-          <label htmlFor="network-rule">Reguła sieciowa</label>
-          <select
-            id="network-rule"
-            value={rule?.id ?? ''}
-            onChange={(event) => setRuleId(event.target.value)}
-          >
-            {view.rules.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.id} · {item.protocol} →{' '}
-                {
-                  view.world.assets.find(
-                    (asset) => asset.id === item.targetAssetId,
-                  )?.name
-                }
-              </option>
-            ))}
-          </select>
-          {rule && (
-            <>
-              <p className="source-note">
-                Obecnie: <strong>{rule.action.toUpperCase()}</strong>. Reguła
-                obejmuje także istniejący ruch tego protokołu. Inne przepływy
-                mają osobne reguły.
-              </p>
-              {rule.accountIds && (
-                <p className="source-note">
-                  Zakres kont:{' '}
-                  {rule.accountIds.length
-                    ? rule.accountIds.join(', ')
-                    : 'pusta grupa — reguła nie dopasuje żadnego konta'}
-                  .
-                </p>
-              )}
-              {view.rules.some((r) => r.accountIds) && (
-                <p className="source-note">
-                  Reguły zależą od konta sesji. Zmiana szerokiej reguły R-SMB
-                  może nie zmienić pierwszeństwa reguł SEG. Domyślna odmowa
-                  działa po dopasowaniu zakresu.
-                </p>
-              )}
-              {view.businessDependencies.additionalWork
-                .filter((work) =>
-                  work.services.some(
-                    (service) =>
-                      service.targetAssetId === rule.targetAssetId &&
-                      service.protocol === rule.protocol,
-                  ),
-                )
-                .map((work) => (
-                  <p className="decision-warning" key={work.id}>
-                    Ten przepływ jest wymagany przez legalne konto{' '}
-                    {work.accountId} dla {work.capacity} zamówień na turę:{' '}
-                    {work.name}.
-                  </p>
-                ))}
-              <button
-                disabled={disabled('set-network-rule')}
-                onClick={() =>
-                  schedule({
-                    type: 'set-network-rule',
-                    ruleId: rule.id,
-                    action: rule.action === 'allow' ? 'deny' : 'allow',
-                  })
-                }
-              >
-                {rule.action === 'allow'
-                  ? 'Zablokuj przepływ'
-                  : 'Dopuść przepływ'}{' '}
-                · 10 min
-              </button>
-            </>
-          )}
-        </details>
-        <details className="session-controls">
-          <summary>Zakończenie tunelu · 5 min</summary>
-          {session ? (
-            <>
-              <label htmlFor="observed-session">
-                Sesja znana z pozyskanych dowodów
-              </label>
-              <select
-                id="observed-session"
-                value={session.id}
-                onChange={(event) => setSessionId(event.target.value)}
-              >
-                {knownSessions.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.id} · {item.accountId}
-                  </option>
-                ))}
-              </select>
-              <p className="source-note">
-                Historyczny log nie potwierdza, że tunel nadal działa.
-                Zakończenie sesji nie blokuje nowych logowań.
-              </p>
-              <button
-                disabled={disabled('terminate-session')}
-                onClick={() =>
-                  schedule({ type: 'terminate-session', sessionId: session.id })
-                }
-              >
-                Zakończ sesję · 5 min
-              </button>
-            </>
-          ) : (
-            <p className="source-note">
-              Najpierw zbadaj logi lub aktywne sesje, aby wskazać tunel.
-            </p>
-          )}
-        </details>
-        <details className="account-controls">
-          <summary>Konto i poświadczenie</summary>
-          {account ? (
-            <>
-              <label htmlFor="known-account">Konto znane ze sprawy</label>
-              <select
-                id="known-account"
-                value={account}
-                onChange={(event) => setAccountId(event.target.value)}
-              >
-                {view.knownAccountIds.map((id) => (
-                  <option key={id} value={id}>
-                    {id}
-                  </option>
-                ))}
-              </select>
-              <p className="source-note">
-                Zmiany dotyczą nowych uwierzytelnień. Nie kończą wcześniej
-                wydanych sesji.
-              </p>
-              <div className="operation-actions">
-                <button
-                  disabled={disabled('block-account')}
-                  onClick={() =>
-                    schedule({ type: 'block-account', accountId: account })
-                  }
-                >
-                  Zablokuj nowe logowania · 5 min
-                </button>
-                <button
-                  disabled={
-                    disabled('unblock-account') ||
-                    !view.blockedKnownAccountIds.includes(account)
-                  }
-                  onClick={() =>
-                    schedule({ type: 'unblock-account', accountId: account })
-                  }
-                >
-                  Przywróć nowe logowania · 5 min
-                </button>
-                <button
-                  disabled={disabled('reset-credential')}
-                  onClick={() =>
-                    schedule({ type: 'reset-credential', accountId: account })
-                  }
-                >
-                  Resetuj poświadczenie · 10 min
-                </button>
-              </div>
-              <p className="decision-warning">
-                Przywrócenie konta nie odtwarza zakończonych tuneli ani nie
-                zmienia hasła i MFA. Nadal ważne przejęte poświadczenie może
-                ponownie umożliwić dostęp. Legalna praca wymaga nowego
-                poprawnego logowania i dostępu do wymaganych usług.
-              </p>
-            </>
-          ) : (
-            <p className="source-note">
-              Brak kont wskazanych przez dostępne obserwacje.
-            </p>
-          )}
-        </details>
-        <details className="vpn-controls">
-          <summary>Szerokie odcięcie VPN · 5 min</summary>
-          <p className="decision-warning">
-            Wyłączenie bramy kończy wszystkie tunele i odbiera zdalnym
-            dyspozytorom dostęp do ERP. Obsługa lokalna pozostaje dostępna.
-          </p>
-          <button
-            className="vpn-action"
-            disabled={disabled('set-vpn')}
-            onClick={() =>
-              schedule({
-                type: 'set-vpn',
-                assetId: view.vpnAssetId,
-                enabled: !view.vpnOnline,
-              })
-            }
-          >
-            {view.vpnOnline ? 'Wyłącz VPN' : 'Włącz VPN'} · 5 min
-          </button>
-        </details>
-      </details>
-      <p className="source-note">
-        Zlecenie rezerwuje pracownika. Zmiana zaczyna działać dopiero po jej
-        ukończeniu.
-      </p>
+      )}
+      <Terms
+        terms={[
+          'MFA',
+          'ACL',
+          ...(view.integrity
+            ? ['EDR', 'False Positive', 'False Negative', 'Backup']
+            : []),
+          ...(view.recovery ? ['RTO', 'RPO', 'Standby', 'Reconciliation'] : []),
+          ...(view.branch ? ['Site-to-site VPN', 'Least Privilege'] : []),
+        ]}
+      />
     </section>
   );
 }

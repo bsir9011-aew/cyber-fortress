@@ -1,3 +1,8 @@
+import type { GameplayExperience } from '../application/gameplay/cockpit';
+import type { MissionReport } from '../application/selectMissionReport';
+import { DecisionCockpit } from './DecisionCockpit';
+import { MissionConclusion } from './MissionConclusion';
+import { DeferredDetails } from './GameplayHelp';
 import { useState } from 'react';
 import type { PlayerView } from '../application/selectPlayerView';
 import type { FinaleReport } from '../application/selectFinaleReport';
@@ -30,6 +35,8 @@ const outcomes: Record<string, string> = {
 };
 export function FinaleWorkspace({
   view: v,
+  experience,
+  fullReport,
   report: r,
   game,
   onCommand,
@@ -37,6 +44,8 @@ export function FinaleWorkspace({
   onMenu,
 }: {
   view: PlayerView;
+  experience: GameplayExperience;
+  fullReport: MissionReport | null;
   report: FinaleReport | null;
   game: GameSession;
   onCommand: (c: SimulationCommand) => void;
@@ -58,158 +67,177 @@ export function FinaleWorkspace({
         </div>
         <button onClick={onMenu}>Menu</button>
       </header>
+      <DecisionCockpit experience={experience} />
       <SimulationTimeBar view={v} onCommand={onCommand} canReset={false} />
       {r ? (
         <>
-          <section className="vendor-card">
-            <p className="eyebrow">
-              Pierwszy rozdział ukończony · możesz ponowić finał w kolejnym
-              oknie
-            </p>
-            <h2>{outcomes[r.outcome]}</h2>
-            <p>{r.explanation}</p>
-            <dl className="business-metrics">
-              <div>
-                <dt>Confidentiality</dt>
-                <dd>{r.exposedRecords} odczytanych rekordów</dd>
-              </div>
-              <div>
-                <dt>Integrity</dt>
-                <dd>
-                  {r.documents.correct}/{r.documents.total} poprawnych
-                </dd>
-              </div>
-              <div>
-                <dt>Availability</dt>
-                <dd>
-                  {r.servicesMet
-                    ? 'Użyteczne kluczowe procesy'
-                    : 'Pozostały ograniczenia'}
-                </dd>
-              </div>
-              <div>
-                <dt>Business Continuity</dt>
-                <dd>
-                  {r.business.totalProcessed}/{r.business.totalReceived}{' '}
-                  zamówień · zaległe {r.business.backlog}
-                </dd>
-              </div>
-            </dl>
-            <p>
-              Uszkodzone: {r.documents.damaged}. Do uzgodnienia:{' '}
-              {r.documents.reconcile}. Szkodliwy dostęp nadal możliwy:{' '}
-              {r.remainingAccess ? 'tak' : 'nie'}. Ręczne wysyłki:{' '}
-              {r.manualProcessed}, nieuzgodnione: {r.pendingOrders.length}. ERP:{' '}
-              {r.erp.instance}, proces{' '}
-              {r.erp.processRunning ? 'działa' : 'zatrzymany'}, storage{' '}
-              {r.erp.storage ? 'dostępny' : 'niedostępny'}.
-            </p>
-            <p>
-              Operational Confidence:{' '}
-              {!r.verification.erpRequired && !r.verification.documentsRequired
-                ? 'nie wykonano odzyskiwania wymagającego końcowej weryfikacji'
-                : r.confidenceMet
-                  ? 'ostatni stan potwierdzony'
-                  : 'brak aktualnej weryfikacji'}
-              . Zakończono{' '}
-              {
-                r.tasks.filter(
-                  (t) => t.status === 'completed' && t.workerId === 'analyst',
-                ).length
-              }{' '}
-              badań i działań analityka. Wygaszenie wyjątku CARGO-LINK o 15:30
-              nie unieważnia poprawnej pracy ostatniego przedziału.
-            </p>
-            <p>
-              FS-01: {r.serviceStatus.fsOnline ? 'online' : 'offline'} · trasa
-              EAST: {r.serviceStatus.branchRoute} · wyjątek CARGO-LINK:{' '}
-              {r.serviceStatus.vendorException}.
-            </p>
-            <h3>Ostatni rozliczony przedział</h3>
-            <ul>
-              {r.business.lastReport?.contributions?.map((c) => (
-                <li key={c.id}>
-                  {c.name}: {c.capacity}/turę ·{' '}
-                  {c.available ? 'użyteczny' : 'niedostępny'}
-                </li>
-              ))}
-            </ul>
-            <button className="primary-button" onClick={onHeadquarters}>
-              Wróć do Centrali — kolejna próba
-            </button>
-          </section>
-          <div className="finale-debrief-grid">
-            <section className="vendor-card">
-              <h2>Dziedzictwo kampanii</h2>
-              {r.usedControls.length ? (
-                r.usedControls.map((c) => (
-                  <details key={c.control}>
-                    <summary>{c.control} — rzeczywiste zdarzenia</summary>
+          {fullReport && (
+            <MissionConclusion
+              report={fullReport}
+              decisions={experience.decisions}
+              onContinue={onHeadquarters}
+            />
+          )}
+          <DeferredDetails title="Szczegóły techniczne i pełny debrief kampanii">
+            {() => (
+              <>
+                <section className="vendor-card">
+                  <p className="eyebrow">
+                    Pierwszy rozdział ukończony · możesz ponowić finał w
+                    kolejnym oknie
+                  </p>
+                  <h2>{outcomes[r.outcome]}</h2>
+                  <p>{r.explanation}</p>
+                  <dl className="business-metrics">
+                    <div>
+                      <dt>Confidentiality</dt>
+                      <dd>{r.exposedRecords} odczytanych rekordów</dd>
+                    </div>
+                    <div>
+                      <dt>Integrity</dt>
+                      <dd>
+                        {r.documents.correct}/{r.documents.total} poprawnych
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Availability</dt>
+                      <dd>
+                        {r.servicesMet
+                          ? 'Użyteczne kluczowe procesy'
+                          : 'Pozostały ograniczenia'}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Business Continuity</dt>
+                      <dd>
+                        {r.business.totalProcessed}/{r.business.totalReceived}{' '}
+                        zamówień · zaległe {r.business.backlog}
+                      </dd>
+                    </div>
+                  </dl>
+                  <p>
+                    Uszkodzone: {r.documents.damaged}. Do uzgodnienia:{' '}
+                    {r.documents.reconcile}. Szkodliwy dostęp nadal możliwy:{' '}
+                    {r.remainingAccess ? 'tak' : 'nie'}. Ręczne wysyłki:{' '}
+                    {r.manualProcessed}, nieuzgodnione: {r.pendingOrders.length}
+                    . ERP: {r.erp.instance}, proces{' '}
+                    {r.erp.processRunning ? 'działa' : 'zatrzymany'}, storage{' '}
+                    {r.erp.storage ? 'dostępny' : 'niedostępny'}.
+                  </p>
+                  <p>
+                    Operational Confidence:{' '}
+                    {!r.verification.erpRequired &&
+                    !r.verification.documentsRequired
+                      ? 'nie wykonano odzyskiwania wymagającego końcowej weryfikacji'
+                      : r.confidenceMet
+                        ? 'ostatni stan potwierdzony'
+                        : 'brak aktualnej weryfikacji'}
+                    . Zakończono{' '}
+                    {
+                      r.tasks.filter(
+                        (t) =>
+                          t.status === 'completed' && t.workerId === 'analyst',
+                      ).length
+                    }{' '}
+                    badań i działań analityka. Wygaszenie wyjątku CARGO-LINK o
+                    15:30 nie unieważnia poprawnej pracy ostatniego przedziału.
+                  </p>
+                  <p>
+                    FS-01: {r.serviceStatus.fsOnline ? 'online' : 'offline'} ·
+                    trasa EAST: {r.serviceStatus.branchRoute} · wyjątek
+                    CARGO-LINK: {r.serviceStatus.vendorException}.
+                  </p>
+                  <h3>Ostatni rozliczony przedział</h3>
+                  <ul>
+                    {r.business.lastReport?.contributions?.map((c) => (
+                      <li key={c.id}>
+                        {c.name}: {c.capacity}/turę ·{' '}
+                        {c.available ? 'użyteczny' : 'niedostępny'}
+                      </li>
+                    ))}
+                  </ul>
+                  <button className="primary-button" onClick={onHeadquarters}>
+                    Wróć do Centrali — kolejna próba
+                  </button>
+                </section>
+                <div className="finale-debrief-grid">
+                  <section className="vendor-card">
+                    <h2>Dziedzictwo kampanii</h2>
+                    {r.usedControls.length ? (
+                      r.usedControls.map((c) => (
+                        <details key={c.control}>
+                          <summary>{c.control} — rzeczywiste zdarzenia</summary>
+                          <ul>
+                            {c.facts.map((x, n) => (
+                              <li key={n}>{x}</li>
+                            ))}
+                          </ul>
+                        </details>
+                      ))
+                    ) : (
+                      <p>
+                        Brak zarejestrowanego użycia zabezpieczeń w tym
+                        przebiegu.
+                      </p>
+                    )}
+                    <h3>Luki w architekturze</h3>
                     <ul>
-                      {c.facts.map((x, n) => (
-                        <li key={n}>{x}</li>
+                      {r.gaps.map((x) => (
+                        <li key={x}>{x}</li>
                       ))}
                     </ul>
-                  </details>
-                ))
-              ) : (
-                <p>
-                  Brak zarejestrowanego użycia zabezpieczeń w tym przebiegu.
-                </p>
-              )}
-              <h3>Luki w architekturze</h3>
-              <ul>
-                {r.gaps.map((x) => (
-                  <li key={x}>{x}</li>
-                ))}
-              </ul>
-              <h3>Niepozyskane dowody</h3>
-              <ul>
-                {r.missingEvidence.map((x) => (
-                  <li key={x}>{x}</li>
-                ))}
-              </ul>
-              <h3>Niewykorzystane możliwości</h3>
-              <ul>
-                {r.unusedCapabilities.map((x) => (
-                  <li key={x}>{x} Nie symulowano alternatywnego wyniku.</li>
-                ))}
-              </ul>
-              <h3>Pozostałe ryzyko i brakujące potwierdzenia</h3>
-              <ul>
-                {r.residualRisk.map((x) => (
-                  <li key={x}>{x}</li>
-                ))}
-              </ul>
-              <p>
-                Źródła nieobjęte pokryciem lub niepobrane nie potwierdzają braku
-                zdarzeń.
-              </p>
-            </section>
-            <section className="vendor-card">
-              <h2>Kluczowe zdarzenia i decyzje</h2>
-              {r.events.map((e, n) => (
-                <p key={n}>
-                  {formatMinute(e.minute)} · {e.assetId}: {e.fact}
-                </p>
-              ))}
-              {r.tasks.map((t) => (
-                <p key={t.id}>
-                  {formatMinute(840 + t.startTurn * 5)} →{' '}
-                  {formatMinute(840 + t.dueTurn * 5)} · {t.workerId} ·{' '}
-                  {actionLabel(t.action)} · {t.status}
-                </p>
-              ))}
-              <h3>Hipotezy gracza</h3>
-              {r.hypotheses.map((h, n) => (
-                <p key={n}>
-                  {formatMinute(h.minute)} · {hypotheses[h.hypothesis]} ·{' '}
-                  {h.observationIds.length} dostępnych wpisów. Nie jest
-                  potwierdzeniem przyczyny.
-                </p>
-              ))}
-            </section>
-          </div>
+                    <h3>Niepozyskane dowody</h3>
+                    <ul>
+                      {r.missingEvidence.map((x) => (
+                        <li key={x}>{x}</li>
+                      ))}
+                    </ul>
+                    <h3>Niewykorzystane możliwości</h3>
+                    <ul>
+                      {r.unusedCapabilities.map((x) => (
+                        <li key={x}>
+                          {x} Nie symulowano alternatywnego wyniku.
+                        </li>
+                      ))}
+                    </ul>
+                    <h3>Pozostałe ryzyko i brakujące potwierdzenia</h3>
+                    <ul>
+                      {r.residualRisk.map((x) => (
+                        <li key={x}>{x}</li>
+                      ))}
+                    </ul>
+                    <p>
+                      Źródła nieobjęte pokryciem lub niepobrane nie potwierdzają
+                      braku zdarzeń.
+                    </p>
+                  </section>
+                  <section className="vendor-card">
+                    <h2>Kluczowe zdarzenia i decyzje</h2>
+                    {r.events.map((e, n) => (
+                      <p key={n}>
+                        {formatMinute(e.minute)} · {e.assetId}: {e.fact}
+                      </p>
+                    ))}
+                    {r.tasks.map((t) => (
+                      <p key={t.id}>
+                        {formatMinute(840 + t.startTurn * 5)} →{' '}
+                        {formatMinute(840 + t.dueTurn * 5)} · {t.workerId} ·{' '}
+                        {actionLabel(t.action)} · {t.status}
+                      </p>
+                    ))}
+                    <h3>Hipotezy gracza</h3>
+                    {r.hypotheses.map((h, n) => (
+                      <p key={n}>
+                        {formatMinute(h.minute)} · {hypotheses[h.hypothesis]} ·{' '}
+                        {h.observationIds.length} dostępnych wpisów. Nie jest
+                        potwierdzeniem przyczyny.
+                      </p>
+                    ))}
+                  </section>
+                </div>
+              </>
+            )}
+          </DeferredDetails>
           <AfterActionExport game={game} />
         </>
       ) : (
@@ -258,7 +286,7 @@ export function FinaleWorkspace({
                       </p>
                     )}
                   </section>
-                  <BusinessPanel view={v} />
+                  <BusinessPanel view={v} experience={experience} />
                 </>
               )}
               {tab === 'investigation' && (
@@ -330,6 +358,7 @@ export function FinaleWorkspace({
                   />
                   <InfrastructureInspector
                     world={v.world}
+                    experience={experience}
                     selection={selection}
                     onSelect={setSelection}
                     networkRules={v.rules}
@@ -346,7 +375,14 @@ export function FinaleWorkspace({
               )}
             </main>
             <aside>
-              <OperationsPanel view={v} onCommand={onCommand} />
+              <OperationsPanel
+                view={v}
+                actions={experience.actions}
+                focusAssetId={
+                  selection?.kind === 'asset' ? selection.id : undefined
+                }
+                onCommand={onCommand}
+              />
             </aside>
           </div>
         </>

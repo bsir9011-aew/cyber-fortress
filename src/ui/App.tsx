@@ -1,3 +1,4 @@
+import { GameplayHelp } from './GameplayHelp';
 import { useState } from 'react';
 import type { ScenarioMode } from '../domain/scenario';
 import { usePersistentOperations } from './usePersistentOperations';
@@ -12,6 +13,7 @@ import './scenario.css';
 import './persistence.css';
 import './strategy.css';
 import './integrity.css';
+import './gameplay.css';
 
 export function App() {
   const operations = usePersistentOperations();
@@ -21,7 +23,7 @@ export function App() {
     return (
       !(operations.active || operations.hasSave) ||
       window.confirm(
-        'Nowa gra zastąpi bieżącą grę i zapis V8. Oryginały V1/V2/V3/V4/V5/V6/V7 oraz historia prób pozostaną. Kontynuować?',
+        'Nowa gra zastąpi bieżącą grę i zapis V9. Oryginały V1/V2/V3/V4/V5/V6/V7/V8 oraz historia prób pozostaną. Kontynuować?',
       )
     );
   }
@@ -60,9 +62,10 @@ export function App() {
           </div>
         </div>
         <span className="version">
-          DEV 0.2 <span>· Third-party Access</span>
+          DEV 0.2 <span>· Decision Cockpit</span>
         </span>
       </header>
+      <GameplayHelp />
       <PersistenceToolbar
         game={game}
         legacyRaw={operations.legacyRaw}
@@ -81,7 +84,7 @@ export function App() {
         onImport={(save) => {
           if (
             !window.confirm(
-              'Import zastąpi bieżącą grę i zapis V8. Oryginały V1/V2/V3/V4/V5/V6/V7 oraz historia pozostaną. Kontynuować?',
+              'Import zastąpi bieżącą grę i zapis V9. Oryginały V1/V2/V3/V4/V5/V6/V7/V8 oraz historia pozostaną. Kontynuować?',
             )
           )
             return;
@@ -167,7 +170,8 @@ export function App() {
       <footer className="app-footer">
         <span>FORTRESS LAB / NEXUS Logistics</span>
         <span>
-          After Action Review <span className="footer-dot" /> Sprint 10
+          After Action Review <span className="footer-dot" /> Rozdział I ·
+          M01–M06
         </span>
       </footer>
     </div>

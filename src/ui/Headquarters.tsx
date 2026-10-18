@@ -1,10 +1,12 @@
+import { selectRecordedCampaignHistory } from '../application/gameplay/campaignHistory';
+import { CampaignCommand as CampaignCommandPanel } from './CampaignCommand';
+import { CampaignHistory } from './CampaignHistory';
+import { PreparationPreview } from './PreparationPreview';
 import { BranchPreparation } from './BranchPreparation';
 import { VendorPreparation } from './VendorPreparation';
 import { DetectionConfiguration } from './DetectionConfiguration';
-import { AfterActionExport } from './AfterActionExport';
-import { campaignAarMissionId } from '../application/createAfterActionReport';
 import { ResilienceStatus } from './ResilienceStatus';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import type {
   StrategicSession,
   HeadquartersTab,
@@ -47,6 +49,10 @@ export function Headquarters({
   onMenu: () => void;
 }) {
   const view = selectStrategyView(session.campaign);
+  const recordedHistory = useMemo(
+    () => selectRecordedCampaignHistory(session),
+    [session.campaign.history, session.initialSeed, session.attemptId],
+  );
   const heading = useRef<HTMLHeadingElement>(null);
   const [assignment, setAssignment] = useState<Record<WorkerId, ProjectId>>({
     administrator: 'remote-access',
@@ -109,210 +115,6 @@ export function Headquarters({
           </strong>
         </div>
       </section>
-      {view.eligibleForFunding && (
-        <section
-          className="resilience-funding"
-          aria-label="Przegląd odporności — Etap II"
-        >
-          <p className="eyebrow">PRZEGLĄD ODPORNOŚCI — ETAP II</p>
-          <h2>
-            {view.funding
-              ? 'Transza przyjęta · 25 000 zł'
-              : 'Decyzja zarządu · 25 000 zł'}
-          </h2>
-          <p>
-            Po incydencie integralności zarząd zwiększa środki na ograniczenie
-            ryzyka. To finansowanie przeglądu, niezależne od wyniku misji.
-            Historyczna alokacja Etapu I: 80 000 zł.
-          </p>
-          {view.funding ? (
-            <p>
-              Jednorazowa alokacja board-resilience-ii · przegląd raportu{' '}
-              {view.funding.allocations[0]?.reportNumber}. Łączna pula: 105 000
-              zł. Wydatki i rezerwacje pozostają w osobnym rejestrze.
-            </p>
-          ) : (
-            <button
-              className="primary-button"
-              onClick={() => onCommand({ type: 'accept-resilience-funding' })}
-            >
-              Przyjmij finansowanie Etapu II — 25 000 zł
-            </button>
-          )}
-          <p>
-            EDR pomaga wcześniej zebrać dowody. Backup skraca odtworzenie
-            sprawdzonej kopii. Zachowanie rezerwy pozostawia dotychczasowe
-            możliwości. Oba projekty: 52 000 zł, 5 h administratora i 4 h
-            analityka — potrzebne kolejne okno.
-          </p>
-        </section>
-      )}
-      {view.history.some((r) => r.vendor) && (
-        <section
-          className="integrity-mission-card"
-          aria-label="Misja 04: ERP nie odpowiada"
-        >
-          <p className="eyebrow">Blackout Protocol</p>
-          <h2>Misja 04 — ERP nie odpowiada</h2>
-          <p>
-            Diagnoza awarii, odtworzenie danych i ciągłość wysyłek. RTO 30 min,
-            RPO 15 min. Dostępna po ukończeniu Misji 03 niezależnie od wyniku.
-            Bez dodatkowego finansowania.
-          </p>
-          <button
-            className="primary-button"
-            disabled={view.preparation.hour !== 4}
-            onClick={() =>
-              onCommand({
-                type: 'start-recovery-incident',
-                familyId: 'nexus-erp-recovery-v1',
-              })
-            }
-          >
-            Rozpocznij Misję 04 →
-          </button>
-        </section>
-      )}
-      {view.history.some((r) => r.recovery) && (
-        <>
-          <BranchPreparation
-            campaign={session.campaign}
-            onCommand={onCommand}
-          />
-          <section className="vendor-card" aria-label="Finał kampanii M06">
-            <p className="eyebrow">THE PERFECT STORM / FINAŁ ROZDZIAŁU</p>
-            <h2>06 — Kryzys w NEXUS</h2>
-            <p>
-              {session.campaign.chapterOneCompleted
-                ? 'Pierwszy rozdział ukończony. Historia pozostaje; możesz ponowić finał.'
-                : 'Finał dostępny po dowolnym ukończeniu M05, także porażce.'}{' '}
-              Jedno okno 90 minut, wspólne 8 + 8 + 3 + 3 zamówień wydajności.
-              Wykorzystaj bieżące cztery godziny na inwestycje, EDR, EAST i nowy
-              wyjątek dostawcy. Poprzednie wyjątki nie przechodzą automatycznie.
-            </p>
-            <button
-              className="primary-button"
-              disabled={
-                !view.history.some((r) => r.branch) ||
-                view.preparation.hour !== 4
-              }
-              onClick={() =>
-                onCommand({
-                  type: 'start-finale-incident',
-                  familyId: 'nexus-campaign-finale-v1',
-                })
-              }
-            >
-              Rozpocznij Misję 06 — finał
-            </button>
-          </section>
-        </>
-      )}
-      <div className="hq-window">
-        <div>
-          <span className="eyebrow">Przygotowanie poza incydentem</span>
-          <strong data-testid="preparation-time">
-            {view.preparation.hour} / 4 h
-          </strong>
-          <p>
-            Administrator i analityk mają oddzielne kanały pracy. Niewykonane
-            godziny projektu przejdą do następnego okna.
-          </p>
-        </div>
-        <div className="window-actions">
-          <button
-            className="secondary-button"
-            disabled={view.preparation.hour === 4}
-            onClick={() => onCommand({ type: 'advance-preparation' })}
-          >
-            Rozlicz godzinę pracy
-          </button>
-          <button
-            className="primary-button"
-            disabled={view.preparation.hour !== 4}
-            onClick={() => onCommand({ type: 'start-incident' })}
-          >
-            Rozpocznij incydent →
-          </button>
-        </div>
-      </div>
-      {view.lastDecision?.result === 'rejected' && (
-        <p className="strategy-error" role="alert">
-          {view.lastDecision.reason}
-        </p>
-      )}
-      <section
-        className="integrity-mission-card"
-        aria-label="Misja 02: Ostatnia czysta kopia"
-      >
-        <div>
-          <p className="eyebrow">Nowy rozdział / Integralność i odzyskiwanie</p>
-          <h2>02 — Ostatnia czysta kopia</h2>
-          <p>
-            ERP działa, ale dokumenty FS-01 nie zgadzają się z zamówieniami.
-            Ustal źródło, ogranicz je i wybierz sposób odtworzenia. To osobna
-            rodzina incydentu.
-          </p>
-          <p>
-            {!view.history.length
-              ? 'Dostępna po ukończeniu jednego incydentu Misji 01.'
-              : view.preparation.hour !== 4
-                ? 'Przed startem rozlicz cztery godziny przygotowania.'
-                : 'Zachowasz budżet, inwestycje i trwałe zmiany. Dowody będą świeże.'}
-          </p>
-        </div>
-        <button
-          className="primary-button"
-          disabled={
-            !view.history.some((r) => !r.integrity) ||
-            view.preparation.hour !== 4
-          }
-          onClick={() => onCommand({ type: 'start-integrity-incident' })}
-        >
-          Rozpocznij Misję 02 →
-        </button>
-      </section>
-      <section
-        className="integrity-mission-card"
-        aria-label="Misja 02 — Nieznany przypadek"
-      >
-        <div>
-          <p className="eyebrow">Rodzina integralności / nieznany przypadek</p>
-          <h2>Misja 02 — Nieznany przypadek</h2>
-          <p>
-            Zespół prosi o sprawdzenie aktywności dokumentów FS-01. Ustal, co
-            się dzieje, zbierz dowody i zachowaj ciągłość wysyłek. EDR jest
-            opcjonalnym źródłem, nie warunkiem rozpoczęcia.
-          </p>
-        </div>
-        <button
-          className="primary-button"
-          disabled={
-            !view.history.some((r) => !r.integrity) ||
-            view.preparation.hour !== 4
-          }
-          onClick={() =>
-            onCommand({
-              type: 'start-detection-incident',
-              familyId: 'nexus-integrity-detection-v1',
-            })
-          }
-        >
-          Rozpocznij nieznany przypadek →
-        </button>
-      </section>
-      {view.history.some((r) => r.integrity) && (
-        <VendorPreparation
-          key={`vendor-${session.attemptId}-${view.preparation.number}`}
-          campaign={session.campaign}
-          onCommand={onCommand}
-        />
-      )}
-      <DetectionConfiguration
-        key={`${session.attemptId}-${view.preparation.number}`}
-        campaign={session.campaign}
-        onCommand={onCommand}
-      />
       <nav className="hq-tabs" aria-label="Konteksty centrali">
         {tabs.map((tab) => (
           <button
@@ -324,6 +126,19 @@ export function Headquarters({
           </button>
         ))}
       </nav>
+      {view.lastDecision?.result === 'rejected' && (
+        <p className="strategy-error" role="alert">
+          {view.lastDecision.reason}
+        </p>
+      )}
+      {session.headquartersTab === 'overview' && (
+        <CampaignCommandPanel
+          history={recordedHistory}
+          campaign={session.campaign}
+          onCommand={onCommand}
+          onTab={onTab}
+        />
+      )}
       {session.headquartersTab === 'overview' && (
         <>
           <section className="hq-overview">
@@ -351,9 +166,10 @@ export function Headquarters({
               <span className="eyebrow">Przed Twoim pierwszym oknem</span>
               <h2>Pilotaż to początek, nie gotowa ochrona.</h2>
               <p>
-                Zapłacono już <strong>12 000 zł</strong>. Pozostało{' '}
-                <strong>68 000 zł</strong>. Trzy dalsze wdrożenia wymagają
-                łącznie 78 000 zł i czasu zespołu.
+                Stan bieżącego budżetu: poniesiono{' '}
+                <strong>{money(view.budget.spent)}</strong>, dostępne{' '}
+                <strong>{money(view.budget.available)}</strong>. Inwestycje
+                wymagają pieniędzy i pracy konkretnych osób.
               </p>
               <p>
                 Sam zakup nie zmieni konfiguracji. Projekt zaczyna działać
@@ -413,56 +229,52 @@ export function Headquarters({
               </button>
             </article>
           </section>
-          <section className="campaign-history">
-            <h2>Zakończone operacje tej kampanii</h2>
-            {!view.history.length ? (
-              <p>
-                Jeszcze żadnej. Możesz zachować rezerwę i przejść okno bez
-                inwestycji.
-              </p>
-            ) : (
-              view.history.map((r) => (
-                <article key={r.number}>
-                  <strong>
-                    Operacja {r.number} · {r.name}
-                  </strong>
-                  <p>
-                    {r.branch
-                      ? `EAST ${r.branch.ready ? 'gotowy' : 'ograniczona obsługa'} · ${r.branch.exposedRecords} ujawnionych rekordów`
-                      : r.recovery
-                        ? `ERP ${r.recovery.useful ? 'użyteczny' : 'niedostępny'} · ${r.recovery.missingRecordIds.length} brakujących zapisów · ${r.recovery.pendingOrderIds.length} nieuzgodnionych wysyłek`
-                        : r.integrity
-                          ? `${r.integrity.correct}/100 poprawnych dokumentów · ${r.integrity.damaged} uszkodzonych · ${r.integrity.reconcile} do uzgodnienia`
-                          : `${r.exposedRecords} ujawnionych rekordów`}{' '}
-                    · {r.processed} obsłużonych · {r.backlog} zaległych · wydano{' '}
-                    {money(r.spent)}.
-                  </p>
-                  <p>
-                    {r.containmentMet === null
-                      ? 'Brak potwierdzonej złośliwej aktywności; ograniczenie zagrożenia nie dotyczy.'
-                      : r.containmentMet
-                        ? 'Cel ograniczenia dostępu osiągnięty.'
-                        : 'Dostęp wymaga dalszej uwagi.'}
-                  </p>
-                  <details>
-                    <summary>Raport szczegółowy tej operacji</summary>
-                    <AfterActionExport
-                      game={session}
-                      missionId={campaignAarMissionId(
-                        session.attemptId,
-                        r.number,
-                      )}
-                      compact
-                    />
-                  </details>
-                </article>
-              ))
-            )}
-          </section>
+          <CampaignHistory session={session} rows={recordedHistory} />
         </>
       )}
       {session.headquartersTab === 'projects' && (
         <>
+          {view.eligibleForFunding && (
+            <section
+              className="resilience-funding"
+              aria-label="Przegląd odporności — Etap II"
+            >
+              <p className="eyebrow">PRZEGLĄD ODPORNOŚCI — ETAP II</p>
+              <h2>
+                {view.funding
+                  ? 'Transza przyjęta · 25 000 zł'
+                  : 'Decyzja zarządu · 25 000 zł'}
+              </h2>
+              <p>
+                Po incydencie integralności zarząd zwiększa środki na
+                ograniczenie ryzyka. To finansowanie przeglądu, niezależne od
+                wyniku misji. Historyczna alokacja Etapu I: 80 000 zł.
+              </p>
+              {view.funding ? (
+                <p>
+                  Jednorazowa alokacja board-resilience-ii · przegląd raportu{' '}
+                  {view.funding.allocations[0]?.reportNumber}. Łączna pula: 105
+                  000 zł. Wydatki i rezerwacje pozostają w osobnym rejestrze.
+                </p>
+              ) : (
+                <button
+                  className="primary-button"
+                  onClick={() =>
+                    onCommand({ type: 'accept-resilience-funding' })
+                  }
+                >
+                  Przyjmij finansowanie Etapu II — 25 000 zł
+                </button>
+              )}
+              <p>
+                EDR pomaga wcześniej zebrać dowody. Backup skraca odtworzenie
+                sprawdzonej kopii. Zachowanie rezerwy pozostawia dotychczasowe
+                możliwości. Oba projekty: 52 000 zł, 5 h administratora i 4 h
+                analityka — potrzebne kolejne okno.
+              </p>
+            </section>
+          )}
+
           <p className="hq-note">
             Najpierw porównaj zakres i zaplanuj projekt. Potwierdzenie rezerwuje
             środki. Przydział pierwszej pracy rozlicza płatność; zabezpieczenie
@@ -533,6 +345,12 @@ export function Headquarters({
                     </button>
                   )}
                   {p.status === 'planned' && (
+                    <PreparationPreview
+                      campaign={session.campaign}
+                      command={{ type: 'reserve-project', projectId: p.id }}
+                    />
+                  )}
+                  {p.status === 'planned' && (
                     <button
                       className="primary-button"
                       disabled={view.preparation.hour === 4}
@@ -593,6 +411,14 @@ export function Headquarters({
       )}
       {session.headquartersTab === 'schedule' && (
         <>
+          <h2>PLAN PRZYGOTOWANIA · {view.preparation.hour}/4 h</h2>
+          <button
+            disabled={view.preparation.hour === 4}
+            onClick={() => onCommand({ type: 'advance-preparation' })}
+          >
+            Rozlicz godzinę pracy
+          </button>
+
           <div className="worker-plan">
             {(['administrator', 'analyst'] as const).map((worker) => {
               const detectionBusy =
@@ -671,6 +497,16 @@ export function Headquarters({
                       </option>
                     ))}
                   </select>
+                  {chosen && (
+                    <PreparationPreview
+                      campaign={session.campaign}
+                      command={{
+                        type: 'assign-work',
+                        projectId: chosen.id,
+                        workerId: worker,
+                      }}
+                    />
+                  )}
                   <button
                     className="secondary-button"
                     disabled={
@@ -779,6 +615,24 @@ export function Headquarters({
               </div>
             ))}
           </section>
+          {view.history.some((r) => r.recovery) && (
+            <BranchPreparation
+              campaign={session.campaign}
+              onCommand={onCommand}
+              showStart={false}
+            />
+          )}
+          {view.history.some((r) => r.integrity) && (
+            <VendorPreparation
+              campaign={session.campaign}
+              onCommand={onCommand}
+              showStart={false}
+            />
+          )}
+          <DetectionConfiguration
+            campaign={session.campaign}
+            onCommand={onCommand}
+          />
           <section className="preparation-progress">
             <h2>Praca przechodząca na kolejne okno</h2>
             {view.projects

@@ -2,6 +2,25 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
+## Decision Cockpit i kampania (Sprint 16)
+
+Centrala **NEXUS CAMPAIGN — ROZDZIAŁ I** zbiera sześć misji, ich odblokowanie,
+próby i ostatnie wyniki. **Plan przygotowania** pokazuje pracę obu specjalistów;
+podgląd zlecenia wyjaśnia czas, płatność, rezerwację i warunki operacji.
+Obowiązkowe cztery godziny oraz dotychczasowe zasady kampanii pozostają zachowane.
+
+W misji **Decision Cockpit** pokazuje firmę, zespół i **Ostatnie 5 minut**.
+Działania są pogrupowane w **INVESTIGATE / CONTAIN / RECOVER / INFRASTRUCTURE**,
+z rzeczywistym wykonawcą, czasem i powodem niedostępności. Mapa prowadzi do
+powiązanych dowodów, procesów i tych samych działań. Szczegóły techniczne można
+rozwinąć; podsumowania korzystają wyłącznie z dostępnej wiedzy gracza.
+
+Krótkie wprowadzenie można pominąć lub ponownie otworzyć przez **Jak grać?**.
+Nie wykonuje komend ani nie przesuwa czasu. Po misji najpierw pojawiają się
+wnioski i rzeczywiste decyzje, potem pełny raport i eksport AAR. Historia Centrali
+pozwala porównać dwie zapisane próby tej samej rodziny; brakujące szczegóły są
+jawnie oznaczone. Zachowano FortressSaveV9 i zgodność wcześniejszych zapisów.
+
 ## Misja 06 — The Perfect Storm
 
 Finał `nexus-campaign-finale-v1` jest dostępny po dowolnym ukończeniu M05.
