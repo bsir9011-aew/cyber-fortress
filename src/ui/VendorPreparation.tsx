@@ -1,3 +1,4 @@
+import { PreparationPreview } from './PreparationPreview';
 import { preparationWorkerBusy } from '../application/branchPreparation';
 import { useState } from 'react';
 import type { CampaignCommand, CampaignState } from '../domain/campaign';
@@ -23,7 +24,9 @@ const previewWorld = {
 export function VendorPreparation({
   campaign,
   onCommand,
+  showStart = true,
 }: {
+  showStart?: boolean;
   campaign: CampaignState;
   onCommand: (c: CampaignCommand) => void;
 }) {
@@ -117,12 +120,20 @@ export function VendorPreparation({
           Przygotuj wyjątek — 1 h administratora
         </button>
       </div>
+      <PreparationPreview
+        campaign={campaign}
+        command={{
+          type: 'prepare-vendor-exception',
+          scope,
+          expiresAtMinute: expiry,
+        }}
+      />
       <p>
         {pending
           ? 'Administrator przygotowuje zatwierdzenie. Rozlicz godzinę; wyjątek jeszcze nie jest gotowy.'
           : busy
             ? 'Administrator jest zajęty wdrożeniem.'
-            : 'Bez dodatkowej opłaty. Gotowy wyjątek dotyczy tylko startu Misji 03 w tym oknie; po użyciu wymaga nowej decyzji.'}
+            : 'Bez dodatkowej opłaty. Gotowy wyjątek dotyczy startu Misji 03 lub 06 w tym oknie; po użyciu wymaga nowej decyzji.'}
       </p>
       <p>
         {approval
@@ -143,18 +154,20 @@ export function VendorPreparation({
           onSelect={setSelection}
         />
       </details>
-      <button
-        className="primary-button"
-        disabled={campaign.preparation.hour !== 4}
-        onClick={() =>
-          onCommand({
-            type: 'start-vendor-incident',
-            familyId: 'nexus-vendor-access-v1',
-          })
-        }
-      >
-        Rozpocznij Misję 03 →
-      </button>
+      {showStart && (
+        <button
+          className="primary-button"
+          disabled={campaign.preparation.hour !== 4}
+          onClick={() =>
+            onCommand({
+              type: 'start-vendor-incident',
+              familyId: 'nexus-vendor-access-v1',
+            })
+          }
+        >
+          Rozpocznij Misję 03 →
+        </button>
+      )}
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { PreparationPreview } from './PreparationPreview';
 import { useState } from 'react';
 import type { CampaignState, CampaignCommand } from '../domain/campaign';
 import type {
@@ -28,7 +29,9 @@ const previewIds = [
 export function BranchPreparation({
   campaign: s,
   onCommand,
+  showStart = true,
 }: {
+  showStart?: boolean;
   campaign: CampaignState;
   onCommand: (c: CampaignCommand) => void;
 }) {
@@ -71,7 +74,10 @@ export function BranchPreparation({
           {label} · {spec.hours} h{' '}
           {spec.workerId === 'analyst' ? 'analityka' : 'administratora'}
         </button>
-        {rejection && <small>{rejection}</small>}
+        <PreparationPreview
+          campaign={s}
+          command={{ type: 'prepare-branch-architecture', change }}
+        />
       </>
     );
   };
@@ -233,18 +239,20 @@ export function BranchPreparation({
           onSelect={setSelection}
         />
       </details>
-      <button
-        className="primary-button"
-        disabled={s.preparation.hour !== 4}
-        onClick={() =>
-          onCommand({
-            type: 'start-branch-incident',
-            familyId: 'nexus-east-branch-v1',
-          })
-        }
-      >
-        Rozpocznij Misję 05 →
-      </button>
+      {showStart && (
+        <button
+          className="primary-button"
+          disabled={s.preparation.hour !== 4}
+          onClick={() =>
+            onCommand({
+              type: 'start-branch-incident',
+              familyId: 'nexus-east-branch-v1',
+            })
+          }
+        >
+          Rozpocznij Misję 05 →
+        </button>
+      )}
     </section>
   );
 }

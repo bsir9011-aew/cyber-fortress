@@ -1,3 +1,5 @@
+import type { GameplayExperience } from '../application/gameplay/cockpit';
+import { formatMinute } from '../simulation/clock';
 import { ResilienceStatus } from './ResilienceStatus';
 import type { ResilienceStatusProps } from './ResilienceStatus';
 import {
@@ -17,6 +19,7 @@ import type { MapSelection } from './infrastructurePresentation';
 import type { IntegrityView } from '../application/selectIntegrityView';
 
 interface Props {
+  experience?: GameplayExperience | undefined;
   vendor?: import('../application/selectVendorView').VendorView | undefined;
   resilience?: ResilienceStatusProps | undefined;
   world: WorldState;
@@ -28,6 +31,7 @@ interface Props {
 
 export function InfrastructureInspector({
   world,
+  experience,
   resilience,
   selection,
   onSelect,
@@ -107,6 +111,51 @@ export function InfrastructureInspector({
             ● {statusLabels[asset.status]} operacyjnie
           </span>
           <p className="inspector-description">{asset.description}</p>
+          {experience && (
+            <section className="inspector-section">
+              <h3>Twoje dowody i możliwe decyzje</h3>
+              {experience.signals
+                .filter((o) => o.assets.includes(asset.id))
+                .slice(-3)
+                .map((o) => (
+                  <p key={o.id}>
+                    {formatMinute(o.obtained)} · {o.source}: {o.text}
+                  </p>
+                ))}
+              {!experience.signals.some((o) => o.assets.includes(asset.id)) && (
+                <p>Nie pozyskano obserwacji dotyczących tego zasobu.</p>
+              )}
+              <p>
+                Powiązane procesy:{' '}
+                {experience.business
+                  .filter((b) => b.assets.includes(asset.id))
+                  .map((b) => b.name)
+                  .join(', ') || 'brak opisanej części procesu'}
+                .
+              </p>
+              <ul>
+                {[
+                  ...new Map(
+                    experience.actions
+                      .filter((a) => a.assets.includes(asset.id))
+                      .map((a) => [a.action.type, a]),
+                  ).values(),
+                ].map((a) => (
+                  <li key={a.action.type}>
+                    <a href="#team-actions">{a.label}</a>
+                    <small>
+                      {a.reason ??
+                        `${a.workerId === 'administrator' ? 'Administrator' : 'Analityk'} · ${a.turns * 5} min`}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+              <p>
+                Filtr działań zespołu odpowiada wybranemu zasobowi. Wybierz
+                grupę INVESTIGATE, CONTAIN, RECOVER lub INFRASTRUCTURE.
+              </p>
+            </section>
+          )}
           <dl className="facts">
             <div>
               <dt>Strefa</dt>

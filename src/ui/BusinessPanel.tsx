@@ -1,3 +1,5 @@
+import { BusinessContributions } from './DecisionCockpit';
+import type { GameplayExperience } from '../application/gameplay/cockpit';
 import type { PlayerView } from '../application/selectPlayerView';
 
 const availabilityLabels = {
@@ -6,7 +8,13 @@ const availabilityLabels = {
   unavailable: 'zatrzymany',
 };
 
-export function BusinessPanel({ view }: { view: PlayerView }) {
+export function BusinessPanel({
+  view,
+  experience,
+}: {
+  view: PlayerView;
+  experience: GameplayExperience;
+}) {
   const report = view.business.lastReport;
   return (
     <section
@@ -22,6 +30,7 @@ export function BusinessPanel({ view }: { view: PlayerView }) {
           Cel 15:30: ≤ {view.maxFinalBacklog} zaległych
         </span>
       </div>
+      <BusinessContributions experience={experience} />
       <details className="business-dependencies">
         <summary>Od czego zależy wydajność firmy?</summary>
         {view.finale && (

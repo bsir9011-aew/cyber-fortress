@@ -1,3 +1,4 @@
+import { SituationSummary } from './SituationSummary';
 import { FinaleWorkspace } from './FinaleWorkspace';
 import { BranchPanel } from './BranchPanel';
 import { BranchReport } from './BranchReport';
@@ -6,8 +7,11 @@ import { RecoveryReport } from './RecoveryReport';
 import { VendorPanel } from './VendorPanel';
 import { VendorReport } from './VendorReport';
 import { AfterActionExport } from './AfterActionExport';
-import { useEffect, useRef } from 'react';
-import { selectPlayerView } from '../application/selectPlayerView';
+import { useEffect, useRef, useMemo } from 'react';
+import { selectGameplayExperience } from '../application/gameplay/cockpit';
+import { DecisionCockpit } from './DecisionCockpit';
+import { MissionConclusion } from './MissionConclusion';
+import { DeferredDetails } from './GameplayHelp';
 import { selectMissionReport } from '../application/selectMissionReport';
 import { nextRun } from '../application/scenarioSelectors';
 import type { ScenarioMode } from '../domain/scenario';
@@ -60,8 +64,12 @@ export function MissionWorkspace({
   const { updateUi } = operations;
   const simulation = session.simulation;
   const { briefing, context, layer, selection } = session.uiState;
-  const view = selectPlayerView(simulation);
-  const report = selectMissionReport(simulation);
+  const experience = useMemo(
+    () => selectGameplayExperience(simulation),
+    [simulation],
+  );
+  const view = experience.player;
+  const report = useMemo(() => selectMissionReport(simulation), [simulation]);
   const { world } = view;
   const setBriefing = (briefing: boolean) => updateUi({ briefing });
   const setContext = (context: Context) => updateUi({ context });
@@ -138,6 +146,8 @@ export function MissionWorkspace({
     return (
       <FinaleWorkspace
         view={view}
+        experience={experience}
+        fullReport={report!}
         report={report?.finale ?? null}
         game={operations.game}
         onCommand={onCommand}
@@ -182,6 +192,7 @@ export function MissionWorkspace({
         <MissionBriefing view={view} onStart={() => setBriefing(false)} />
       ) : (
         <>
+          <DecisionCockpit experience={experience} />
           <SimulationTimeBar
             view={view}
             onCommand={onCommand}
@@ -200,34 +211,45 @@ export function MissionWorkspace({
               <h1 ref={headingRef} tabIndex={-1} className="sr-only">
                 Raport po zakończeniu misji
               </h1>
-              {report.branch ? (
-                <BranchReport
-                  report={report.branch}
-                  onHeadquarters={newIncident}
-                />
-              ) : report.recovery ? (
-                <RecoveryReport
-                  report={report.recovery}
-                  onHeadquarters={newIncident}
-                />
-              ) : report.vendor ? (
-                <VendorReport
-                  report={report.vendor}
-                  onHeadquarters={newIncident}
-                />
-              ) : report.integrity ? (
-                <IntegrityReport
-                  report={report.integrity}
-                  onHeadquarters={newIncident}
-                />
-              ) : (
-                <MissionReportPanel
-                  report={report}
-                  onReplay={() => onCommand({ type: 'reset' })}
-                  onNewIncident={newIncident}
-                  campaignMode={operations.game.kind === 'campaign'}
-                />
-              )}
+              <MissionConclusion
+                report={report}
+                decisions={experience.decisions}
+                onContinue={newIncident}
+              />
+              <DeferredDetails title="Szczegóły techniczne i pełny raport">
+                {() => (
+                  <>
+                    {report.branch ? (
+                      <BranchReport
+                        report={report.branch}
+                        onHeadquarters={newIncident}
+                      />
+                    ) : report.recovery ? (
+                      <RecoveryReport
+                        report={report.recovery}
+                        onHeadquarters={newIncident}
+                      />
+                    ) : report.vendor ? (
+                      <VendorReport
+                        report={report.vendor}
+                        onHeadquarters={newIncident}
+                      />
+                    ) : report.integrity ? (
+                      <IntegrityReport
+                        report={report.integrity}
+                        onHeadquarters={newIncident}
+                      />
+                    ) : (
+                      <MissionReportPanel
+                        report={report}
+                        onReplay={() => onCommand({ type: 'reset' })}
+                        onNewIncident={newIncident}
+                        campaignMode={operations.game.kind === 'campaign'}
+                      />
+                    )}
+                  </>
+                )}
+              </DeferredDetails>
               <AfterActionExport game={operations.game} />
               {operations.game.kind === 'campaign' && (
                 <StrategicReport campaign={operations.game.campaign} />
@@ -400,32 +422,42 @@ export function MissionWorkspace({
                   )}
                   {context === 'cases' && (
                     <>
-                      {view.branch ? (
-                        <BranchPanel view={view.branch} />
-                      ) : view.recovery ? (
-                        <RecoveryPanel view={view.recovery} />
-                      ) : view.vendor ? (
-                        <>
-                          <VendorPanel view={view.vendor} />
-                          <FileEvidence view={view} />
-                        </>
-                      ) : view.integrity ? (
-                        <>
-                          <IntegrityPanel
-                            view={view.integrity}
-                            onCommand={onCommand}
-                          />
-                          <FileEvidence view={view} />
-                        </>
-                      ) : (
-                        <InvestigationPanel view={view} onCommand={onCommand} />
-                      )}
+                      <SituationSummary experience={experience} />
+                      <DeferredDetails title="Sprawa, hipotezy i pełne dowody techniczne">
+                        {() => (
+                          <>
+                            {view.branch ? (
+                              <BranchPanel view={view.branch} />
+                            ) : view.recovery ? (
+                              <RecoveryPanel view={view.recovery} />
+                            ) : view.vendor ? (
+                              <>
+                                <VendorPanel view={view.vendor} />
+                                <FileEvidence view={view} />
+                              </>
+                            ) : view.integrity ? (
+                              <>
+                                <IntegrityPanel
+                                  view={view.integrity}
+                                  onCommand={onCommand}
+                                />
+                                <FileEvidence view={view} />
+                              </>
+                            ) : (
+                              <InvestigationPanel
+                                view={view}
+                                onCommand={onCommand}
+                              />
+                            )}
+                          </>
+                        )}
+                      </DeferredDetails>
                       <NarrativeFeed view={view} />
                     </>
                   )}
                   {context === 'operations' && (
                     <>
-                      <BusinessPanel view={view} />
+                      <BusinessPanel view={view} experience={experience} />
                       <NarrativeFeed view={view} />
                       <SimulationEventLog view={view} />
                     </>
@@ -542,7 +574,7 @@ export function MissionWorkspace({
                         </p>
                         <span className="keyboard-hint">Tab · Enter</span>
                       </div>
-                      <BusinessPanel view={view} />
+                      <BusinessPanel view={view} experience={experience} />
                     </>
                   )}
                 </main>
@@ -550,11 +582,16 @@ export function MissionWorkspace({
                   <OperationsPanel
                     key={session.attemptId}
                     view={view}
+                    actions={experience.actions}
+                    focusAssetId={
+                      selection?.kind === 'asset' ? selection.id : undefined
+                    }
                     onCommand={onCommand}
                   />
                   {context === 'architecture' && (
                     <InfrastructureInspector
                       world={world}
+                      experience={experience}
                       selection={selection}
                       onSelect={select}
                       networkRules={view.rules}
