@@ -1,3 +1,4 @@
+import { preparationWorkerBusy } from '../application/branchPreparation';
 import { useState } from 'react';
 import type { CampaignCommand, CampaignState } from '../domain/campaign';
 
@@ -17,12 +18,7 @@ export function DetectionConfiguration({
   const pending = campaign.detectionChanges?.find(
     (w) => w.completedHour === null,
   );
-  const analystBusy = campaign.work.some(
-    (w) =>
-      w.window === campaign.preparation.number &&
-      w.workerId === 'analyst' &&
-      w.status === 'running',
-  );
+  const analystBusy = preparationWorkerBusy(campaign, 'analyst');
   return (
     <section
       className="detection-configuration"

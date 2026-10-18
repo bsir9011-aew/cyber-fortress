@@ -75,6 +75,7 @@ export interface KnownAtDecision {
     readonly backupReadiness: AarData;
     readonly vendorAuthorization?: AarData;
     readonly erpRecovery?: AarData;
+    readonly branchAccess?: AarData;
   };
   readonly business: BusinessState;
   readonly pendingTasks: readonly EmployeeTask[];
@@ -83,6 +84,7 @@ export interface KnownAtDecision {
 }
 export interface AarActualState {
   readonly erpRecovery?: AarData;
+  readonly branchAccess?: AarData;
   readonly vendorAuthorization?: AarData;
   readonly threatAccess: ThreatAccessAssessment;
   readonly accounts: readonly Account[];
@@ -186,6 +188,8 @@ export interface AarCampaignContext {
   readonly investmentLedger: readonly BudgetOperation[];
   readonly posture: SecurityPosture;
   readonly vendorApprovals?: readonly import('./vendor').VendorApproval[];
+  readonly branchArchitecture?: import('./branch').BranchArchitecture;
+  readonly branchWork?: readonly import('./branch').BranchPreparationWork[];
   readonly detectionChanges?: readonly import('./resilience').DetectionConfigurationWork[];
 }
 export interface FortressAfterActionReportV1 {
@@ -196,8 +200,8 @@ export interface FortressAfterActionReportV1 {
   readonly generatedAt: string;
   readonly gameVersion: {
     readonly application: '0.2.0';
-    readonly engine: '9.0.0' | '11.0.0' | '12.0.0' | '13.0.0';
-    readonly reportGenerator: '1.0.0' | '1.1.0' | '1.2.0' | '1.3.0';
+    readonly engine: '9.0.0' | '11.0.0' | '12.0.0' | '13.0.0' | '14.0.0';
+    readonly reportGenerator: '1.0.0' | '1.1.0' | '1.2.0' | '1.3.0' | '1.4.0';
   };
   readonly fieldGuide: Readonly<Record<string, string>>;
   readonly organization: {
@@ -207,11 +211,12 @@ export interface FortressAfterActionReportV1 {
   };
   readonly scenario: {
     readonly id: string;
-    readonly family: 'M01' | 'M02' | 'M03' | 'M04';
+    readonly family: 'M01' | 'M02' | 'M03' | 'M04' | 'M05';
     readonly variantFamilyId?:
       | 'nexus-integrity-detection-v1'
       | 'nexus-vendor-access-v1'
-      | 'nexus-erp-recovery-v1';
+      | 'nexus-erp-recovery-v1'
+      | 'nexus-east-branch-v1';
     readonly name: string;
     readonly kind: string;
     readonly mode: string;
@@ -232,6 +237,7 @@ export interface FortressAfterActionReportV1 {
     readonly serviceRecoveryMet?: boolean;
     readonly operationalConfidenceMet?: boolean;
     readonly manualClosedMet?: boolean;
+    readonly branchWorkMet?: boolean;
     readonly allObjectivesMet: boolean;
   };
   readonly timeline: readonly AarTimelineEntry[];
@@ -262,6 +268,7 @@ export interface FortressAfterActionReportV1 {
     readonly detectionReview?: AarData;
     readonly vendorAccess?: AarData;
     readonly erpRecovery?: AarData;
+    readonly branchAccess?: AarData;
   };
   readonly businessConsequences: {
     readonly ordersReceived: number;

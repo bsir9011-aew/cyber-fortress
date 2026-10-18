@@ -6,6 +6,8 @@ import { selectScenario } from './scenarioSelectors';
 import { createScenario } from './createScenario';
 import { issueVpnSession } from '../simulation/access';
 import type { VendorApproval } from '../domain/vendor';
+import type { BranchArchitecture } from '../domain/branch';
+import { selectBranchScenario } from '../content/scenarios/branch';
 import { selectRecoveryScenario } from '../content/scenarios/recovery';
 import { selectVendorScenario } from '../content/scenarios/vendor';
 import { selectDetectionScenario } from '../content/scenarios/detection';
@@ -194,7 +196,7 @@ export function prepareCampaignDefinition(
     access,
     legitimateBehaviors: legal,
     briefing:
-      events.length || source.integrity || source.recovery
+      events.length || source.integrity || source.recovery || source.branch
         ? source.briefing
         : {
             ...source.briefing,
@@ -348,6 +350,21 @@ export function createRecoveryIncident(
 ) {
   return createScenario(
     prepareCampaignDefinition(selectRecoveryScenario(familyId, seed), posture),
+    { mode: 'unknown', seed },
+  );
+}
+
+export function createBranchIncident(
+  seed: number,
+  posture: SecurityPosture,
+  familyId: string,
+  architecture: BranchArchitecture,
+) {
+  return createScenario(
+    prepareCampaignDefinition(
+      selectBranchScenario(familyId, seed, architecture),
+      posture,
+    ),
     { mode: 'unknown', seed },
   );
 }

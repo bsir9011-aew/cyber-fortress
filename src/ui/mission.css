@@ -1295,3 +1295,38 @@ div.evidence-empty {
 .status-dot.status-unknown {
   fill: #9ba9b9;
 }
+
+.branch-card {
+  overflow-wrap: anywhere;
+}
+.branch-config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.branch-config-grid article {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.branch-config-grid label {
+  display: grid;
+  gap: 8px;
+}
+.branch-config-grid small {
+  color: var(--muted);
+}
+.branch-card details {
+  margin: 16px 0;
+}
+.branch-card article {
+  margin: 10px 0;
+}
+@media (max-width: 700px) {
+  .branch-config-grid {
+    grid-template-columns: 1fr;
+  }
+}

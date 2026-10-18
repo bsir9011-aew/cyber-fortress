@@ -1,3 +1,5 @@
+import { branchLabels, smbScopeLabels } from '../content/branchLabels';
+import { isBranchAction } from '../simulation/branch';
 import { recoveryLabels } from '../content/recoveryLabels';
 import { isRecoveryAction } from '../simulation/recovery';
 import type {
@@ -7,6 +9,17 @@ import type {
 } from '../domain/simulation';
 
 export function actionLabel(action: TaskAction): string {
+  if (isBranchAction(action))
+    return (
+      branchLabels[action.type] +
+      ('route' in action
+        ? ` · ${action.route === 'backup' ? 'zapasowa' : 'podstawowa'}`
+        : 'scope' in action
+          ? ` · ${smbScopeLabels[action.scope]}`
+          : 'restricted' in action
+            ? ` · ${action.accountId} · ${action.restricted ? 'ogranicz' : 'przywróć'}`
+            : '')
+    );
   if (isRecoveryAction(action))
     return (
       recoveryLabels[action.type] +

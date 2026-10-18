@@ -1,3 +1,9 @@
+import {
+  beginBranchPreparation,
+  branchPreparationRejection,
+  advanceBranchPreparation,
+} from './branchPreparation';
+import { defaultBranchArchitecture } from '../content/scenarios/branch';
 import type {
   BudgetOperation,
   CampaignCommand,
@@ -18,6 +24,7 @@ import {
   createDetectionIncident,
   createVendorIncident,
   createRecoveryIncident,
+  createBranchIncident,
 } from './prepareCampaignIncident';
 import { simulationReducer } from './simulationReducer';
 import { selectMissionReport } from './selectMissionReport';
@@ -161,6 +168,16 @@ export function campaignReducer(
       ? [
           ...state.history,
           {
+            ...(report.branch
+              ? {
+                  branch: {
+                    ready: report.branch.ready,
+                    exposedRecords: report.branch.exposedRecords,
+                    remainingAccess: report.branch.remainingAccess,
+                    goalMet: report.branch.goalMet,
+                  },
+                }
+              : {}),
             ...(report.recovery
               ? {
                   recovery: {
@@ -193,9 +210,13 @@ export function campaignReducer(
             exposedRecords: report.confidentiality.exposedRecords,
             processed: report.continuity.processed,
             backlog: report.continuity.backlog,
-            containmentMet: report.integrity
-              ? !report.integrity.summary.sourceHasWrite
-              : report.containment.goalMet,
+            containmentMet: report.branch
+              ? report.branch.kind === 'compromised-context'
+                ? !report.branch.remainingAccess
+                : null
+              : report.integrity
+                ? !report.integrity.summary.sourceHasWrite
+                : report.containment.goalMet,
             spent: budgetBalance(state).spent,
             activeProjects: state.projects
               .filter((p) => p.status === 'completed')
@@ -269,6 +290,9 @@ export function campaignReducer(
         ...state,
         incident: null,
         phase: 'preparation',
+        ...(incident.branch
+          ? { branchArchitecture: incident.branch.architecture }
+          : {}),
         posture: {
           ...state.posture,
           ...(incident.integrity
@@ -299,6 +323,51 @@ export function campaignReducer(
   }
   if (state.phase !== 'preparation')
     return reject('Planowanie jest dostępne w centrali, poza incydentem.');
+  if (command.type === 'prepare-branch-architecture') {
+    const reason = branchPreparationRejection(state, command.change);
+    return reason
+      ? reject(reason)
+      : decide(state, beginBranchPreparation(state, command.change), command);
+  }
+  if (command.type === 'start-branch-incident') {
+    if (command.familyId !== 'nexus-east-branch-v1')
+      return reject('Nieznana rodzina oddziału.');
+    if (!state.history.some((r) => r.recovery))
+      return reject('Najpierw ukończ Misję 04.');
+    if (state.preparation.hour !== 4)
+      return reject('Najpierw rozlicz czterogodzinne okno.');
+    return decide(
+      state,
+      {
+        ...state,
+        phase: 'incident',
+        incident: createBranchIncident(
+          state.nextSeed,
+          state.posture,
+          command.familyId,
+          state.branchArchitecture ?? defaultBranchArchitecture,
+        ),
+      },
+      command,
+    );
+  }
+  const branchWorker =
+    command.type === 'assign-work'
+      ? command.workerId
+      : command.type === 'prepare-vendor-exception' ||
+          (command.type === 'set-segmentation-scope' &&
+            state.posture.segmentation)
+        ? 'administrator'
+        : command.type === 'configure-endpoint-detection'
+          ? 'analyst'
+          : null;
+  if (
+    branchWorker &&
+    state.branchWork?.some(
+      (w) => w.workerId === branchWorker && w.status === 'running',
+    )
+  )
+    return reject('Wykonawca przygotowuje architekturę NEXUS EAST.');
   if (command.type === 'accept-resilience-funding') {
     const report = state.history.find((r) => r.integrity !== undefined);
     if (!report)
@@ -596,6 +665,7 @@ export function campaignReducer(
   if (command.type === 'advance-preparation') {
     if (state.preparation.hour >= 4)
       return reject('Okno przygotowania jest zamknięte.');
+    const branchAdvanced = advanceBranchPreparation(state);
     const hour = state.preparation.hour + 1;
     const pendingVendor = state.vendorApprovals?.find(
       (a) => a.window === state.preparation.number && a.completedHour === null,
@@ -659,6 +729,12 @@ export function campaignReducer(
         ...state,
         projects,
         work,
+        ...(branchAdvanced.branchWork
+          ? {
+              branchWork: branchAdvanced.branchWork,
+              branchArchitecture: branchAdvanced.branchArchitecture!,
+            }
+          : {}),
         ...(state.vendorApprovals
           ? {
               vendorApprovals: state.vendorApprovals.map((a) =>
@@ -676,6 +752,7 @@ export function campaignReducer(
         preparation: { ...state.preparation, hour },
         posture: {
           ...state.posture,
+          ruleOverrides: branchAdvanced.posture.ruleOverrides,
           remoteAccess: completed('remote-access'),
           fileVisibility: completed('file-visibility'),
           segmentation: completed('segmentation'),

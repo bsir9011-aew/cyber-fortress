@@ -1,3 +1,4 @@
+import { selectBranchView, selectKnownBranchWorld } from './selectBranchView';
 import {
   selectRecoveryView,
   selectKnownRecoveryWorld,
@@ -18,13 +19,16 @@ import { selectIntegrityView } from './selectIntegrityView';
 /** Jawna projekcja: nigdy spread SimulationState/access/hidden do komponentów. */
 export function selectPlayerView(state: SimulationState) {
   return {
+    ...(state.branch ? { branch: selectBranchView(state) } : {}),
     ...(state.recovery ? { recovery: selectRecoveryView(state) } : {}),
     ...(state.vendor ? { vendor: selectVendorView(state) } : {}),
     ...(state.integrity ? { integrity: selectIntegrityView(state) } : {}),
     run: { ...state.run },
     briefing: { ...state.hidden.scenario.briefing },
     recordPool: state.hidden.scenario.goals.recordPool,
-    world: selectKnownRecoveryWorld(state),
+    world: state.branch
+      ? selectKnownBranchWorld(state)
+      : selectKnownRecoveryWorld(state),
     clock: state.clock,
     minute: currentMinute(state.clock),
     finished: isFinished(state.clock),

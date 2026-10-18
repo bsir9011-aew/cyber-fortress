@@ -1,3 +1,9 @@
+import { branchOutcome } from '../selectBranchReport';
+import {
+  assessBranchAccess,
+  branchWorkAvailability,
+} from '../../simulation/branchAccess';
+import { isBranchAction } from '../../simulation/branch';
 import {
   assessErpAvailability,
   pendingErpOrderIds,
@@ -49,6 +55,32 @@ export function actualState(state: SimulationState): AarActualState {
           }),
         }
       : {}),
+    ...(state.branch
+      ? {
+          branchAccess: facts({
+            architecture: state.branch.architecture,
+            activeRoute: state.branch.activeRoute,
+            tunnel: state.branch.tunnel,
+            contexts: state.branch.contexts,
+            compromisedContextId:
+              state.hidden.scenario.branch!.compromisedContextId,
+            work: branchWorkAvailability(state),
+            ...branchOutcome(state),
+            serviceChecks: state.branch.contexts.flatMap((c) => [
+              {
+                contextId: c.id,
+                target: 'erp',
+                ...assessBranchAccess(state, c.id, 'erp', 'HTTPS'),
+              },
+              {
+                contextId: c.id,
+                target: 'fs-01',
+                ...assessBranchAccess(state, c.id, 'fs-01', 'SMB'),
+              },
+            ]),
+          }),
+        }
+      : {}),
     threatAccess: assessThreatAccess(state),
     ...(state.access.vendorAuthorization
       ? { vendorAuthorization: facts(state.access.vendorAuthorization) }
@@ -80,7 +112,9 @@ export function actualState(state: SimulationState): AarActualState {
         ),
       })),
     ),
-    exposedRecords: state.hidden.attacker?.transfer.exposedRecords ?? 0,
+    exposedRecords: state.branch
+      ? branchOutcome(state).exposedRecords
+      : (state.hidden.attacker?.transfer.exposedRecords ?? 0),
     endpoint:
       i && d
         ? facts({
@@ -126,6 +160,7 @@ export function knownAtDecision(
       integrity: v.integrity?.hypothesis ?? null,
     },
     configuration: {
+      ...(v.branch ? { branchAccess: facts(v.branch) } : {}),
       ...(v.recovery ? { erpRecovery: facts(v.recovery) } : {}),
       assets: v.world.assets.map((a) => ({
         id: a.id,
@@ -197,6 +232,27 @@ export function actionTarget(
         hypothesis: string;
       },
 ) {
+  if ('type' in action && isBranchAction(action as TaskAction))
+    return {
+      kind: 'branch-architecture',
+      id:
+        'accountId' in action
+          ? action.accountId
+          : 'route' in action
+            ? String(action.route)
+            : 'scope' in action
+              ? String(action.scope)
+              : null,
+      resourceIds: [
+        'east-workstations',
+        'east-gateway',
+        'east-primary-link',
+        'east-backup-gateway',
+        'erp',
+        'fs-01',
+      ],
+      flow: facts(state.branch?.architecture),
+    };
   if ('approvalId' in action)
     return {
       kind: 'vendor-exception',

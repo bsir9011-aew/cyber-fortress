@@ -1,3 +1,4 @@
+import { branchTaskSpecs, isBranchAction, branchTaskRejection } from './branch';
 import type {
   CommandRejection,
   SimulationState,
@@ -20,10 +21,11 @@ import {
 } from './integrity';
 
 export function knownAccountIds(
-  state: Pick<SimulationState, 'knowledge' | 'incident' | 'vendor'>,
+  state: Pick<SimulationState, 'knowledge' | 'incident' | 'vendor' | 'branch'>,
 ): readonly string[] {
   return [
     ...new Set([
+      ...(state.branch?.contexts.map((c) => c.accountId) ?? []),
       ...(state.vendor?.observations ?? []).flatMap((o) =>
         o.records.map((r) => r.accountId),
       ),
@@ -68,6 +70,7 @@ export const taskSpecs: Record<
   TaskAction['type'],
   { readonly workerId: WorkerId; readonly turns: number }
 > = {
+  ...branchTaskSpecs,
   ...recoveryTaskSpecs,
   'inspect-vendor-operations': { workerId: 'analyst', turns: 1 },
   'revoke-vendor-exception': { workerId: 'administrator', turns: 1 },
@@ -100,7 +103,11 @@ export function taskRejection(
   workerId: WorkerId,
   action: TaskAction,
 ): CommandRejection | null {
-  if (!action || !Object.hasOwn(taskSpecs, action.type))
+  if (
+    !action ||
+    typeof action.type !== 'string' ||
+    !Object.hasOwn(taskSpecs, action.type)
+  )
     return 'invalid-command';
   const spec = taskSpecs[action.type];
   if (spec.workerId !== workerId) return 'wrong-worker';
@@ -118,6 +125,7 @@ export function taskRejection(
     state.clock.turnLimit
   )
     return 'outside-time-window';
+  if (isBranchAction(action)) return branchTaskRejection(state, action);
   if (isRecoveryAction(action)) return recoveryTaskRejection(state, action);
   if (isIntegrityAction(action)) return integrityTaskRejection(state, action);
   switch (action.type) {

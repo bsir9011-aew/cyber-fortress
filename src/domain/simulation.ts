@@ -1,3 +1,4 @@
+import type { BranchState, BranchTaskAction } from './branch';
 import type { RecoveryState, RecoveryTaskAction } from './recovery';
 import type { VendorState, VendorTaskAction } from './vendor';
 import type { AccessState, NetworkRule } from './access';
@@ -43,8 +44,9 @@ export interface BusinessProcess {
   readonly workstationAssetId: string;
   readonly remoteAccountId: string;
   readonly protocol: string;
-  /** Dodatkowe części procesu wymagają własnej legalnej sesji i wszystkich usług. */
+  /** Default: personal VPN session; branch-context uses M05 site-to-site and a held local identity. */
   readonly additionalWork?: readonly {
+    readonly accessMode?: 'branch-context';
     readonly id: string;
     readonly name: string;
     readonly capacity: number;
@@ -85,6 +87,7 @@ export interface BusinessState {
 
 export type WorkerId = 'analyst' | 'administrator';
 export type TaskAction =
+  | BranchTaskAction
   | RecoveryTaskAction
   | VendorTaskAction
   | { readonly type: 'inspect-edr-telemetry' }
@@ -186,6 +189,7 @@ export type SimulationEventData =
 export type SimulationEvent = EventBase & SimulationEventData;
 
 export interface SimulationState {
+  readonly branch?: BranchState;
   readonly recovery?: RecoveryState;
   readonly vendor?: VendorState;
   readonly integrity?: IntegrityState;

@@ -1,3 +1,4 @@
+import { BranchPreparation } from './BranchPreparation';
 import { VendorPreparation } from './VendorPreparation';
 import { DetectionConfiguration } from './DetectionConfiguration';
 import { AfterActionExport } from './AfterActionExport';
@@ -171,6 +172,9 @@ export function Headquarters({
             Rozpocznij Misję 04 →
           </button>
         </section>
+      )}
+      {view.history.some((r) => r.recovery) && (
+        <BranchPreparation campaign={session.campaign} onCommand={onCommand} />
       )}
       <div className="hq-window">
         <div>
@@ -391,11 +395,13 @@ export function Headquarters({
                     Operacja {r.number} · {r.name}
                   </strong>
                   <p>
-                    {r.recovery
-                      ? `ERP ${r.recovery.useful ? 'użyteczny' : 'niedostępny'} · ${r.recovery.missingRecordIds.length} brakujących zapisów · ${r.recovery.pendingOrderIds.length} nieuzgodnionych wysyłek`
-                      : r.integrity
-                        ? `${r.integrity.correct}/100 poprawnych dokumentów · ${r.integrity.damaged} uszkodzonych · ${r.integrity.reconcile} do uzgodnienia`
-                        : `${r.exposedRecords} ujawnionych rekordów`}{' '}
+                    {r.branch
+                      ? `EAST ${r.branch.ready ? 'gotowy' : 'ograniczona obsługa'} · ${r.branch.exposedRecords} ujawnionych rekordów`
+                      : r.recovery
+                        ? `ERP ${r.recovery.useful ? 'użyteczny' : 'niedostępny'} · ${r.recovery.missingRecordIds.length} brakujących zapisów · ${r.recovery.pendingOrderIds.length} nieuzgodnionych wysyłek`
+                        : r.integrity
+                          ? `${r.integrity.correct}/100 poprawnych dokumentów · ${r.integrity.damaged} uszkodzonych · ${r.integrity.reconcile} do uzgodnienia`
+                          : `${r.exposedRecords} ujawnionych rekordów`}{' '}
                     · {r.processed} obsłużonych · {r.backlog} zaległych · wydano{' '}
                     {money(r.spent)}.
                   </p>
@@ -567,6 +573,9 @@ export function Headquarters({
                 session.campaign.vendorApprovals?.some(
                   (a) => a.completedHour === null,
                 );
+              const branchBusy = session.campaign.branchWork?.some(
+                (w) => w.workerId === worker && w.status === 'running',
+              );
               const busy = activeWork(worker);
               const options = view.projects.filter(
                 (p) =>
@@ -583,13 +592,15 @@ export function Headquarters({
                       : 'Analityk'}
                   </span>
                   <h2>
-                    {vendorBusy
-                      ? 'Wyjątek CARGO-LINK — 1 h'
-                      : detectionBusy
-                        ? 'Konfiguracja EDR — 1 h'
-                        : busy
-                          ? 'W trakcie wdrożenia'
-                          : 'Gotowy do przydziału'}
+                    {branchBusy
+                      ? 'Architektura NEXUS EAST'
+                      : vendorBusy
+                        ? 'Wyjątek CARGO-LINK — 1 h'
+                        : detectionBusy
+                          ? 'Konfiguracja EDR — 1 h'
+                          : busy
+                            ? 'W trakcie wdrożenia'
+                            : 'Gotowy do przydziału'}
                   </h2>
                   <p>
                     {busy
@@ -606,6 +617,7 @@ export function Headquarters({
                     id={`assign-${worker}`}
                     value={chosen?.id ?? ''}
                     disabled={
+                      branchBusy ||
                       vendorBusy ||
                       detectionBusy ||
                       Boolean(busy) ||
@@ -630,6 +642,7 @@ export function Headquarters({
                   <button
                     className="secondary-button"
                     disabled={
+                      branchBusy ||
                       vendorBusy ||
                       detectionBusy ||
                       Boolean(busy) ||
@@ -678,6 +691,19 @@ export function Headquarters({
                                 .remaining[worker]
                             : 0),
                   );
+                  const east = session.campaign.branchWork?.find(
+                    (w) =>
+                      w.workerId === worker &&
+                      w.segments.some(
+                        (segment) =>
+                          segment.window === view.preparation.number &&
+                          segment.startHour <= hour &&
+                          hour <
+                            segment.startHour +
+                              segment.hoursWorked +
+                              (w.status === 'running' ? w.remainingHours : 0),
+                      ),
+                  );
                   const detection =
                     worker === 'analyst' &&
                     session.campaign.detectionChanges?.find(
@@ -696,7 +722,7 @@ export function Headquarters({
                     <div
                       key={hour}
                       className={
-                        w || detection || vendorWork
+                        w || detection || vendorWork || east
                           ? hour < view.preparation.hour
                             ? 'work-done'
                             : 'work-planned'
@@ -705,13 +731,15 @@ export function Headquarters({
                     >
                       <small>{hour + 1}. godzina okna</small>
                       <span>
-                        {vendorWork
-                          ? 'Wyjątek CARGO-LINK'
-                          : detection
-                            ? 'Konfiguracja EDR'
-                            : w
-                              ? workName(w.projectId)
-                              : 'Wolne'}
+                        {east
+                          ? `EAST / ${east.change.component}`
+                          : vendorWork
+                            ? 'Wyjątek CARGO-LINK'
+                            : detection
+                              ? 'Konfiguracja EDR'
+                              : w
+                                ? workName(w.projectId)
+                                : 'Wolne'}
                       </span>
                     </div>
                   );

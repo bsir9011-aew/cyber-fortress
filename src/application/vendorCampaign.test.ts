@@ -1,4 +1,4 @@
-import { CURRENT_GAME_SAVE_KEY } from '../persistence/gameSaveV7';
+import { CURRENT_GAME_SAVE_KEY } from '../persistence/gameSaveV8';
 import { describe, expect, it } from 'vitest';
 import { createStrategicSession, currentOperation } from './gameSession';
 import type { StrategicSession } from './gameSession';

@@ -1,3 +1,4 @@
+import { CURRENT_GAME_SAVE_KEY as CURRENT_KEY } from '../persistence/gameSaveV8';
 import { describe, it, expect } from 'vitest';
 import type { GameSession, StrategicSession } from './gameSession';
 import { currentOperation, createStrategicSession } from './gameSession';
@@ -30,7 +31,6 @@ import {
   serializeCurrentGameSave,
   isCurrentCampaignCommand,
   isCurrentRecordedCommand,
-  CURRENT_GAME_SAVE_KEY as V7,
 } from '../persistence/gameSaveV7';
 import {
   createCurrentGameSave as saveV6,
@@ -178,8 +178,8 @@ describe('M04 campaign and historical contracts', () => {
     expect(loaded.result).toEqual({ ok: true, value: g });
     expect(storeCurrentGameState(storage, g, reportDate).ok).toBe(true);
     expect(map.get(V6)).toBe(v6);
-    expect(JSON.parse(map.get(V7)!).schemaVersion).toBe(7);
-    map.set(V7, 'broken');
+    expect(JSON.parse(map.get(CURRENT_KEY)!).schemaVersion).toBe(8);
+    map.set(CURRENT_KEY, 'broken');
     expect(loadCurrentGameState(storage).result.ok).toBe(false);
     expect(map.get(V6)).toBe(v6);
   });

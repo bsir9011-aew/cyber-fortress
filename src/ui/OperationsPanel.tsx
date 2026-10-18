@@ -1,3 +1,4 @@
+import { BranchOperations } from './BranchPanel';
 import { RecoveryOperations } from './RecoveryPanel';
 import { useState } from 'react';
 import type { PlayerView } from '../application/selectPlayerView';
@@ -133,6 +134,9 @@ export function OperationsPanel({
           Pobierz audyt FS-01 · 5 min
         </button>
       )}
+      {view.branch && (
+        <BranchOperations view={view.branch} onCommand={onCommand} />
+      )}
       {view.recovery && (
         <RecoveryOperations view={view.recovery} onCommand={onCommand} />
       )}
@@ -144,9 +148,13 @@ export function OperationsPanel({
       )}
       <details
         className="legacy-operations"
-        open={!view.integrity && !view.vendor && !view.recovery}
+        open={!view.integrity && !view.vendor && !view.recovery && !view.branch}
       >
-        <summary hidden={!view.integrity && !view.vendor && !view.recovery}>
+        <summary
+          hidden={
+            !view.integrity && !view.vendor && !view.recovery && !view.branch
+          }
+        >
           Narzędzia dostępu VPN i reguły sieciowe
         </summary>
         <h3 className="action-group-title">

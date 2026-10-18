@@ -1,3 +1,5 @@
+import { BranchPanel } from './BranchPanel';
+import { BranchReport } from './BranchReport';
 import { RecoveryPanel } from './RecoveryPanel';
 import { RecoveryReport } from './RecoveryReport';
 import { VendorPanel } from './VendorPanel';
@@ -86,7 +88,8 @@ export function MissionWorkspace({
     view.ownerStatements.length +
     (view.sessionObservation ? 1 : 0) +
     (view.vendor?.observations.length ?? 0) +
-    (view.recovery?.observations.length ?? 0);
+    (view.recovery?.observations.length ?? 0) +
+    (view.branch?.observations.length ?? 0);
 
   useEffect(() => {
     if (!briefing) headingRef.current?.focus();
@@ -185,7 +188,12 @@ export function MissionWorkspace({
               <h1 ref={headingRef} tabIndex={-1} className="sr-only">
                 Raport po zakończeniu misji
               </h1>
-              {report.recovery ? (
+              {report.branch ? (
+                <BranchReport
+                  report={report.branch}
+                  onHeadquarters={newIncident}
+                />
+              ) : report.recovery ? (
                 <RecoveryReport
                   report={report.recovery}
                   onHeadquarters={newIncident}
@@ -221,37 +229,45 @@ export function MissionWorkspace({
               >
                 <div>
                   <span className="eyebrow">
-                    {view.recovery
-                      ? 'ERP nie odpowiada'
-                      : view.vendor
-                        ? 'Dostawca na godzinę'
-                        : 'Ostatnie okno wysyłkowe'}
+                    {view.branch
+                      ? 'Oddział na granicy'
+                      : view.recovery
+                        ? 'ERP nie odpowiada'
+                        : view.vendor
+                          ? 'Dostawca na godzinę'
+                          : 'Ostatnie okno wysyłkowe'}
                   </span>
                   <strong>
-                    {view.recovery
-                      ? 'Przywróć ERP. Uzgodnij wysyłki.'
-                      : 'Chroń dane. Dowieź wysyłki.'}
+                    {view.branch
+                      ? 'Połącz oddział. Kontroluj przepływy.'
+                      : view.recovery
+                        ? 'Przywróć ERP. Uzgodnij wysyłki.'
+                        : 'Chroń dane. Dowieź wysyłki.'}
                   </strong>
                 </div>
                 <div>
                   <small>
                     Sprawa{' '}
-                    {view.recovery
-                      ? '04'
-                      : view.vendor
-                        ? '03'
-                        : view.integrity
-                          ? '02'
-                          : '01'}
+                    {view.branch
+                      ? '05'
+                      : view.recovery
+                        ? '04'
+                        : view.vendor
+                          ? '03'
+                          : view.integrity
+                            ? '02'
+                            : '01'}
                   </small>
                   <button onClick={() => setContext('cases')}>
-                    {view.recovery
-                      ? 'Centrum odzyskiwania ERP →'
-                      : view.vendor
-                        ? 'Operacje CARGO-LINK →'
-                        : view.integrity
-                          ? 'Rozbieżności dokumentów →'
-                          : 'Nietypowe logowania VPN →'}
+                    {view.branch
+                      ? 'Centrum NEXUS EAST →'
+                      : view.recovery
+                        ? 'Centrum odzyskiwania ERP →'
+                        : view.vendor
+                          ? 'Operacje CARGO-LINK →'
+                          : view.integrity
+                            ? 'Rozbieżności dokumentów →'
+                            : 'Nietypowe logowania VPN →'}
                   </button>
                 </div>
                 <div>
@@ -324,13 +340,15 @@ export function MissionWorkspace({
                     <div>
                       <p className="eyebrow">
                         NEXUS / Misja{' '}
-                        {view.recovery
-                          ? '04'
-                          : view.vendor
-                            ? '03'
-                            : view.integrity
-                              ? '02'
-                              : '01'}
+                        {view.branch
+                          ? '05'
+                          : view.recovery
+                            ? '04'
+                            : view.vendor
+                              ? '03'
+                              : view.integrity
+                                ? '02'
+                                : '01'}
                       </p>
                       <h1 ref={headingRef} tabIndex={-1}>
                         {context === 'cases'
@@ -370,7 +388,9 @@ export function MissionWorkspace({
                   )}
                   {context === 'cases' && (
                     <>
-                      {view.recovery ? (
+                      {view.branch ? (
+                        <BranchPanel view={view.branch} />
+                      ) : view.recovery ? (
                         <RecoveryPanel view={view.recovery} />
                       ) : view.vendor ? (
                         <>

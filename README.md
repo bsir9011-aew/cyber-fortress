@@ -2,6 +2,29 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
+## FORTRESS LAB — Misja 05: The New Branch (Sprint 14)
+
+Po dowolnym ukończonym M04 Centrala udostępnia **Projekt architektury — NEXUS EAST**.
+Wdróż ERP/HTTPS (1 h administratora), zakres SMB (1 h), przygotuj backup HTTPS
+(2 h) i monitoring bram (1 h analityka). Prace konkurują z dotychczasowymi
+wdrożeniami; przerwane przygotowanie backupu przechodzi do następnego okna.
+Zmiany konfiguracji także wymagają pracy. Bez nowych opłat i finansowania.
+
+Rodzina `nexus-east-branch-v1` obejmuje awarię łącza, zapotrzebowanie na dokumenty
+lub nadużycie wydanego lokalnego kontekstu. Site-to-site ma własne warunki
+transportu i nie jest sesją VPN pracownika. Trasa, ACL, tożsamość i nadanie
+zasobowe są rozstrzygane osobno. Oddział wnosi do 6 z 22 zamówień/turę
+(centrala 8 + praca zdalna 8); backup najwyżej 3 i nigdy SMB. Ograniczenie
+konta EAST odbiera bieżącą autoryzację SMB bez zmiany logowań, ERP, hasła czy MFA.
+Monitoring widzi metadane przekazania, a audyt FS-01 tylko rzeczywiste żądania
+na serwerze. Raport i AAR M05 pokazują konfigurację, przepływy, ekspozycję,
+wiedzę przed decyzją i pozostałe ryzyko bez wymyślania alternatywnych wyników.
+
+Aktywny zapis **V8**: silnik `14.0.0`, treść `nexus-east-1`, klucz
+`fortress-lab.game.v8`. Odczyt V1–V7 i oryginalne bajty pozostają zachowane.
+12 osób i 8 komputerów oddziału przeniesiono z centrali: nadal 120/94 w firmie.
+Model ma dwie jawne drogi, bez edytora sieci, prawdziwego VPN i routingu IP.
+
 ## FORTRESS LAB — Misja 04: Blackout Protocol (Sprint 13)
 
 Po ukończeniu dowolnej Misji 03 rozlicz kolejne okno przygotowania i wybierz
@@ -19,7 +42,7 @@ dziennikiem magazynu: odtworzenie nie wysyła ich ponownie ani samo nie dopisuje
 brakujących transakcji. Pełne ERP osiąga 22/turę i może nadrabiać kolejkę.
 
 Raport oraz AAR M04 rozdzielają usługę, dane, ciągłość i potwierdzenie spójności.
-Nowe zapisy **V7**: silnik `13.0.0`, treść `nexus-recovery-1`, klucz
+Sprint 13 wprowadził **V7**: silnik `13.0.0`, treść `nexus-recovery-1`, klucz
 `fortress-lab.game.v7`. Czytniki V1–V6 i oryginalne bajty pozostają zachowane;
 import wymaga zgodności stanu z pełnym replay. Bez nowych projektów, finansowania,
 backendu i zależności. Model to mały rejestr ERP i dwie instancje, bez pełnego HA.
@@ -209,7 +232,7 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 - **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
   strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
   Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu. Nowe zapisy mają
-  format V7; poprzednie oryginały V1/V2/V3/V4/V5/V6 pozostają zachowane i możliwe do wyeksportowania.
+  format V8; poprzednie oryginały V1/V2/V3/V4/V5/V6/V7 pozostają zachowane i możliwe do wyeksportowania.
 - **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
   działalność, ograniczenie dostępu i działania samodzielnych misji. Wyniki strategii
   znajdziesz w Centrali w historii bieżącej kampanii. Powtórka tworzy nową próbę tego

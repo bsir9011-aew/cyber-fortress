@@ -1,3 +1,4 @@
+import { preparationWorkerBusy } from '../application/branchPreparation';
 import { useState } from 'react';
 import type { CampaignCommand, CampaignState } from '../domain/campaign';
 import type { VendorExpiry, VendorScope } from '../domain/vendor';
@@ -47,12 +48,7 @@ export function VendorPreparation({
         a.completedHour !== null &&
         a.usedInWindow === null,
     );
-  const busy = campaign.work.some(
-    (w) =>
-      w.window === campaign.preparation.number &&
-      w.workerId === 'administrator' &&
-      w.status === 'running',
-  );
+  const busy = preparationWorkerBusy(campaign, 'administrator');
   return (
     <section
       className="vendor-card"

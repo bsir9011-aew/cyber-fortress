@@ -1,3 +1,4 @@
+import { branchWorkAvailability } from './branchAccess';
 import { recoveryBusinessAvailability } from './recoveryAccess';
 import { vendorWorkAvailable } from './vendor';
 import type {
@@ -42,24 +43,29 @@ export function businessAvailability(
   const contributions = (process.additionalWork ?? []).map((work) => ({
     id: work.id,
     name: work.name,
-    capacity: work.capacity,
+    capacity:
+      state.branch && work.id === 'east-branch'
+        ? branchWorkAvailability(state).capacity
+        : work.capacity,
     available:
-      state.vendor && work.id === 'cargo-link-integration'
-        ? vendorWorkAvailable(state)
-        : access.sessions.some(
-            (session) =>
-              session.accountId === work.accountId &&
-              work.services.every((service) =>
-                canUseService(
-                  world,
-                  access,
-                  session.id,
-                  service.targetAssetId,
-                  service.protocol,
-                  currentMinute(state.clock),
+      state.branch && work.id === 'east-branch'
+        ? branchWorkAvailability(state).capacity > 0
+        : state.vendor && work.id === 'cargo-link-integration'
+          ? vendorWorkAvailable(state)
+          : access.sessions.some(
+              (session) =>
+                session.accountId === work.accountId &&
+                work.services.every((service) =>
+                  canUseService(
+                    world,
+                    access,
+                    session.id,
+                    service.targetAssetId,
+                    service.protocol,
+                    currentMinute(state.clock),
+                  ),
                 ),
-              ),
-          ),
+            ),
   }));
   if (state.integrity) {
     const i = state.integrity;
@@ -140,7 +146,8 @@ export function businessAvailability(
         ? 'unavailable'
         : localAvailable &&
             remoteAvailable &&
-            contributions.every((item) => item.available)
+            contributions.every((item) => item.available) &&
+            (!state.branch || branchWorkAvailability(state).capacity === 6)
           ? 'available'
           : 'degraded',
     ...(contributions.length ? { contributions } : {}),
