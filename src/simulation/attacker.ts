@@ -224,7 +224,10 @@ export function stepAttacker(
 ): ReferenceSimulationState;
 export function stepAttacker(state: SimulationState): SimulationState;
 export function stepAttacker(state: SimulationState): SimulationState {
-  if (state.integrity) return stepIntegrityThreat(state);
+  if (state.integrity) {
+    state = stepIntegrityThreat(state);
+    if (!state.finale) return state;
+  }
   const attacker = state.hidden.attacker;
   if (!attacker) return state;
   const action = selectAttackerAction(attacker, state.clock.turn);

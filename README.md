@@ -2,6 +2,23 @@
 
 FORTRESS LAB - A cybersecurity strategy game and IT infrastructure simulator. Build defenses, investigate incidents, manage risks, and learn through gameplay.
 
+## Misja 06 — The Perfect Storm
+
+Finał `nexus-campaign-finale-v1` jest dostępny po dowolnym ukończeniu M05.
+Trzy deterministyczne warianty łączą lokalną integralność, dostęp dostawcy,
+odzyskiwanie ERP i NEXUS EAST w jednej symulacji 14:00–15:30.
+Jedna kolejka otrzymuje 20 zamówień/turę; maksymalne 22 dzieli się na
+8 lokalnych + 8 zdalnych + 3 EAST + 3 CARGO-LINK. Manifesty ręczne zastępują
+lokalną obsługę ERP (do 8), nie powiększają wydajności i wymagają uzgodnienia.
+
+Wykorzystaj dotychczasowe cztery godziny przygotowania, inwestycje i pracowników.
+Wyjątek dostawcy musi pochodzić z bieżącego okna; można go też awaryjnie
+zatwierdzić zadaniem administratora (10 min). Wspólna oś czasu pokazuje tylko
+pozyskane informacje; robocze hipotezy wraz z wiedzą w chwili decyzji trafiają
+do jednego AAR M06. Debrief rozdziela poufność, integralność, dostępność,
+ciągłość i pewność operacyjną. Ukończenie oznacza zamknięcie rozdziału bez
+blokowania powtórek i usuwania wcześniejszej historii.
+
 ## FORTRESS LAB — Misja 05: The New Branch (Sprint 14)
 
 Po dowolnym ukończonym M04 Centrala udostępnia **Projekt architektury — NEXUS EAST**.
@@ -20,8 +37,8 @@ Monitoring widzi metadane przekazania, a audyt FS-01 tylko rzeczywiste żądania
 na serwerze. Raport i AAR M05 pokazują konfigurację, przepływy, ekspozycję,
 wiedzę przed decyzją i pozostałe ryzyko bez wymyślania alternatywnych wyników.
 
-Aktywny zapis **V8**: silnik `14.0.0`, treść `nexus-east-1`, klucz
-`fortress-lab.game.v8`. Odczyt V1–V7 i oryginalne bajty pozostają zachowane.
+Aktywny zapis **V9**: silnik `15.0.0`, treść `nexus-finale-1`, klucz
+`fortress-lab.game.v9`. Odczyt V1–V8 i oryginalne bajty pozostają zachowane.
 12 osób i 8 komputerów oddziału przeniesiono z centrali: nadal 120/94 w firmie.
 Model ma dwie jawne drogi, bez edytora sieci, prawdziwego VPN i routingu IP.
 
@@ -232,7 +249,7 @@ sesje, dowody, kolejkę zamówień i prywatny stan symulacji.
 - **Eksportuj zapis** pobiera kompletny JSON. **Importuj zapis** sprawdza wersje,
   strukturę i spójność z historią komend przed potwierdzeniem zastąpienia gry.
   Błędny plik nie zmienia bieżącego świata ani lokalnego zapisu. Nowe zapisy mają
-  format V8; poprzednie oryginały V1/V2/V3/V4/V5/V6/V7 pozostają zachowane i możliwe do wyeksportowania.
+  format V9; poprzednie oryginały V1/V2/V3/V4/V5/V6/V7/V8 pozostają zachowane i możliwe do wyeksportowania.
 - **Historia prób** porównuje ostatnie 50 zakończonych operacji: ujawnione dane,
   działalność, ograniczenie dostępu i działania samodzielnych misji. Wyniki strategii
   znajdziesz w Centrali w historii bieżącej kampanii. Powtórka tworzy nową próbę tego

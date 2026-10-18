@@ -381,6 +381,19 @@ export class MissionTrace {
           result.taskId,
         );
     }
+    for (const [n, e] of (s.finale?.events ?? []).entries())
+      this.once(`finale-event:${n}`, () =>
+        this.emit(
+          'finale-event',
+          s,
+          'actor-resolution',
+          'finale-coordination',
+          'occurred',
+          e,
+          {},
+          e.minute,
+        ),
+      );
     for (const o of s.recovery?.observations ?? [])
       this.addEvidence(
         s,
@@ -630,7 +643,9 @@ export class MissionTrace {
         knownAtDecision: knownAtDecision(before, this.evidence, this.ordinal),
         actualStateAtDecision: actualState(before),
         expectedEffect: null,
-        intentRecorded: false,
+        intentRecorded:
+          command.type === 'schedule-task' &&
+          command.action.type === 'approve-emergency-vendor-access',
         actualEffect: null,
         subsequentConsequences: {
           afterEventId: issued,

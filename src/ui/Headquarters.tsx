@@ -174,7 +174,39 @@ export function Headquarters({
         </section>
       )}
       {view.history.some((r) => r.recovery) && (
-        <BranchPreparation campaign={session.campaign} onCommand={onCommand} />
+        <>
+          <BranchPreparation
+            campaign={session.campaign}
+            onCommand={onCommand}
+          />
+          <section className="vendor-card" aria-label="Finał kampanii M06">
+            <p className="eyebrow">THE PERFECT STORM / FINAŁ ROZDZIAŁU</p>
+            <h2>06 — Kryzys w NEXUS</h2>
+            <p>
+              {session.campaign.chapterOneCompleted
+                ? 'Pierwszy rozdział ukończony. Historia pozostaje; możesz ponowić finał.'
+                : 'Finał dostępny po dowolnym ukończeniu M05, także porażce.'}{' '}
+              Jedno okno 90 minut, wspólne 8 + 8 + 3 + 3 zamówień wydajności.
+              Wykorzystaj bieżące cztery godziny na inwestycje, EDR, EAST i nowy
+              wyjątek dostawcy. Poprzednie wyjątki nie przechodzą automatycznie.
+            </p>
+            <button
+              className="primary-button"
+              disabled={
+                !view.history.some((r) => r.branch) ||
+                view.preparation.hour !== 4
+              }
+              onClick={() =>
+                onCommand({
+                  type: 'start-finale-incident',
+                  familyId: 'nexus-campaign-finale-v1',
+                })
+              }
+            >
+              Rozpocznij Misję 06 — finał
+            </button>
+          </section>
+        </>
       )}
       <div className="hq-window">
         <div>

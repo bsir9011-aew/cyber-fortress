@@ -44,6 +44,15 @@ export function actualState(state: SimulationState): AarActualState {
     i = state.integrity,
     d = state.hidden.scenario.integrity;
   return {
+    ...(state.finale
+      ? {
+          campaignFinale: facts({
+            definition: state.hidden.scenario.finale,
+            faultInjected: state.finale.faultInjected,
+            events: state.finale.events,
+          }),
+        }
+      : {}),
     ...(state.recovery
       ? {
           erpRecovery: facts({
@@ -69,8 +78,18 @@ export function actualState(state: SimulationState): AarActualState {
             serviceChecks: state.branch.contexts.flatMap((c) => [
               {
                 contextId: c.id,
-                target: 'erp',
-                ...assessBranchAccess(state, c.id, 'erp', 'HTTPS'),
+                target:
+                  state.finale && state.recovery?.activeInstance === 'standby'
+                    ? 'erp-standby'
+                    : 'erp',
+                ...assessBranchAccess(
+                  state,
+                  c.id,
+                  state.finale && state.recovery?.activeInstance === 'standby'
+                    ? 'erp-standby'
+                    : 'erp',
+                  'HTTPS',
+                ),
               },
               {
                 contextId: c.id,
@@ -112,9 +131,10 @@ export function actualState(state: SimulationState): AarActualState {
         ),
       })),
     ),
-    exposedRecords: state.branch
-      ? branchOutcome(state).exposedRecords
-      : (state.hidden.attacker?.transfer.exposedRecords ?? 0),
+    exposedRecords:
+      state.branch && !state.finale
+        ? branchOutcome(state).exposedRecords
+        : (state.hidden.attacker?.transfer.exposedRecords ?? 0),
     endpoint:
       i && d
         ? facts({
@@ -157,9 +177,18 @@ export function knownAtDecision(
     sessions: v.sessionObservation?.sessions ?? null,
     hypotheses: {
       vpn: v.hypothesis,
+      ...(v.finale ? { crisis: v.finale.hypothesis } : {}),
       integrity: v.integrity?.hypothesis ?? null,
     },
     configuration: {
+      ...(v.finale
+        ? {
+            campaignFinale: facts({
+              hypothesis: v.finale.hypothesis,
+              observationIds: v.finale.timeline.map((o) => o.id),
+            }),
+          }
+        : {}),
       ...(v.branch ? { branchAccess: facts(v.branch) } : {}),
       ...(v.recovery ? { erpRecovery: facts(v.recovery) } : {}),
       assets: v.world.assets.map((a) => ({
@@ -228,7 +257,10 @@ export function actionTarget(
   action:
     | TaskAction
     | {
-        type: 'set-hypothesis' | 'set-integrity-hypothesis';
+        type:
+          | 'set-hypothesis'
+          | 'set-integrity-hypothesis'
+          | 'set-crisis-hypothesis';
         hypothesis: string;
       },
 ) {

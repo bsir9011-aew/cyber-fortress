@@ -1330,3 +1330,63 @@ div.evidence-empty {
     grid-template-columns: 1fr;
   }
 }
+
+.finale-workspace {
+  width: min(1500px, 100%);
+  margin: auto;
+  padding: 1rem;
+}
+.finale-header,
+.finale-tabs {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.finale-header h1 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+.finale-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 360px);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.finale-grid main,
+.finale-grid aside {
+  min-width: 0;
+}
+.finale-debrief-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.finale-observation {
+  border-top: 1px solid var(--border, #354151);
+  padding: 1rem 0;
+  overflow-wrap: anywhere;
+}
+.finale-action-group {
+  border-top: 1px solid #354151;
+  padding: 0.8rem 0;
+}
+.finale-action-group summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.finale-workspace select,
+.finale-workspace input {
+  max-width: 100%;
+  width: 100%;
+  margin: 0.4rem 0;
+}
+@media (max-width: 900px) {
+  .finale-grid,
+  .finale-debrief-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .finale-workspace {
+    padding: 0.6rem;
+  }
+}

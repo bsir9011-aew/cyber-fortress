@@ -1,3 +1,4 @@
+import { FinaleWorkspace } from './FinaleWorkspace';
 import { BranchPanel } from './BranchPanel';
 import { BranchReport } from './BranchReport';
 import { RecoveryPanel } from './RecoveryPanel';
@@ -133,6 +134,17 @@ export function MissionWorkspace({
     startRun(run.mode, run.seed);
   }
 
+  if (view.finale)
+    return (
+      <FinaleWorkspace
+        view={view}
+        report={report?.finale ?? null}
+        game={operations.game}
+        onCommand={onCommand}
+        onHeadquarters={newIncident}
+        onMenu={onMenu}
+      />
+    );
   return (
     <>
       {operations.game.kind === 'campaign' && (

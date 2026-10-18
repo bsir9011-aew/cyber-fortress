@@ -1,3 +1,4 @@
+import { CURRENT_GAME_SAVE_KEY as V9 } from '../persistence/gameSaveV9';
 import { describe, it, expect } from 'vitest';
 import type { GameSession, StrategicSession } from './gameSession';
 import { createStrategicSession, currentOperation } from './gameSession';
@@ -35,7 +36,6 @@ import {
   serializeCurrentGameSave,
   isCurrentCampaignCommand,
   isCurrentRecordedCommand,
-  CURRENT_GAME_SAVE_KEY as V8,
 } from '../persistence/gameSaveV8';
 import {
   createCurrentGameSave as saveV7,
@@ -367,8 +367,8 @@ describe('EAST gameplay, evidence and versioned journals', () => {
     expect(loadCurrentGameState(storage).seventhRaw).toBe(raw);
     expect(storeCurrentGameState(storage, g, reportDate).ok).toBe(true);
     expect(data.get(V7)).toBe(raw);
-    expect(JSON.parse(data.get(V8)!).schemaVersion).toBe(8);
-    data.set(V8, 'broken');
+    expect(JSON.parse(data.get(V9)!).schemaVersion).toBe(9);
+    data.set(V9, 'broken');
     expect(loadCurrentGameState(storage).result.ok).toBe(false);
     expect(data.get(V7)).toBe(raw);
   });

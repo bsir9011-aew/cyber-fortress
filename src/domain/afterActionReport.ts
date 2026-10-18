@@ -58,6 +58,7 @@ export interface KnownAtDecision {
   readonly hypotheses: {
     readonly vpn: string;
     readonly integrity: string | null;
+    readonly crisis?: string;
   };
   readonly configuration: {
     readonly assets: readonly {
@@ -76,6 +77,7 @@ export interface KnownAtDecision {
     readonly vendorAuthorization?: AarData;
     readonly erpRecovery?: AarData;
     readonly branchAccess?: AarData;
+    readonly campaignFinale?: AarData;
   };
   readonly business: BusinessState;
   readonly pendingTasks: readonly EmployeeTask[];
@@ -83,6 +85,7 @@ export interface KnownAtDecision {
   readonly unknowns: readonly string[];
 }
 export interface AarActualState {
+  readonly campaignFinale?: AarData;
   readonly erpRecovery?: AarData;
   readonly branchAccess?: AarData;
   readonly vendorAuthorization?: AarData;
@@ -138,7 +141,10 @@ export interface AarDecision {
   readonly action:
     | TaskAction
     | {
-        readonly type: 'set-hypothesis' | 'set-integrity-hypothesis';
+        readonly type:
+          | 'set-hypothesis'
+          | 'set-integrity-hypothesis'
+          | 'set-crisis-hypothesis';
         readonly hypothesis: string;
       };
   readonly target: {
@@ -153,7 +159,7 @@ export interface AarDecision {
   readonly knownAtDecision: KnownAtDecision;
   readonly actualStateAtDecision: AarActualState;
   readonly expectedEffect: null;
-  readonly intentRecorded: false;
+  readonly intentRecorded: boolean;
   readonly actualEffect: {
     readonly scope: 'completion-boundary-including-concurrent-events';
     readonly boundaryState: AarActualState;
@@ -200,8 +206,20 @@ export interface FortressAfterActionReportV1 {
   readonly generatedAt: string;
   readonly gameVersion: {
     readonly application: '0.2.0';
-    readonly engine: '9.0.0' | '11.0.0' | '12.0.0' | '13.0.0' | '14.0.0';
-    readonly reportGenerator: '1.0.0' | '1.1.0' | '1.2.0' | '1.3.0' | '1.4.0';
+    readonly engine:
+      | '9.0.0'
+      | '11.0.0'
+      | '12.0.0'
+      | '13.0.0'
+      | '14.0.0'
+      | '15.0.0';
+    readonly reportGenerator:
+      | '1.0.0'
+      | '1.1.0'
+      | '1.2.0'
+      | '1.3.0'
+      | '1.4.0'
+      | '1.5.0';
   };
   readonly fieldGuide: Readonly<Record<string, string>>;
   readonly organization: {
@@ -211,12 +229,13 @@ export interface FortressAfterActionReportV1 {
   };
   readonly scenario: {
     readonly id: string;
-    readonly family: 'M01' | 'M02' | 'M03' | 'M04' | 'M05';
+    readonly family: 'M01' | 'M02' | 'M03' | 'M04' | 'M05' | 'M06';
     readonly variantFamilyId?:
       | 'nexus-integrity-detection-v1'
       | 'nexus-vendor-access-v1'
       | 'nexus-erp-recovery-v1'
-      | 'nexus-east-branch-v1';
+      | 'nexus-east-branch-v1'
+      | 'nexus-campaign-finale-v1';
     readonly name: string;
     readonly kind: string;
     readonly mode: string;
@@ -269,6 +288,7 @@ export interface FortressAfterActionReportV1 {
     readonly vendorAccess?: AarData;
     readonly erpRecovery?: AarData;
     readonly branchAccess?: AarData;
+    readonly campaignFinale?: AarData;
   };
   readonly businessConsequences: {
     readonly ordersReceived: number;

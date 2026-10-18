@@ -72,6 +72,7 @@ export function App() {
         fifthRaw={operations.fifthRaw}
         sixthRaw={operations.sixthRaw}
         seventhRaw={operations.seventhRaw}
+        eighthRaw={operations.eighthRaw}
         canExport={operations.canResume}
         status={operations.saveStatus}
         error={operations.saveError}

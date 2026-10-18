@@ -258,7 +258,9 @@ export function recordLegalBranchActivity(s: SimulationState): SimulationState {
   let next = recordOperation(
     s,
     'EAST-OP',
-    'erp',
+    s.finale && s.recovery?.activeInstance === 'standby'
+      ? 'erp-standby'
+      : 'erp',
     'HTTPS',
     'work',
     'legitimate',
@@ -267,7 +269,9 @@ export function recordLegalBranchActivity(s: SimulationState): SimulationState {
   next = recordOperation(
     next,
     'EAST-DOC',
-    'erp',
+    s.finale && s.recovery?.activeInstance === 'standby'
+      ? 'erp-standby'
+      : 'erp',
     'HTTPS',
     'work',
     'legitimate',
@@ -467,9 +471,11 @@ export function applyBranchTask(
       observe(
         'NEXUS EAST operations',
         'human-statement',
-        d.requiresDocuments
-          ? 'Operacje potwierdzają: od 14:10 dwa z sześciu zleceń wymagają tylko ERP, cztery także FS-01/SMB z konta east-documents. Konto east-operator nie potrzebuje plików. To relacja zespołu; nie dowodzi pochodzenia obserwowanego ruchu.'
-          : 'Operacje potwierdzają: sześć zleceń wymaga ERP/HTTPS (cztery east-operator, dwa east-documents). W tym oknie nie zlecono pracy z FS-01/SMB. To relacja zespołu; sam ruch SMB nie identyfikuje człowieka ani nie dowodzi odczytu danych.',
+        s.finale
+          ? 'Operacje finału: EAST wnosi do 3 zamówień/turę — jedno tylko ERP z east-operator, dwa wymagają ERP i poprawnych dokumentów FS-01 z east-documents. Backup przenosi wyłącznie HTTPS. Użyteczna praca wymaga także aktywnej poprawnej bazy ERP. Relacja zespołu nie ustala zamiaru obserwowanego ruchu.'
+          : d.requiresDocuments
+            ? 'Operacje potwierdzają: od 14:10 dwa z sześciu zleceń wymagają tylko ERP, cztery także FS-01/SMB z konta east-documents. Konto east-operator nie potrzebuje plików. To relacja zespołu; nie dowodzi pochodzenia obserwowanego ruchu.'
+            : 'Operacje potwierdzają: sześć zleceń wymaga ERP/HTTPS (cztery east-operator, dwa east-documents). W tym oknie nie zlecono pracy z FS-01/SMB. To relacja zespołu; sam ruch SMB nie identyfikuje człowieka ani nie dowodzi odczytu danych.',
       );
       break;
     case 'activate-branch-route':

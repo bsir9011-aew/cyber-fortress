@@ -1,3 +1,4 @@
+import { finaleBusinessAvailability } from './finaleAvailability';
 import { branchWorkAvailability } from './branchAccess';
 import { recoveryBusinessAvailability } from './recoveryAccess';
 import { vendorWorkAvailable } from './vendor';
@@ -21,6 +22,7 @@ export function isBusinessGoalMet(state: SimulationState): boolean {
 export function businessAvailability(
   state: SimulationState,
 ): ProcessAvailability {
+  if (state.finale) return finaleBusinessAvailability(state);
   if (state.recovery) return recoveryBusinessAvailability(state);
   const { world, access, process } = state;
   const localAvailable = networkAllows(world, access, {

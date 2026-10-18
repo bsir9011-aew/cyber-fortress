@@ -179,6 +179,38 @@ export function recordRecoveryBusiness(
   const eligible = r.manualActive
     ? manualEligible(state)
     : orders.filter((o) => o.fulfilledBy === null).map((o) => o.id);
+  if (state.finale) {
+    const processed = business.lastReport!.processed;
+    const manualCount = r.manualActive
+      ? Math.min(
+          processed,
+          business.lastReport!.contributions?.find(
+            (c) => c.id === 'manual-shipping',
+          )?.capacity ?? 0,
+        )
+      : 0;
+    const manualIds = manualEligible(state).slice(0, manualCount);
+    const erpIds = orders
+      .filter((o) => o.fulfilledBy === null && !manualIds.includes(o.id))
+      .slice(0, processed - manualIds.length)
+      .map((o) => o.id);
+    return put(state, {
+      ...r,
+      orders: orders.map((o) =>
+        manualIds.includes(o.id) || erpIds.includes(o.id)
+          ? {
+              ...o,
+              fulfilledBy: manualIds.includes(o.id) ? 'manual' : 'erp',
+              fulfilledAtMinute: minute,
+            }
+          : o,
+      ),
+      [r.activeInstance]: {
+        ...r[r.activeInstance],
+        postedOrderIds: [...r[r.activeInstance].postedOrderIds, ...erpIds],
+      },
+    });
+  }
   const selected = eligible.slice(0, business.lastReport!.processed);
   const mode = r.manualActive ? ('manual' as const) : ('erp' as const);
   return put(state, {
@@ -307,7 +339,7 @@ export function applyRecoveryTask(
     case 'contact-warehouse-operations':
       observe(
         'Warehouse journal',
-        `Lokalny dziennik na ${d.reconciliationSource.assetId} zawiera ${d.reconciliationSource.recordIds.length} zatwierdzonych zapisów: ${d.reconciliationSource.recordIds.join(', ')}. Manifesty ORD-001–ORD-${d.manualManifestLimit} pozwalają wysłać do 10 zamówień na turę. Rejestr wykonanych wysyłek jest niezależny od dysku ERP i musi zostać uzgodniony po zamknięciu trybu ręcznego.`,
+        `Lokalny dziennik na ${d.reconciliationSource.assetId} zawiera ${d.reconciliationSource.recordIds.length} zatwierdzonych zapisów: ${d.reconciliationSource.recordIds.join(', ')}. Manifesty ORD-001–ORD-${d.manualManifestLimit} pozwalają wysłać do ${state.finale ? 8 : 10} zamówień na turę${state.finale ? ' zamiast lokalnej części pracy ERP' : ''}. Rejestr wykonanych wysyłek jest niezależny od dysku ERP i musi zostać uzgodniony po zamknięciu trybu ręcznego.`,
         [d.reconciliationSource.assetId],
       );
       break;
@@ -427,8 +459,9 @@ export function applyRecoveryTask(
         failure('Lokalne manifesty niedostępne.');
       else {
         r = { ...r, manualActive: true };
-        text =
-          'Uruchomiono obsługę ręczną: do 10/turę, tylko przygotowane manifesty; ERP nie obsługuje równolegle tej samej kolejki.';
+        text = state.finale
+          ? 'Uruchomiono ręczne manifesty dla lokalnej części kolejki (do 8/turę), zamiast jej obsługi w ERP. Pozostałe procesy mają odrębne zależności; jeden rejestr wyklucza powtórną wysyłkę.'
+          : 'Uruchomiono obsługę ręczną: do 10/turę, tylko przygotowane manifesty; ERP nie obsługuje równolegle tej samej kolejki.';
       }
       break;
     case 'close-manual-shipping':

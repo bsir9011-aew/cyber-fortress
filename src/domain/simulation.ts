@@ -1,3 +1,4 @@
+import type { FinaleState, FinaleTaskAction, CrisisHypothesis } from './finale';
 import type { BranchState, BranchTaskAction } from './branch';
 import type { RecoveryState, RecoveryTaskAction } from './recovery';
 import type { VendorState, VendorTaskAction } from './vendor';
@@ -87,6 +88,7 @@ export interface BusinessState {
 
 export type WorkerId = 'analyst' | 'administrator';
 export type TaskAction =
+  | FinaleTaskAction
   | BranchTaskAction
   | RecoveryTaskAction
   | VendorTaskAction
@@ -121,6 +123,10 @@ export interface EmployeeTask {
 }
 
 export type SimulationCommand =
+  | {
+      readonly type: 'set-crisis-hypothesis';
+      readonly hypothesis: CrisisHypothesis;
+    }
   | {
       readonly type: 'set-integrity-hypothesis';
       readonly hypothesis: IntegrityState['hypothesis'];
@@ -189,6 +195,7 @@ export type SimulationEventData =
 export type SimulationEvent = EventBase & SimulationEventData;
 
 export interface SimulationState {
+  readonly finale?: FinaleState;
   readonly branch?: BranchState;
   readonly recovery?: RecoveryState;
   readonly vendor?: VendorState;

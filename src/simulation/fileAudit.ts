@@ -82,7 +82,7 @@ export function attemptFileAccess(
 export function recordLegalFileActivity(
   state: SimulationState,
 ): SimulationState {
-  if (state.branch) return state;
+  if (state.branch && !state.finale) return state;
   if (state.integrity)
     return resolveLocalFileOperation(
       state,

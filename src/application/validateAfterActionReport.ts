@@ -61,6 +61,37 @@ export function validateAfterActionReport(
         : null)
     )
       return bad();
+  } else if (r.scenario.family === 'M06') {
+    const f = r.securityConsequences.campaignFinale;
+    if (
+      !f ||
+      !isObject(f) ||
+      f.goalMet !== r.finalOutcome.allObjectivesMet ||
+      f.exposedRecords !== r.securityConsequences.exposedRecords ||
+      r.finalOutcome.confidentialityMet !==
+        (r.securityConsequences.exposedRecords === 0) ||
+      !documents ||
+      !f.documents ||
+      !isObject(f.documents) ||
+      f.documents.correct !== documents.correct ||
+      f.documents.damaged !== documents.damaged ||
+      f.documents.reconcile !== documents.reconcile ||
+      f.confidentialityMet !== r.finalOutcome.confidentialityMet ||
+      f.containmentMet !== r.finalOutcome.containmentMet ||
+      f.integrityMet !== r.finalOutcome.integrityMet ||
+      f.servicesMet !== r.finalOutcome.serviceRecoveryMet ||
+      f.confidenceMet !== r.finalOutcome.operationalConfidenceMet ||
+      f.reconciliationMet !== r.finalOutcome.manualClosedMet
+    )
+      return bad();
+    if (
+      b.perTurn.some(
+        (t) =>
+          t.capacity > 22 ||
+          t.contributions?.reduce((n, c) => n + c.capacity, 0) !== t.capacity,
+      )
+    )
+      return bad();
   } else if (r.scenario.family === 'M05') {
     const branch = r.securityConsequences.branchAccess;
     if (
@@ -177,6 +208,11 @@ export function validateAfterActionReport(
       return bad();
   }
   for (const d of r.playerDecisions) {
+    if (
+      d.intentRecorded !==
+      (d.action.type === 'approve-emergency-vendor-access')
+    )
+      return bad();
     if (
       d.knownAtDecision.asOfCommand !== d.commandOrdinal ||
       d.knownAtDecision.at.minute !== d.issuedAt.minute ||

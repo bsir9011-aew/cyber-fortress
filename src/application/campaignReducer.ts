@@ -25,6 +25,7 @@ import {
   createVendorIncident,
   createRecoveryIncident,
   createBranchIncident,
+  createFinaleIncident,
 } from './prepareCampaignIncident';
 import { simulationReducer } from './simulationReducer';
 import { selectMissionReport } from './selectMissionReport';
@@ -168,7 +169,15 @@ export function campaignReducer(
       ? [
           ...state.history,
           {
-            ...(report.branch
+            ...(report.finale
+              ? {
+                  finale: {
+                    outcome: report.finale.outcome,
+                    goalMet: report.finale.goalMet,
+                  },
+                }
+              : {}),
+            ...(report.branch && !report.finale
               ? {
                   branch: {
                     ready: report.branch.ready,
@@ -210,13 +219,15 @@ export function campaignReducer(
             exposedRecords: report.confidentiality.exposedRecords,
             processed: report.continuity.processed,
             backlog: report.continuity.backlog,
-            containmentMet: report.branch
-              ? report.branch.kind === 'compromised-context'
-                ? !report.branch.remainingAccess
-                : null
-              : report.integrity
-                ? !report.integrity.summary.sourceHasWrite
-                : report.containment.goalMet,
+            containmentMet: report.finale
+              ? report.finale.containmentMet
+              : report.branch
+                ? report.branch.kind === 'compromised-context'
+                  ? !report.branch.remainingAccess
+                  : null
+                : report.integrity
+                  ? !report.integrity.summary.sourceHasWrite
+                  : report.containment.goalMet,
             spent: budgetBalance(state).spent,
             activeProjects: state.projects
               .filter((p) => p.status === 'completed')
@@ -246,7 +257,13 @@ export function campaignReducer(
       : state.history;
     return decide(
       state,
-      { ...state, incident, phase: report ? 'report' : 'incident', history },
+      {
+        ...state,
+        incident,
+        phase: report ? 'report' : 'incident',
+        history,
+        ...(report?.finale ? { chapterOneCompleted: true } : {}),
+      },
       command,
     );
   }
@@ -328,6 +345,46 @@ export function campaignReducer(
     return reason
       ? reject(reason)
       : decide(state, beginBranchPreparation(state, command.change), command);
+  }
+  if (command.type === 'start-finale-incident') {
+    if (command.familyId !== 'nexus-campaign-finale-v1')
+      return reject('Nieznana rodzina finału.');
+    if (!state.history.some((r) => r.branch))
+      return reject('Najpierw ukończ Misję 05.');
+    if (state.preparation.hour !== 4)
+      return reject('Najpierw rozlicz czterogodzinne okno.');
+    const approval = [...(state.vendorApprovals ?? [])]
+      .reverse()
+      .find(
+        (a) =>
+          a.window === state.preparation.number &&
+          a.completedHour !== null &&
+          a.usedInWindow === null,
+      );
+    return decide(
+      state,
+      {
+        ...state,
+        phase: 'incident',
+        ...(state.vendorApprovals
+          ? {
+              vendorApprovals: state.vendorApprovals.map((a) =>
+                a === approval
+                  ? { ...a, usedInWindow: state.preparation.number }
+                  : a,
+              ),
+            }
+          : {}),
+        incident: createFinaleIncident(
+          state.nextSeed,
+          state.posture,
+          command.familyId,
+          state.branchArchitecture ?? defaultBranchArchitecture,
+          approval,
+        ),
+      },
+      command,
+    );
   }
   if (command.type === 'start-branch-incident') {
     if (command.familyId !== 'nexus-east-branch-v1')

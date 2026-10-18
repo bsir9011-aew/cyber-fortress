@@ -25,10 +25,12 @@ export function selectIntegrityReport(state: SimulationState) {
     );
   const summary: IntegrityMissionSummary = {
     serviceOnline: isAssetOnline(state.world, d.datasetAssetId),
-    dataAvailable:
-      businessAvailability(state).contributions?.find(
-        (c) => c.id === 'correct-documents',
-      )?.available === true,
+    dataAvailable: state.finale
+      ? isAssetOnline(state.world, d.datasetAssetId) &&
+        i.documents.every((doc) => doc.status === 'correct')
+      : businessAvailability(state).contributions?.find(
+          (c) => c.id === 'correct-documents',
+        )?.available === true,
     ...documentCounts(i.documents),
     everDamaged: i.documents.filter((doc) => doc.everDamaged).length,
     sourceHasWrite,
