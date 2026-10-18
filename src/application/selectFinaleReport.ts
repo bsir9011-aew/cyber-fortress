@@ -46,15 +46,40 @@ export function selectFinaleReport(s: SimulationState) {
     );
   const continuityMet = s.business.backlog <= 40;
   const reconciliationMet = pendingOrders.length === 0 && !r.manualActive;
-  const confidenceMet =
+  const erpVerificationRequired =
+    r.revision > 0 ||
+    r.orders.some((order) => order.fulfilledBy === 'manual') ||
+    pendingOrders.length > 0;
+  const documentVerificationRequired =
+    i.recoveries.length > 0 || i.reconciledIds.length > 0;
+  const erpVerified =
     r.verifiedRevision === r.revision &&
-    (!i.recoveries.length || i.verifiedRecoveryMinute !== null);
+    erp.consistent &&
+    erp.missingRecordIds.length === 0 &&
+    reconciliationMet;
+  const documentsVerified =
+    i.verifiedRecoveryMinute !== null &&
+    i.observations.some(
+      (observation) =>
+        observation.revision === i.revision &&
+        observation.correct === documents.total &&
+        observation.scope.length === documents.total &&
+        observation.damaged === 0 &&
+        observation.reconcile === 0,
+    );
+  const confidenceMet =
+    (!erpVerificationRequired || erpVerified) &&
+    (!documentVerificationRequired || documentsVerified);
   const securityMet = exposedRecords === 0 && containmentMet && integrityMet;
   const goalMet =
-    securityMet && servicesMet && continuityMet && reconciliationMet;
+    securityMet &&
+    servicesMet &&
+    continuityMet &&
+    reconciliationMet &&
+    confidenceMet;
   const outcome = goalMet
     ? 'full-success'
-    : servicesMet && continuityMet && reconciliationMet
+    : !securityMet && servicesMet && continuityMet && reconciliationMet
       ? 'operational-success-with-security-breach'
       : containmentMet && (localThreat || vpn.applicable) && !servicesMet
         ? 'contained-with-business-unavailable'
@@ -222,6 +247,12 @@ export function selectFinaleReport(s: SimulationState) {
     continuityMet,
     reconciliationMet,
     confidenceMet,
+    verification: {
+      erpRequired: erpVerificationRequired,
+      documentsRequired: documentVerificationRequired,
+      erpVerified,
+      documentsVerified,
+    },
     exposedRecords,
     remainingAccess,
     localWrite,

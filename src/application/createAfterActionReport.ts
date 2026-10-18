@@ -316,6 +316,9 @@ export function createAfterActionReport(
               maxCapacity: 22,
               manualReconciliationRequired: true,
               requireUsefulProcesses: true,
+              verifiedRecoveryRequired:
+                finale.verification.erpRequired ||
+                finale.verification.documentsRequired,
             }
           : {
               ...(branch
@@ -365,6 +368,7 @@ export function createAfterActionReport(
             integrityMet: finale.integrityMet,
             serviceRecoveryMet: finale.servicesMet,
             manualClosedMet: finale.reconciliationMet,
+            operationalConfidenceMet: finale.confidenceMet,
             allObjectivesMet: finale.goalMet,
           }
         : {

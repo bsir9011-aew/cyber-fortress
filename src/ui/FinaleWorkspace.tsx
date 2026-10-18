@@ -106,9 +106,11 @@ export function FinaleWorkspace({
             </p>
             <p>
               Operational Confidence:{' '}
-              {r.confidenceMet
-                ? 'ostatni stan potwierdzony'
-                : 'brak aktualnej weryfikacji'}
+              {!r.verification.erpRequired && !r.verification.documentsRequired
+                ? 'nie wykonano odzyskiwania wymagającego końcowej weryfikacji'
+                : r.confidenceMet
+                  ? 'ostatni stan potwierdzony'
+                  : 'brak aktualnej weryfikacji'}
               . Zakończono{' '}
               {
                 r.tasks.filter(

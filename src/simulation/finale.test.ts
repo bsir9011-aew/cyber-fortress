@@ -141,10 +141,15 @@ describe('M06 — one deterministic coordinated crisis', () => {
     expect(s.recovery!.activeInstance).toBe('standby');
     expect(pendingErpOrderIds(s)).toEqual([]);
   });
-  it('has a full false-lead strategy without unnecessary containment', () => {
+  it('has a full false-lead strategy without unnecessary containment or recovery verification', () => {
     const s = finish(make(1));
+    expect(s.recovery!.verifiedRevision).toBeNull();
+    expect(s.integrity!.verifiedRecoveryMinute).toBeNull();
     expect(selectFinaleReport(s)).toMatchObject({
       goalMet: true,
+      outcome: 'full-success',
+      confidenceMet: true,
+      verification: { erpRequired: false, documentsRequired: false },
       documents: { correct: 100 },
       exposedRecords: 0,
     });

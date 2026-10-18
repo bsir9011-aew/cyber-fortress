@@ -305,4 +305,104 @@ describe('M06 campaign, replay and one after action review', () => {
       'Awaryjna realizacja przewozów NEXUS',
     );
   });
+  it.each([
+    ['ERP without verification', 'erp', 'none', false],
+    ['ERP with verification before the restore only', 'erp', 'before', false],
+    [
+      'ERP with current verification after restore and reconciliation',
+      'erp',
+      'after',
+      true,
+    ],
+    [
+      'FS-01 restored without document verification',
+      'documents',
+      'none',
+      false,
+    ],
+    [
+      'FS-01 restored and its current documents verified',
+      'documents',
+      'after',
+      true,
+    ],
+  ] as const)(
+    '%s produces the same result in the report, campaign history and AAR',
+    (_name, target, verification, success) => {
+      let g = startFinale(1);
+      if (target === 'erp') {
+        if (verification === 'before')
+          g = job(g, { type: 'inspect-erp-consistency' }) as StrategicSession;
+        g = job(g, { type: 'inspect-erp-backups' }) as StrategicSession;
+        g = job(g, {
+          type: 'restore-erp-backup',
+          backupId: 'ERP-1350',
+        }) as StrategicSession;
+        g = job(g, { type: 'reconcile-erp-records' }) as StrategicSession;
+        if (verification === 'after')
+          g = job(g, { type: 'inspect-erp-consistency' }) as StrategicSession;
+      } else {
+        // Legal modifications have ended: this tests confirmation of the restore itself.
+        g = advance(g, 7) as StrategicSession;
+        g = job(g, { type: 'inspect-backups' }) as StrategicSession;
+        g = job(g, {
+          type: 'verify-backup',
+          backupId: 'FS-1350',
+        }) as StrategicSession;
+        g = job(g, {
+          type: 'restore-documents',
+          backupId: 'FS-1350',
+        }) as StrategicSession;
+        if (verification === 'after')
+          g = job(g, { type: 'inspect-documents' }) as StrategicSession;
+      }
+      g = finish(g) as StrategicSession;
+      const report = selectFinaleReport(simulation(g))!;
+      expect(report).toMatchObject({
+        confidentialityMet: true,
+        containmentMet: true,
+        integrityMet: true,
+        servicesMet: true,
+        continuityMet: true,
+        reconciliationMet: true,
+        confidenceMet: success,
+        goalMet: success,
+        outcome: success ? 'full-success' : 'partial-recovery',
+        verification: {
+          erpRequired: target === 'erp',
+          documentsRequired: target === 'documents',
+        },
+      });
+      expect(g.campaign.history.at(-1)!.finale).toEqual({
+        goalMet: report.goalMet,
+        outcome: report.outcome,
+      });
+      const aar = createAfterActionReport(g, undefined, reportDate);
+      expect(aar.ok, aar.ok ? '' : aar.error).toBe(true);
+      if (!aar.ok) return;
+      expect(aar.value.finalOutcome).toMatchObject({
+        confidentialityMet: true,
+        integrityMet: true,
+        serviceRecoveryMet: true,
+        continuityMet: true,
+        operationalConfidenceMet: success,
+        allObjectivesMet: success,
+      });
+      expect(aar.value.securityConsequences.campaignFinale).toMatchObject({
+        goalMet: report.goalMet,
+        outcome: report.outcome,
+        confidenceMet: report.confidenceMet,
+      });
+      expect(validateAfterActionReport(aar.value).ok).toBe(true);
+      expect(
+        validateAfterActionReport({
+          ...aar.value,
+          finalOutcome: {
+            ...aar.value.finalOutcome,
+            operationalConfidenceMet: !success,
+          },
+        }).ok,
+      ).toBe(false);
+    },
+  );
 });

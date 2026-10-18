@@ -80,6 +80,7 @@ export function validateAfterActionReport(
       f.containmentMet !== r.finalOutcome.containmentMet ||
       f.integrityMet !== r.finalOutcome.integrityMet ||
       f.servicesMet !== r.finalOutcome.serviceRecoveryMet ||
+      f.confidenceMet !== r.finalOutcome.operationalConfidenceMet ||
       f.reconciliationMet !== r.finalOutcome.manualClosedMet
     )
       return bad();
